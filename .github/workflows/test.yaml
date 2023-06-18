@@ -1,0 +1,46 @@
+name: Run Test
+
+on:
+  pull_request:
+    paths:
+      - wacruit/**
+      - .github/workflows/test.yaml
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install poetry
+        run: pipx install poetry
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+          cache: poetry
+
+      - name: Set poetry environment
+        run: |
+          poetry env use 3.11
+
+      - name: Install dependencies
+        run: poetry install --no-root
+
+      - name: Run tests
+        run: |
+          cd ${GITHUB_WORKSPACE}/wacruit/
+          poetry run pytest --junit-xml=${GITHUB_WORKSPACE}/wacruit/test.xml ./
+
+      - name: Test reports
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: backend tests
+          path: "./wacruit/test.xml"
+          reporter: java-junit
+
+      - name: Check Pylint
+        run: |
+          poetry run pylint -rn -sn --rcfile=${GITHUB_WORKSPACE}/.pylintrc ./wacruit
