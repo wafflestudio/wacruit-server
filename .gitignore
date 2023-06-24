@@ -1,0 +1,45 @@
+### Python ###
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Sqlite
+db.sqlite3
+
+# Environments
+.env
+.venv
+
+# VScode
+.vscode
+
+# Pycharm
+.idea/
+wacruit/.idea/
+
+# yarn
+node_modules
+
+*.local
+*.pickle
+.DS_Store

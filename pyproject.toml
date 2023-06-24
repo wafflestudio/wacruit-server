@@ -1,0 +1,52 @@
+[tool.poetry]
+name = "wacruit-server"
+version = "0.1.0"
+description = ""
+authors = ["shinhong-park <shinhong.park@linecorp.com>"]
+readme = "README.md"
+packages = [{include = "wacruit"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.95.1"
+sqlalchemy = "^2.0.13"
+loguru = "^0.7.0"
+python-dotenv = "^1.0.0"
+uvicorn = "^0.22.0"
+bcrypt = "^4.0.1"
+alembic = "^1.11.1"
+mysqlclient = "^2.1.1"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.3.1"
+pre-commit = "^3.3.1"
+black = "^23.3.0"
+pylint = "^2.17.4"
+devtools = "^0.11.0"
+pyright = "^1.1.314"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+pythonpath = [
+  "."
+]
+
+[tool.pyright]
+exclude = [
+    "**/node_modules",
+    "**/__pycache__",
+    "**/migrations/versions",
+]
+venvPath = "."
+venv = ".venv"
+reportShadowedImports = false
+
+[tool.isort]
+profile = "black"
+
+[tool.pycln]
+all = true
