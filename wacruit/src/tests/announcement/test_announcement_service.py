@@ -1,13 +1,6 @@
-import asyncio
-from datetime import datetime
-from datetime import timedelta
-import time
-
 import pytest
 
 from wacruit.src.apps.announcement.exceptions import AnnouncementNotFound
-from wacruit.src.apps.announcement.schemas import AnnouncementCreateDto
-from wacruit.src.apps.announcement.schemas import AnnouncementDto
 from wacruit.src.apps.announcement.services import AnnouncementService
 
 
@@ -67,3 +60,22 @@ def test_update_announcement_not_found(
         announcement_service.update_announcement(
             999, announcement_update_dto
         )  # Assumption that ID 999 does not exist.
+
+
+def test_delete_announcement(
+    announcement_service: AnnouncementService, announcement_create_dto
+):
+    response = announcement_service.create_announcement(announcement_create_dto.copy())
+    assert response.id is not None
+    announcement_service.delete_announcement(response.id)
+    with pytest.raises(AnnouncementNotFound):
+        announcement_service.get_announcement(response.id)
+
+
+def test_delete_announcement_twice(
+    announcement_service: AnnouncementService, announcement_create_dto
+):
+    response = announcement_service.create_announcement(announcement_create_dto.copy())
+    assert response.id is not None
+    announcement_service.delete_announcement(response.id)
+    announcement_service.delete_announcement(response.id)

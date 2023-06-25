@@ -5,7 +5,7 @@ import pytest
 import sqlalchemy
 from sqlalchemy import orm
 
-from wacruit.src.database.models.base import DeclarativeBase
+from wacruit.src.database.base import DeclarativeBase
 
 
 @pytest.fixture(scope="session")

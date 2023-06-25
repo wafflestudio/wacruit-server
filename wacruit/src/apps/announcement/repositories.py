@@ -1,7 +1,7 @@
-from sqlite3 import IntegrityError
 from typing import Sequence
 
 from fastapi import Depends
+from sqlalchemy import delete
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -36,3 +36,7 @@ class AnnouncementRepository:
         with self.transaction:
             self.session.merge(announcement)
         return announcement
+
+    def delete_announcement(self, id: int) -> None:
+        with self.transaction:
+            self.session.execute(delete(Announcement).where(Announcement.id == id))

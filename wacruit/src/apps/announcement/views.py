@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from fastapi import Depends
+from fastapi import Response
 
 from wacruit.src.apps.announcement.exceptions import AnnouncementNotFound
 from wacruit.src.apps.announcement.schemas import AnnouncementCreateDto
@@ -36,3 +37,14 @@ async def update_announcement(
 ) -> AnnouncementDto:
     # TODO: Add permission check
     return announcement_service.update_announcement(id, request)
+
+
+@v1_router.delete(
+    "/{id}", responses=responses_from(AnnouncementNotFound), status_code=204
+)
+async def delete_announcement(
+    id: int,
+    announcement_service: AnnouncementService = Depends(),
+):
+    announcement_service.delete_announcement(id)
+    return Response(status_code=204)

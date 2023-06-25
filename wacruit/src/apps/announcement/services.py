@@ -40,3 +40,6 @@ class AnnouncementService:
         if announcement is None:
             raise AnnouncementNotFound
         return AnnouncementDto.from_orm(announcement)
+
+    def delete_announcement(self, id: int) -> None:
+        self.announcement_repository.delete_announcement(id)
