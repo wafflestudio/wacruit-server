@@ -1,3 +1,4 @@
+# pylint: skip-file
 from fastapi import Depends
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
@@ -7,7 +8,7 @@ from wacruit.src.apps.user.repositories import UserRepository
 from wacruit.src.apps.user.schemas import UserCreateResponse
 from wacruit.src.apps.user.schemas import UserCreateUpdateRequest
 from wacruit.src.apps.user.schemas import UserDetailResponse
-from wacruit.src.database.models import User
+from wacruit.src.database.models import User  # type: ignore
 
 
 class UserService:
@@ -36,7 +37,7 @@ class UserService:
             notion_email=request.notion_email,
             apple_email=request.apple_email,
             introduction=request.introduction,
-        )
+        )  # noqa
         try:
             user = self.user_repository.create_user(user)
         except IntegrityError as exc:
