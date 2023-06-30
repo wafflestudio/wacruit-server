@@ -24,4 +24,7 @@ COPY wacruit ./wacruit
 
 EXPOSE 8080
 
+ARG ENV=dev
+ENV ENV=$ENV
+
 CMD ["uvicorn", "wacruit.src.main:app", "--host", "0.0.0.0", "--port", "8080"]
