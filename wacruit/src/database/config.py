@@ -21,11 +21,11 @@ class DBConfig(BaseSettings):
     def url(self) -> str:
         aws_secrets = AWSSecretManager()
         if aws_secrets.is_available():
-            self.username = aws_secrets.get_secret("db_username")
-            self.password = aws_secrets.get_secret("db_password")
-            self.host = aws_secrets.get_secret("db_host")
-            self.port = int(aws_secrets.get_secret("db_port"))
-            self.name = aws_secrets.get_secret("db_name")
+            self.username = aws_secrets.get_secret("server_db_username")
+            self.password = aws_secrets.get_secret("server_db_password")
+            self.host = aws_secrets.get_secret("server_db_host")
+            self.port = int(aws_secrets.get_secret("server_db_port"))
+            self.name = aws_secrets.get_secret("server_db_name")
 
         return (
             f"mysql+mysqldb://{self.username}:{self.password}"
