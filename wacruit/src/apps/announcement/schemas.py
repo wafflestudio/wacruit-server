@@ -6,7 +6,7 @@ from pydantic import Field
 
 class AnnouncementCreateDto(BaseModel):
     title: str = Field(..., min_length=1, max_length=50)
-    content: str = Field(..., min_length=1, max_length=1000)
+    content: str = Field(..., min_length=1, max_length=10000)
 
 
 class AnnouncementDto(BaseModel):

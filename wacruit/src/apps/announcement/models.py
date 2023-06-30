@@ -14,7 +14,7 @@ class Announcement(DeclarativeBase):
     __tablename__ = "announcement"
     id: Mapped[intpk]
     title: Mapped[str | None] = mapped_column(String(50))
-    content: Mapped[str | None] = mapped_column(String(1000))
+    content: Mapped[str | None] = mapped_column(String(10000))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),  # pylint: disable=not-callable
