@@ -3,8 +3,9 @@ from logging.config import fileConfig
 from alembic import context
 import sqlalchemy
 
+from wacruit.src.apps.announcement.models import *  # pylint: disable=wildcard-import
+from wacruit.src.database.base import DeclarativeBase
 from wacruit.src.database.config import DBConfig
-from wacruit.src.database.models.base import DeclarativeBase
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

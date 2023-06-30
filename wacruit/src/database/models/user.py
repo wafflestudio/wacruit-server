@@ -6,10 +6,10 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
-from wacruit.src.database.models.base import DeclarativeBase
-from wacruit.src.database.models.base import intpk
-from wacruit.src.database.models.base import str30
-from wacruit.src.database.models.base import str50_default_none
+from wacruit.src.database.base import DeclarativeBase
+from wacruit.src.database.base import intpk
+from wacruit.src.database.base import str30
+from wacruit.src.database.base import str50_default_none
 from wacruit.src.database.models.position import position_user_association
 from wacruit.src.database.models.team import team_user_association
 

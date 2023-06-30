@@ -8,9 +8,9 @@ from sqlalchemy import Table
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import relationship
 
-from wacruit.src.database.models.base import DeclarativeBase
-from wacruit.src.database.models.base import intpk
-from wacruit.src.database.models.base import mapped_column
+from wacruit.src.database.base import DeclarativeBase
+from wacruit.src.database.base import intpk
+from wacruit.src.database.base import mapped_column
 
 if TYPE_CHECKING:
     from wacruit.src.database.models.user import User

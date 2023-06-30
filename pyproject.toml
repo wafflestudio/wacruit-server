@@ -50,3 +50,6 @@ profile = "black"
 
 [tool.pycln]
 all = true
+exclude = [
+    "**/database/migrations/env.py",
+]
