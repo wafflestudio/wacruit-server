@@ -11,6 +11,7 @@ from wacruit.src.database.models.base import intpk
 from wacruit.src.database.models.base import str30
 from wacruit.src.database.models.base import str50_default_none
 from wacruit.src.database.models.position import position_user_association
+from wacruit.src.database.models.problem import CodeSubmission
 from wacruit.src.database.models.team import team_user_association
 
 if TYPE_CHECKING:
@@ -55,5 +56,8 @@ class User(DeclarativeBase):
         secondary=position_user_association, back_populates="users"
     )
     sns_accounts: Mapped[list["SNSAccount"]] = relationship(
+        back_populates="user", cascade="all, delete"
+    )
+    code_submissions: Mapped[list["CodeSubmission"]] = relationship(
         back_populates="user", cascade="all, delete"
     )
