@@ -1,6 +1,7 @@
 # wacruit-server
 
 [![Python 3.11.1](https://img.shields.io/badge/python-3.11.1-blue.svg)](https://www.python.org/downloads/release/python-3111/)
+[![Poetry 1.5.1](https://img.shields.io/badge/poetry-1.5.1-yellow.svg/)](https://github.com/python-poetry/poetry/releases/tag/1.5.1)
 
 ## Prerequisites
 

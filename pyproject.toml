@@ -16,6 +16,7 @@ uvicorn = "^0.22.0"
 bcrypt = "^4.0.1"
 alembic = "^1.11.1"
 mysqlclient = "^2.1.1"
+sse-starlette = "^1.6.1"
 
 
 [tool.poetry.group.dev.dependencies]
