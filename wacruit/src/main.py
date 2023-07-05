@@ -1,9 +1,11 @@
 import uvicorn
 
 from wacruit.src.app import create_app
+from wacruit.src.apps.router import api_router
 
 # Entrypoint for Docker container.
 app = create_app()
+app.include_router(api_router)
 
 
 def main():

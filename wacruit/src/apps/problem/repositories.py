@@ -62,9 +62,9 @@ class ProblemRepository:
     def get_problem_by_id(self, problem_id) -> Problem | None:
         return self.session.query(Problem).filter(Problem.id == problem_id).first()
 
-    def get_testcases_by_problem_id(self, problem_id) -> list[TestCase] | None:
+    def get_testcases_by_problem_id(self, problem_id) -> list[TestCase]:
         problem = self.get_problem_by_id(problem_id)
-        return problem and problem.testcases
+        return problem.testcases if problem else []
 
     def create_problem(self, problem: Problem) -> Problem:
         with self.transaction:
