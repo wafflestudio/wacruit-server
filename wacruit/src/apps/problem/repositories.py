@@ -6,11 +6,11 @@ from wacruit.src.api.connections import get_api_client
 from wacruit.src.api.schemas import CreateSubmissionRequest
 from wacruit.src.api.schemas import CreateSubmissionResponse
 from wacruit.src.api.schemas import GetSubmissionResponse
+from wacruit.src.apps.problem.models import CodeSubmission
+from wacruit.src.apps.problem.models import Problem
+from wacruit.src.apps.problem.models import TestCase
 from wacruit.src.database.connection import get_db_session
 from wacruit.src.database.connection import Transaction
-from wacruit.src.database.models import CodeSubmission
-from wacruit.src.database.models import Problem
-from wacruit.src.database.models import TestCase
 
 
 class JudgeApiRepository:
