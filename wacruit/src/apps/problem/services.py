@@ -4,9 +4,9 @@ from typing import AsyncGenerator, Literal
 from fastapi import Depends
 from fastapi import Request
 
-from wacruit.src.api.schemas import CreateSubmissionRequest
+from wacruit.src.apps.judge.repositories import JudgeApiRepository
+from wacruit.src.apps.judge.schemas import JudgeCreateSubmissionRequest
 from wacruit.src.apps.problem.repositories import CodeSubmissionRepository
-from wacruit.src.apps.problem.repositories import JudgeApiRepository
 from wacruit.src.apps.problem.repositories import ProblemRepository
 from wacruit.src.apps.problem.schemas import CodeSubmissionResultResponse
 from wacruit.src.apps.problem.schemas import CodeSubmitRequest
@@ -58,7 +58,7 @@ class ProblemService(LoggingMixin):
             ),  # type: ignore
             start=1,
         ):
-            create_submission_request = CreateSubmissionRequest(
+            create_submission_request = JudgeCreateSubmissionRequest(
                 problem_id=request.problem_id,
                 source_code=request.source_code,
                 language_id=LANG_MAP[request.language.upper()],

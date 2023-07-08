@@ -1,50 +1,11 @@
 from fastapi import Depends
-from httpx import AsyncClient
 from sqlalchemy.orm import Session
 
-from wacruit.src.api.connections import get_api_client
-from wacruit.src.api.schemas import CreateSubmissionRequest
-from wacruit.src.api.schemas import CreateSubmissionResponse
-from wacruit.src.api.schemas import GetSubmissionResponse
 from wacruit.src.apps.problem.models import CodeSubmission
 from wacruit.src.apps.problem.models import Problem
 from wacruit.src.apps.problem.models import TestCase
 from wacruit.src.database.connection import get_db_session
 from wacruit.src.database.connection import Transaction
-
-
-class JudgeApiRepository:
-    def __init__(self, client: AsyncClient = Depends(get_api_client("JUDGE"))):
-        self.client = client
-
-    async def create_submission(
-        self, request: CreateSubmissionRequest
-    ) -> CreateSubmissionResponse:
-        res = await self.client.post(
-            url="/submissions?base64_encoded=false", data=request.dict(), timeout=60
-        )
-        res.raise_for_status()
-        return CreateSubmissionResponse(**res.json())
-
-    async def list_submission(self, fields: list[str]) -> GetSubmissionResponse:
-        res = await self.client.get(
-            url="/submissions?base64_encoded=false",
-            params={"fields": ",".join(fields)},
-            timeout=60,
-        )
-        res.raise_for_status()
-        return GetSubmissionResponse(**res.json())
-
-    async def get_submission(
-        self, token: str, fields: list[str] | None = None
-    ) -> GetSubmissionResponse:
-        res = await self.client.get(
-            url=f"/submissions/{token}?base64_encoded=false",
-            params=fields and {"fields": ",".join(fields)},  # type: ignore
-            timeout=60,
-        )
-        res.raise_for_status()
-        return GetSubmissionResponse(**res.json())
 
 
 class ProblemRepository:
