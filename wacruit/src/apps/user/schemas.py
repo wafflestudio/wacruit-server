@@ -25,6 +25,9 @@ class UserCreateResponse(BaseModel):
     phone_number: str | None = Field(default=None, max_length=30)
     email: str | None = Field(default=None, max_length=50)
 
+    class Config:
+        orm_mode = True
+
 
 class UserDetailResponse(BaseModel):
     id: int
@@ -39,3 +42,6 @@ class UserDetailResponse(BaseModel):
     department: str | None
     college: str | None
     university: str | None
+
+    class Config:
+        orm_mode = True

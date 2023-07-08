@@ -24,7 +24,7 @@ class User(DeclarativeBase):
     last_name: Mapped[str30]
 
     phone_number: Mapped[str30]
-    email: Mapped[str50]
+    email: Mapped[str50] = mapped_column(unique=True)
 
     department: Mapped[str50 | None]
     college: Mapped[str50 | None]
