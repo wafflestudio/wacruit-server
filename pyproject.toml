@@ -16,6 +16,7 @@ uvicorn = "^0.22.0"
 bcrypt = "^4.0.1"
 alembic = "^1.11.1"
 mysqlclient = "^2.1.1"
+aws-secretsmanager-caching = "^1.1.1.5"
 sse-starlette = "^1.6.1"
 httpx = "^0.24.1"
 
@@ -52,3 +53,6 @@ profile = "black"
 
 [tool.pycln]
 all = true
+exclude = [
+    "**/database/migrations/env.py",
+]

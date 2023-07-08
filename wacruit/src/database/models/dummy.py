@@ -2,7 +2,7 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.sql.sqltypes import String
 
-from wacruit.src.database.models.base import DeclarativeBase
+from wacruit.src.database.base import DeclarativeBase
 
 
 class DummyModel(DeclarativeBase):

@@ -3,8 +3,9 @@ from logging.config import fileConfig
 from alembic import context
 import sqlalchemy
 
-from wacruit.src.database.config import DBConfig
-from wacruit.src.database.models.base import DeclarativeBase
+from wacruit.src.apps.announcement.models import *  # pylint: disable=wildcard-import
+from wacruit.src.database.base import DeclarativeBase
+from wacruit.src.database.config import db_config
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -36,7 +37,7 @@ def run_migrations_offline() -> None:
 
     """
     context.configure(
-        url=DBConfig().url,
+        url=db_config.url,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -55,7 +56,7 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    engine = sqlalchemy.create_engine(DBConfig().url)
+    engine = sqlalchemy.create_engine(db_config.url)
 
     with engine.connect() as connection:
         context.configure(connection=connection, target_metadata=target_metadata)
