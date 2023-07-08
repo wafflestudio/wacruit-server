@@ -8,6 +8,7 @@ ROOT_PATH = Path(__file__).parent.parent.parent
 
 class Settings(BaseSettings):
     env: Literal["dev", "prod", "local"] = "local"
+    apps = ["dummy", "announcement", "problem", "user"]
 
     @property
     def is_dev(self) -> bool:
