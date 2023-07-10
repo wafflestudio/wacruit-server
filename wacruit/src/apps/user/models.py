@@ -31,7 +31,7 @@ class User(DeclarativeBase):
     university: Mapped[str50 | None]
 
     code_submissions: Mapped[list["CodeSubmission"]] = relationship(
-        back_populates="user", cascade="all, delete"
+        back_populates="user"
     )
 
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False)
