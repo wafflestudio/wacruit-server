@@ -1,12 +1,15 @@
+from datetime import datetime
 from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean
+from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
 from sqlalchemy import String
 from sqlalchemy import Text
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 
 from wacruit.src.database.base import DeclarativeBase
 from wacruit.src.database.base import intpk
@@ -35,6 +38,10 @@ class CodeSubmission(DeclarativeBase):
     )
     problem: Mapped["Problem"] = relationship(back_populates="submissions")
     token: Mapped[str] = mapped_column(String(255), nullable=False)
+    create_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),  # pylint: disable=not-callable
+    )
 
 
 class TestCase(DeclarativeBase):
