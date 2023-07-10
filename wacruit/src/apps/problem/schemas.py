@@ -3,11 +3,8 @@ from typing import Any, Literal
 from pydantic import BaseModel
 from pydantic import Field
 
-SupportedLanguage = Literal[
-    "C", "CPP", "JAVA", "KOTLIN", "SCALA", "SWIFT", "JAVASCRIPT", "TYPESCRIPT", "PYTHON"
-]
-
-TestCaseState = Literal["RUNNING", "SUCCESS", "FAILED"]
+from wacruit.src.apps.common.enums import Language
+from wacruit.src.apps.judge.schemas import JudgeSubmissionStatusModel
 
 
 class ProblemResponse(BaseModel):
@@ -17,17 +14,17 @@ class ProblemResponse(BaseModel):
 
 class CodeSubmitRequest(BaseModel):
     problem_id: int
-    language: SupportedLanguage = Field(...)
+    language: Language = Field(...)
     source_code: str = Field(..., max_length=10000)
     is_test: bool = Field(False)
     testcases: list[Any] | None = Field(None, max_items=10)
 
 
-class TestCaseResult(BaseModel):
+class CodeSubmissionResult(BaseModel):
     id: int
-    # state: TestCaseState
+    status: JudgeSubmissionStatusModel
     result: str
 
 
 class CodeSubmissionResultResponse(BaseModel):
-    results: list[TestCaseResult]
+    results: list[CodeSubmissionResult]

@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 from pydantic import Field
 
+from wacruit.src.apps.common.enums import JudgeSubmissionStatus
+
 
 class JudgeCreateSubmissionRequest(BaseModel):
     problem_id: int
@@ -13,8 +15,8 @@ class JudgeCreateSubmissionResponse(BaseModel):
     token: str
 
 
-class JudgeSubmissionStatus(BaseModel):
-    id: int
+class JudgeSubmissionStatusModel(BaseModel):
+    id: JudgeSubmissionStatus
     description: str
 
 
@@ -23,7 +25,6 @@ class JudgeGetSubmissionResponse(BaseModel):
     stderr: str | None
     compile_output: str | None
     message: str | None
-    status: JudgeSubmissionStatus | None
+    status: JudgeSubmissionStatusModel
     time: str | None
     memory: int | None
-    token: str | None

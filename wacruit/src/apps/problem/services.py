@@ -6,28 +6,14 @@ from fastapi import Request
 
 from wacruit.src.apps.judge.repositories import JudgeApiRepository
 from wacruit.src.apps.judge.schemas import JudgeCreateSubmissionRequest
+from wacruit.src.apps.judge.schemas import JudgeGetSubmissionResponse
 from wacruit.src.apps.problem.repositories import CodeSubmissionRepository
 from wacruit.src.apps.problem.repositories import ProblemRepository
+from wacruit.src.apps.problem.schemas import CodeSubmissionResult
 from wacruit.src.apps.problem.schemas import CodeSubmissionResultResponse
 from wacruit.src.apps.problem.schemas import CodeSubmitRequest
 from wacruit.src.apps.problem.schemas import ProblemResponse
-from wacruit.src.apps.problem.schemas import TestCaseResult
 from wacruit.src.utils.mixins import LoggingMixin
-
-LANG_MAP = {
-    "C": 100,
-    "C++": 101,
-    "JAVA": 102,
-    "JAVASCRIPT": 103,
-    "PYTHON": 104,
-    "RUBY": 105,
-    "GO": 106,
-    "TYPESCRIPT": 107,
-    "KOTLIN": 108,
-    "SCALA": 109,
-    "SQL": 110,
-    "SWIFT": 111,
-}
 
 
 class ProblemService(LoggingMixin):
@@ -61,7 +47,7 @@ class ProblemService(LoggingMixin):
             create_submission_request = JudgeCreateSubmissionRequest(
                 problem_id=request.problem_id,
                 source_code=request.source_code,
-                language_id=LANG_MAP[request.language.upper()],
+                language_id=request.language.value,
                 stdin=testcase.stdin,
             )
             testcase_token_map[i] = (
@@ -82,8 +68,14 @@ class ProblemService(LoggingMixin):
             pending_testcases = []
             for testcase in running_testcases_set:
                 result = await self.check_submission(testcase_token_map[testcase])
-                if result:
-                    results.append(TestCaseResult(id=testcase, result=result))
+                if result.status.id.value > 2:
+                    results.append(
+                        CodeSubmissionResult(
+                            id=testcase,
+                            status=result.status,
+                            result=f"{result.time},{result.memory}",
+                        )
+                    )
                 else:
                     pending_testcases.append(testcase)
             running_testcases_set = set(pending_testcases)
@@ -91,8 +83,5 @@ class ProblemService(LoggingMixin):
 
             await asyncio.sleep(1)
 
-    async def check_submission(self, token: str) -> str | Literal[False]:
-        result = await self.judge_api_repository.get_submission(token)
-        return (
-            result.status.id == 3 and f"{result.time},{result.memory}"  # type: ignore
-        )
+    async def check_submission(self, token: str) -> JudgeGetSubmissionResponse:
+        return await self.judge_api_repository.get_submission(token)

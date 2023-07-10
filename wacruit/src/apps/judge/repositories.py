@@ -20,21 +20,21 @@ class JudgeApiRepository:
         res.raise_for_status()
         return JudgeCreateSubmissionResponse(**res.json())
 
-    async def list_submission(self, fields: list[str]) -> JudgeGetSubmissionResponse:
+    async def list_submission(self) -> JudgeGetSubmissionResponse:
+        fields = "stdout,stderr,compile_output,message,status,time,memory"
         res = await self.client.get(
-            url="/submissions?base64_encoded=false",
-            params={"fields": ",".join(fields)},
+            url="/submissions?=false",
+            params={"base64_encoded": False, "fields": ",".join(fields)},
             timeout=60,
         )
         res.raise_for_status()
         return JudgeGetSubmissionResponse(**res.json())
 
-    async def get_submission(
-        self, token: str, fields: list[str] | None = None
-    ) -> JudgeGetSubmissionResponse:
+    async def get_submission(self, token: str) -> JudgeGetSubmissionResponse:
+        fields = "stdout,stderr,compile_output,message,status,time,memory"
         res = await self.client.get(
             url=f"/submissions/{token}?base64_encoded=false",
-            params=fields and {"fields": ",".join(fields)},  # type: ignore
+            params={"base64_encoded": False, "fields": ",".join(fields)},
             timeout=60,
         )
         res.raise_for_status()
