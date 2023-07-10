@@ -1,21 +1,11 @@
-from importlib import import_module
-from logging import getLogger
 from logging.config import fileConfig
 
 from alembic import context
 import sqlalchemy
 
+from wacruit.src.apps.announcement.models import *  # pylint: disable=wildcard-import
 from wacruit.src.database.base import DeclarativeBase
 from wacruit.src.database.config import db_config
-from wacruit.src.settings import settings
-
-logger = getLogger(__name__)
-for app in settings.apps:
-    try:
-        app_module = import_module(f"wacruit.src.apps.{app}.models")
-        globals().update(app_module.__dict__)
-    except ModuleNotFoundError:
-        logger.info("%s app doesn't have any models", app)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
