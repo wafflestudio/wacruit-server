@@ -28,7 +28,7 @@ class ProblemService(LoggingMixin):
         self.code_submission_repository = code_submission_repository
         self.judge_api_repository = judge_api_repository
 
-    async def get_all_problems(self) -> list[ProblemResponse]:
+    def get_all_problems(self) -> list[ProblemResponse]:
         return [
             ProblemResponse(problem_num=i, body=p.body)
             for i, p in enumerate(self.problem_repository.get_problems(), start=1)

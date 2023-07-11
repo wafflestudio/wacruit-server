@@ -14,10 +14,10 @@ v1_router = APIRouter(prefix="/v1/problem", tags=["problem"])
 
 
 @v1_router.get("/")
-async def list_problem(
+def list_problem(
     problem_service: Annotated[ProblemService, Depends()],
 ) -> list[ProblemResponse]:
-    return await problem_service.get_all_problems()
+    return problem_service.get_all_problems()
 
 
 @v1_router.post("/submission")
