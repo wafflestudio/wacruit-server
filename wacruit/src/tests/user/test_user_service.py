@@ -8,40 +8,41 @@ from wacruit.src.apps.user.services import UserService
 def test_create_user(user_service: UserService):
     request = UserCreateUpdateRequest(
         sso_id="test",
-        username="test",
         first_name="test",
         last_name="test",
+        phone_number="010-0000-0000",
+        email="test@test.com",
     )
     response = user_service.create_user(request)
     assert response.id is not None
 
 
-def test_create_user_duplicate_username(user_service: UserService):
+def test_create_user_duplicate_sso_id(user_service: UserService):
     request = UserCreateUpdateRequest(
         sso_id="test",
-        username="test",
         first_name="test",
         last_name="test",
+        phone_number="010-0000-0000",
+        email="test2@test.com",
     )
     user_service.create_user(request)
     with pytest.raises(HTTPException) as excinfo:
         new_request = request.copy()
-        new_request.sso_id = "test2"
         user_service.create_user(new_request)
         assert excinfo.value.status_code == 409
 
 
-def test_create_user_duplicate_sso_id(user_service: UserService):
+def test_create_user_duplicate_email(user_service: UserService):
     request = UserCreateUpdateRequest(
-        sso_id="test",
-        username="test",
+        sso_id="test2",
         first_name="test",
         last_name="test",
+        phone_number="010-0000-0000",
+        email="test@test.com",
     )
     user_service.create_user(request)
     with pytest.raises(HTTPException) as excinfo:
         new_request = request.copy()
-        new_request.username = "test2"
         user_service.create_user(new_request)
         assert excinfo.value.status_code == 409
 
@@ -49,9 +50,10 @@ def test_create_user_duplicate_sso_id(user_service: UserService):
 def test_list_user_detail(user_service: UserService):
     request = UserCreateUpdateRequest(
         sso_id="test",
-        username="test",
         first_name="test",
         last_name="test",
+        phone_number="010-0000-0000",
+        email="test@test.com",
     )
     response = user_service.create_user(request)
     assert response.id is not None

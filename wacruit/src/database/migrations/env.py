@@ -3,7 +3,9 @@ from logging.config import fileConfig
 from alembic import context
 import sqlalchemy
 
-from wacruit.src.apps.announcement.models import *  # pylint: disable=wildcard-import
+import wacruit.src.apps.announcement.models
+import wacruit.src.apps.problem.models
+import wacruit.src.apps.user.models
 from wacruit.src.database.base import DeclarativeBase
 from wacruit.src.database.config import db_config
 

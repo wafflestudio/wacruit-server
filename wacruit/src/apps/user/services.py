@@ -1,14 +1,13 @@
-# pylint: skip-file
 from fastapi import Depends
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 
 from wacruit.src.apps.user.exceptions import UserAlreadyExistsException
+from wacruit.src.apps.user.models import User
 from wacruit.src.apps.user.repositories import UserRepository
 from wacruit.src.apps.user.schemas import UserCreateResponse
 from wacruit.src.apps.user.schemas import UserCreateUpdateRequest
 from wacruit.src.apps.user.schemas import UserDetailResponse
-from wacruit.src.database.models import User  # type: ignore
 
 
 class UserService:
@@ -23,20 +22,13 @@ class UserService:
             raise HTTPException(status_code=400, detail="SSO ID가 필요합니다.")
         user = User(
             sso_id=request.sso_id,
-            username=request.username,
             first_name=request.first_name,
             last_name=request.last_name,
-            positions=request.positions,
             department=request.department,
             college=request.college,
+            university=request.university,
             phone_number=request.phone_number,
-            github_id=request.github_id,
-            github_email=request.github_email,
-            slack_id=request.slack_id,
-            slack_email=request.slack_email,
-            notion_email=request.notion_email,
-            apple_email=request.apple_email,
-            introduction=request.introduction,
+            email=request.email,
         )  # noqa
         try:
             user = self.user_repository.create_user(user)
