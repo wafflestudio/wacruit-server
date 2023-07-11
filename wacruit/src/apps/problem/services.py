@@ -4,6 +4,7 @@ from typing import AsyncGenerator, Literal
 from fastapi import Depends
 from fastapi import Request
 
+from wacruit.src.apps.common.enums import JudgeSubmissionStatus
 from wacruit.src.apps.judge.repositories import JudgeApiRepository
 from wacruit.src.apps.judge.schemas import JudgeCreateSubmissionRequest
 from wacruit.src.apps.judge.schemas import JudgeGetSubmissionResponse
@@ -68,7 +69,12 @@ class ProblemService(LoggingMixin):
             pending_testcases = []
             for testcase in running_testcases_set:
                 result = await self.check_submission(testcase_token_map[testcase])
-                if result.status.id.value > 2:
+                if result.status.id in (
+                    JudgeSubmissionStatus.IN_QUEUE,
+                    JudgeSubmissionStatus.PROCESSING,
+                ):
+                    pending_testcases.append(testcase)
+                else:
                     results.append(
                         CodeSubmissionResult(
                             id=testcase,
@@ -76,8 +82,6 @@ class ProblemService(LoggingMixin):
                             result=f"{result.time},{result.memory}",
                         )
                     )
-                else:
-                    pending_testcases.append(testcase)
             running_testcases_set = set(pending_testcases)
             yield CodeSubmissionResultResponse(results=results)
 
