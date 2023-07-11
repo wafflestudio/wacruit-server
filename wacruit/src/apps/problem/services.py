@@ -62,7 +62,9 @@ class ProblemService(LoggingMixin):
         self, request: Request, testcase_token_map: dict[int, str], user_id: str
     ) -> AsyncGenerator[CodeSubmissionResultResponse, None]:
         running_testcases_set = set(testcase_token_map.keys())
-        while len(running_testcases_set) > 0 and await request.is_disconnected():
+        while len(running_testcases_set) > 0:
+            if await request.is_disconnected():
+                self.logger.debug("Request disconnected")
             results = []
             pending_testcases = []
             for testcase in running_testcases_set:
