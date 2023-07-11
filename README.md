@@ -1,13 +1,14 @@
 # wacruit-server
 
 [![Python 3.11.1](https://img.shields.io/badge/python-3.11.1-blue.svg)](https://www.python.org/downloads/release/python-3111/)
-[![Poetry 1.5.1](https://img.shields.io/badge/poetry-1.5.1-yellow.svg/)](https://github.com/python-poetry/poetry/releases/tag/1.5.1)
+[![Poetry 1.5.1](https://img.shields.io/badge/poetry-1.5.1-yellow.svg)](https://github.com/python-poetry/poetry/releases/tag/1.5.1)
 
 ## Prerequisites
 
 - Python version 3.11 and above is required.
 - Install [Poetry](https://python-poetry.org/docs/#installation) package manager to install all the dependencies.
 - A MySQL client is required for database operations in your local machine. On macos, you can install via `brew install mysql-client` or `brew install mysql`. Don't forget to add it to PATH.
+- This project requires [wacruit-judge](https://github.com/wafflestudio/wacruit-judge) which is the fork version of [Judge0](https://github.com/judge0/judge0). To test this project, you first need to clone wacruit-judge and run it using docker-compose.
 
 ## Installation
 
