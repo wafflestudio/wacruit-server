@@ -64,7 +64,7 @@ class ProblemService(LoggingMixin):
         running_testcases_set = set(testcase_token_map.keys())
         while len(running_testcases_set) > 0:
             if await request.is_disconnected():
-                self.logger.debug("Request disconnected")
+                break
             results = []
             pending_testcases = []
             for testcase in running_testcases_set:
