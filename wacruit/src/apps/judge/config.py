@@ -3,8 +3,8 @@ from pydantic import BaseSettings
 from wacruit.src.settings import settings
 
 
-class APIConfig(BaseSettings):
-    URL: str = ""
+class JudgeAPIConfig(BaseSettings):
+    url: str = ""
 
     class Config:
         case_sensitive = False
@@ -12,4 +12,4 @@ class APIConfig(BaseSettings):
         env_file = settings.env_files
 
 
-judge_api_config = APIConfig()
+judge_api_config = JudgeAPIConfig()
