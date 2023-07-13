@@ -69,5 +69,5 @@ jobs:
           echo DB_HOST=$DB_HOST >> .env.local
           echo DB_PORT=$DB_PORT >> .env.local
           echo DB_NAME=$DB_NAME >> .env.local
-          alembic revision --autogenerate
-          alembic upgrade head
+          poetry run alembic revision --autogenerate
+          poetry run alembic upgrade head
