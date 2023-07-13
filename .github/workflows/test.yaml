@@ -57,11 +57,11 @@ jobs:
 
       - name: Run alembic migration test
         env:
-          - DB_USERNAME: root
-          - DB_PASSWORD: root-password
-          - DB_HOST: localhost
-          - DB_PORT: 3306
-          - DB_NAME: testdb
+          DB_USERNAME: root
+          DB_PASSWORD: root-password
+          DB_HOST: localhost
+          DB_PORT: 3306
+          DB_NAME: testdb
         run: |
           touch .env.local
           echo DB_USERNAME=$DB_USERNAME >> .env.local
