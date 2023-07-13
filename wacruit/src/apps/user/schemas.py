@@ -6,8 +6,6 @@ from pydantic import validator
 
 
 class UserCreateUpdateRequest(BaseModel):
-    sso_id: str | None = Field(default=None, max_length=50)
-
     first_name: str = Field(..., max_length=30)
     last_name: str = Field(..., max_length=30)
 

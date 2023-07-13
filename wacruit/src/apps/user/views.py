@@ -24,8 +24,7 @@ def create_user(
     waffle_user_id: Annotated[str, Header()],
     user_service: Annotated[UserService, Depends()],
 ):
-    request.sso_id = waffle_user_id
-    return user_service.create_user(request)
+    return user_service.create_user(waffle_user_id, request)
 
 
 @v1_router.get("")

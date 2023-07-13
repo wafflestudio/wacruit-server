@@ -21,11 +21,11 @@ class UserService:
     ) -> None:
         self.user_repository = user_repository
 
-    def create_user(self, request: UserCreateUpdateRequest) -> UserCreateResponse:
-        if request.sso_id is None:
-            raise HTTPException(status_code=400, detail="SSO ID가 필요합니다.")
+    def create_user(
+        self, sso_id: str, request: UserCreateUpdateRequest
+    ) -> UserCreateResponse:
         user = User(
-            sso_id=request.sso_id,
+            sso_id=sso_id,
             first_name=request.first_name,
             last_name=request.last_name,
             department=request.department,
