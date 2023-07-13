@@ -32,12 +32,20 @@ jobs:
           python-version: 3.11
           cache: poetry
 
-      - name: Set poetry environment
+      - name: Set poetry environment & install dependencies
         run: |
           poetry env use 3.11
+          poetry install --no-root
 
-      - name: Install dependencies
-        run: poetry install --no-root
+      - name: create .env.local
+        run: |
+          touch .env.local
+          mkdir -p wacruit/src/database/migrations/versions
+          echo DB_USERNAME=test-user >> .env.local
+          echo DB_PASSWORD=password >> .env.local
+          echo DB_HOST=127.0.0.1 >> .env.local
+          echo DB_PORT=3306 >> .env.local
+          echo DB_NAME=testdb >> .env.local
 
       - name: Run tests
         run: |
@@ -57,19 +65,6 @@ jobs:
           poetry run pylint -rn -sn --rcfile=${GITHUB_WORKSPACE}/.pylintrc ./wacruit
 
       - name: Run alembic migration test
-        env:
-          DB_USERNAME: test-user
-          DB_PASSWORD: password
-          DB_HOST: 127.0.0.1
-          DB_PORT: 3306
-          DB_NAME: testdb
         run: |
-          touch .env.local
-          mkdir -p wacruit/src/database/migrations/versions
-          echo DB_USERNAME=$DB_USERNAME >> .env.local
-          echo DB_PASSWORD=$DB_PASSWORD >> .env.local
-          echo DB_HOST=$DB_HOST >> .env.local
-          echo DB_PORT=$DB_PORT >> .env.local
-          echo DB_NAME=$DB_NAME >> .env.local
           poetry run alembic revision --autogenerate
           poetry run alembic upgrade head
