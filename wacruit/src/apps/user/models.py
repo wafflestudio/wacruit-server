@@ -9,6 +9,7 @@ from wacruit.src.database.base import DeclarativeBase
 from wacruit.src.database.base import intpk
 from wacruit.src.database.base import str30
 from wacruit.src.database.base import str50
+from wacruit.src.database.base import str200
 
 if TYPE_CHECKING:
     from wacruit.src.apps.problem.models import CodeSubmission
@@ -29,6 +30,10 @@ class User(DeclarativeBase):
     department: Mapped[str50 | None]
     college: Mapped[str50 | None]
     university: Mapped[str50 | None]
+
+    github_email: Mapped[str200 | None]
+    slack_email: Mapped[str200 | None]
+    notion_email: Mapped[str200 | None]
 
     code_submissions: Mapped[list["CodeSubmission"]] = relationship(
         back_populates="user"
