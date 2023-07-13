@@ -65,6 +65,7 @@ jobs:
           DB_NAME: testdb
         run: |
           touch .env.local
+          mkdir -p wacruit/src/database/migrations/versions
           echo DB_USERNAME=$DB_USERNAME >> .env.local
           echo DB_PASSWORD=$DB_PASSWORD >> .env.local
           echo DB_HOST=$DB_HOST >> .env.local
