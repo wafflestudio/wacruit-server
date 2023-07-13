@@ -5,6 +5,7 @@ import sqlalchemy
 
 import wacruit.src.apps.announcement.models
 import wacruit.src.apps.problem.models
+import wacruit.src.apps.resume.models
 import wacruit.src.apps.user.models
 from wacruit.src.database.base import DeclarativeBase
 from wacruit.src.database.config import db_config

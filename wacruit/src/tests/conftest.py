@@ -12,6 +12,8 @@ from wacruit.src.database.base import DeclarativeBase
 def db_engine() -> Iterable[sqlalchemy.Engine]:
     with tempfile.TemporaryDirectory() as tmpdirname:
         url = f"sqlite:////{tmpdirname}/db.sqlite3"
+        url = url.replace("C:\\", "")
+
         engine = sqlalchemy.create_engine(url)
         DeclarativeBase.metadata.create_all(bind=engine)
 
