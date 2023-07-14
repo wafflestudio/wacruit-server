@@ -1,4 +1,3 @@
-import tempfile
 from typing import Iterable
 
 import pytest
@@ -6,19 +5,19 @@ import sqlalchemy
 from sqlalchemy import orm
 
 from wacruit.src.database.base import DeclarativeBase
+from wacruit.src.database.config import db_config
 
 
 @pytest.fixture(scope="session")
 def db_engine() -> Iterable[sqlalchemy.Engine]:
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        url = f"sqlite:////{tmpdirname}/db.sqlite3"
-        engine = sqlalchemy.create_engine(url)
-        DeclarativeBase.metadata.create_all(bind=engine)
+    url = db_config.url
+    engine = sqlalchemy.create_engine(url)
+    DeclarativeBase.metadata.create_all(bind=engine)
 
-        try:
-            yield engine
-        finally:
-            engine.dispose()
+    try:
+        yield engine
+    finally:
+        engine.dispose()
 
 
 @pytest.fixture(scope="function")

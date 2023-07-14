@@ -9,6 +9,17 @@ on:
 jobs:
   pytest:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_USER: test-user
+          MYSQL_PASSWORD: password
+          MYSQL_ROOT_PASSWORD: root-password
+          MYSQL_DATABASE: testdb
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
       - uses: actions/checkout@v3
@@ -21,12 +32,20 @@ jobs:
           python-version: 3.11
           cache: poetry
 
-      - name: Set poetry environment
+      - name: Set poetry environment & install dependencies
         run: |
           poetry env use 3.11
+          poetry install --no-root
 
-      - name: Install dependencies
-        run: poetry install --no-root
+      - name: create .env.local
+        run: |
+          touch .env.local
+          mkdir -p wacruit/src/database/migrations/versions
+          echo DB_USERNAME=test-user >> .env.local
+          echo DB_PASSWORD=password >> .env.local
+          echo DB_HOST=127.0.0.1 >> .env.local
+          echo DB_PORT=3306 >> .env.local
+          echo DB_NAME=testdb >> .env.local
 
       - name: Run tests
         run: |
@@ -44,3 +63,8 @@ jobs:
       - name: Check Pylint
         run: |
           poetry run pylint -rn -sn --rcfile=${GITHUB_WORKSPACE}/.pylintrc ./wacruit
+
+      - name: Run alembic migration test
+        run: |
+          poetry run alembic revision --autogenerate
+          poetry run alembic upgrade head
