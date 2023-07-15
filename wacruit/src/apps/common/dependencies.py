@@ -1,16 +1,12 @@
 from typing import Annotated
 
-from fastapi import APIRouter
 from fastapi import Depends
-from fastapi import Header
-from fastapi import HTTPException
 from fastapi import Security
 from fastapi.security import APIKeyHeader
 
+from wacruit.src.apps.user.exceptions import UserNotFoundException
 from wacruit.src.apps.user.models import User
 from wacruit.src.apps.user.repositories import UserRepository
-from wacruit.src.apps.user.schemas import UserCreateUpdateRequest
-from wacruit.src.apps.user.services import UserService
 
 
 def get_current_user(
@@ -31,7 +27,7 @@ def get_current_user(
 ) -> User:
     user = user_repository.get_user_by_sso_id(waffle_user_id)
     if user is None:
-        raise HTTPException(status_code=404, detail="존재하지 않는 유저입니다.")
+        raise UserNotFoundException
     return user
 
 
