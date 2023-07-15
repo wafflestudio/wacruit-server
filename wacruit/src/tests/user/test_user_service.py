@@ -1,6 +1,4 @@
-from email_validator import EmailNotValidError
-from fastapi import HTTPException
-from pydantic import ValidationError
+from pydantic import EmailStr
 import pytest
 
 from wacruit.src.apps.user.exceptions import UserAlreadyExistsException
@@ -17,7 +15,7 @@ def test_create_user(user_service: UserService):
         first_name="test",
         last_name="test",
         phone_number="010-0000-0000",
-        email="test@test.com",
+        email=EmailStr("test@test.com"),
     )
     response = user_service.create_user("sso_id", request)
     assert response.id is not None
@@ -29,7 +27,7 @@ def test_create_user_duplicate_sso_id(user_service: UserService):
         first_name="test",
         last_name="test",
         phone_number="010-0000-0000",
-        email="test2@test.com",
+        email=EmailStr("test2@test.com"),
     )
     user_service.create_user(sso_id, request)
     with pytest.raises(UserAlreadyExistsException):
@@ -43,7 +41,7 @@ def test_create_user_duplicate_email(user_service: UserService):
         first_name="test",
         last_name="test",
         phone_number="010-0000-0000",
-        email="test@test.com",
+        email=EmailStr("test@test.com"),
     )
     user_service.create_user(sso_id, request)
     with pytest.raises(UserAlreadyExistsException):
@@ -57,7 +55,7 @@ def test_list_user_detail(user_service: UserService):
         first_name="test",
         last_name="test",
         phone_number="010-0000-0000",
-        email="test@test.com",
+        email=EmailStr("test@test.com"),
     )
     response = user_service.create_user(sso_id, request)
     assert response.id is not None
@@ -70,9 +68,9 @@ def test_list_user_detail(user_service: UserService):
 
 def test_update_invitation_emails(created_user: User, user_service: UserService):
     request = UserUpdateInvitationEmailsRequest(
-        github_email="github@mail.com",
-        notion_email="notion@mail.com",
-        slack_email="slack@smail.com",
+        github_email=EmailStr("github@mail.com"),
+        notion_email=EmailStr("notion@mail.com"),
+        slack_email=EmailStr("slack@smail.com"),
     )
     response = user_service.update_invitaion_emails(created_user, request)
     assert response.github_email == request.github_email
@@ -82,9 +80,9 @@ def test_update_invitation_emails(created_user: User, user_service: UserService)
 
 def test_update_invitation_emails_user_not_found(user_service: UserService, user: User):
     request = UserUpdateInvitationEmailsRequest(
-        github_email="github@mail.com",
-        notion_email="notion@mail.com",
-        slack_email="slack@email.com",
+        github_email=EmailStr("github@mail.com"),
+        notion_email=EmailStr("notion@mail.com"),
+        slack_email=EmailStr("slack@email.com"),
     )
     with pytest.raises(UserNotFoundException):
         user_service.update_invitaion_emails(user, request)

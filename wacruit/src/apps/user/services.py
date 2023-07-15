@@ -1,5 +1,3 @@
-from email_validator import EmailNotValidError
-from email_validator import validate_email
 from fastapi import Depends
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
@@ -33,6 +31,9 @@ class UserService:
             university=request.university,
             phone_number=request.phone_number,
             email=request.email,
+            github_email=request.email,
+            notion_email=request.email,
+            slack_email=request.email,
         )  # noqa
         try:
             user = self.user_repository.create_user(user)

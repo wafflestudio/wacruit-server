@@ -1,8 +1,6 @@
-from email_validator import EmailNotValidError
-from email_validator import validate_email
 from pydantic import BaseModel
+from pydantic import EmailStr
 from pydantic import Field
-from pydantic import validator
 
 
 class UserCreateUpdateRequest(BaseModel):
@@ -10,16 +8,11 @@ class UserCreateUpdateRequest(BaseModel):
     last_name: str = Field(..., max_length=30)
 
     phone_number: str = Field(max_length=30)
-    email: str = Field(max_length=50)
+    email: EmailStr
 
     department: str | None = Field(default=None, max_length=50)
     college: str | None = Field(default=None, max_length=50)
     university: str | None = Field(default=None, max_length=50)
-
-    @validator("email")
-    def validate_email(cls, v):
-        validate_email(v, check_deliverability=True)
-        return v
 
 
 class UserCreateResponse(BaseModel):
@@ -36,15 +29,9 @@ class UserCreateResponse(BaseModel):
 
 
 class UserUpdateInvitationEmailsRequest(BaseModel):
-    github_email: str | None = Field(default=None, max_length=200)
-    slack_email: str | None = Field(default=None, max_length=200)
-    notion_email: str | None = Field(default=None, max_length=200)
-
-    @validator("github_email", "slack_email", "notion_email")
-    def validate_email(cls, v):
-        if v is not None:
-            validate_email(v, check_deliverability=True)
-        return v
+    github_email: EmailStr | None = None
+    slack_email: EmailStr | None = None
+    notion_email: EmailStr | None = None
 
 
 class UserDetailResponse(BaseModel):
