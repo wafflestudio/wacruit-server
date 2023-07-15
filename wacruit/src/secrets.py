@@ -15,7 +15,7 @@ class AWSSecretManager:
         )
         cache_config = SecretCacheConfig()
         self.cache = SecretCache(config=cache_config, client=client)
-        self.secret_name = f"{settings.env}/wacruit-server"
+        self.secret_name = f"{settings.env}/wacruit"
 
     def is_available(self) -> bool:
         if settings.is_local:
