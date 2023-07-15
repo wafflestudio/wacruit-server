@@ -1,3 +1,5 @@
+from typing import cast
+
 from pydantic import EmailStr
 import pytest
 
@@ -86,3 +88,33 @@ def test_update_invitation_emails_user_not_found(user_service: UserService, user
     )
     with pytest.raises(UserNotFoundException):
         user_service.update_invitaion_emails(user, request)
+
+
+def test_partial_update_invitation_emails(
+    created_user: User, user_service: UserService
+):
+    data = {
+        "github_email": "github@email.com",
+        "notion_email": "notion@email.com",
+        "slack_email": "slack@email.com",
+    }
+    data = cast(dict[str, EmailStr], data)
+    request = UserUpdateInvitationEmailsRequest(**data)
+    user_service.update_invitaion_emails(created_user, request)
+
+    # skip github_email update
+    new_data = {
+        "github_email": "new-github@email.com",
+        "notion_email": None,
+        "slack_email": None,
+    }
+    new_data = cast(dict[str, EmailStr], new_data)
+    new_request = UserUpdateInvitationEmailsRequest(**new_data)
+    user = user_service.update_invitaion_emails(created_user, new_request)
+    assert (
+        user.github_email == new_data["github_email"]
+    ), "github_email should be updated"
+    assert (
+        user.notion_email == data["notion_email"]
+    ), "notion_email should not be updated"
+    assert user.slack_email == data["slack_email"], "slack_email should not be updated"

@@ -48,9 +48,12 @@ class UserService:
     def update_invitaion_emails(
         self, user: User, request: UserUpdateInvitationEmailsRequest
     ) -> UserDetailResponse:
-        user.github_email = request.github_email
-        user.notion_email = request.notion_email
-        user.slack_email = request.slack_email
+        """
+        None이 들어오면 기존 이메일을 유지한다.
+        """
+        user.github_email = request.github_email or user.github_email
+        user.notion_email = request.notion_email or user.notion_email
+        user.slack_email = request.slack_email or user.slack_email
         updated_user = self.user_repository.update_user(user)
         if updated_user is None:
             raise UserNotFoundException
