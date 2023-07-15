@@ -67,6 +67,20 @@ alembic downgrade base
 alembic downgrade <revision_id>
 ```
 
+## Testing
+
+### MySQL Test DB
+
+```
+docker run --name wacruit-test \
+  -e MYSQL_USER=test-user \
+  -e MYSQL_PASSWORD=password \
+  -e MYSQL_ROOT_PASSWORD=root-password \
+  -e MYSQL_DATABASE=testdb \
+  -p 3307:3306 \
+  -d mysql:5.7  # or mysql:latest
+```
+
 ## Infra
 - CI/CD
   - Define a Dockerfile to run the application(`wacruit-server`) and expose the port(`8080`).
