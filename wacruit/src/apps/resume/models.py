@@ -33,19 +33,30 @@ class ResumeSubmission(DeclarativeBase):
     __tablename__ = "resume_submission"
 
     id: Mapped[intpk]
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"))
+    user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("user.id", ondelete="SET NULL")
+    )
     user: Mapped["User"] = relationship("User", back_populates="resume_submissions")
-    question_id: Mapped[int] = mapped_column(
-        ForeignKey("resume_question.id", ondelete="CASCADE")
+    question_id: Mapped[int | None] = mapped_column(
+        ForeignKey("resume_question.id", ondelete="SET NULL")
     )
     question: Mapped["ResumeQuestion"] = relationship(
         back_populates="resume_submissions"
     )
-    recruiting_id: Mapped[int] = mapped_column(
-        ForeignKey("recruiting.id", ondelete="CASCADE")
+    recruiting_id: Mapped[int | None] = mapped_column(
+        ForeignKey("recruiting.id", ondelete="SET NULL")
     )
     recruiting: Mapped["Recruiting"] = relationship(back_populates="resume_submissions")
     answer: Mapped[str | None] = mapped_column(String(10000))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),  # pylint: disable=not-callable
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        onupdate=func.now(),  # pylint: disable=not-callable
+        server_default=func.now(),  # pylint: disable=not-callable
+    )
 
 
 class Recruiting(DeclarativeBase):

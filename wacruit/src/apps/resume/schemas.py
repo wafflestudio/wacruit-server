@@ -25,6 +25,8 @@ class ResumeSubmissionDto(BaseModel):
     user_id: int = Field(...)
     recruiting_id: int = Field(...)
     question_id: int = Field(...)
+    created_at: datetime = Field(...)
+    updated_at: datetime = Field(...)
     answer: str = Field(..., min_length=1, max_length=10000)
 
     class Config:
@@ -36,7 +38,6 @@ class ResumeSubmissionWithUserDto(ResumeSubmissionDto):
 
 
 class ResumeSubmissionCreateDto(BaseModel):
-    user_id: int = Field(...)
     recruiting_id: int = Field(...)
     question_id: int = Field(...)
     answer: str = Field(..., min_length=1, max_length=10000)
