@@ -8,6 +8,7 @@ from wacruit.src.apps.common.enums import JudgeSubmissionStatus
 from wacruit.src.apps.judge.repositories import JudgeApiRepository
 from wacruit.src.apps.judge.schemas import JudgeCreateSubmissionRequest
 from wacruit.src.apps.judge.schemas import JudgeGetSubmissionResponse
+from wacruit.src.apps.problem.exceptions import ProblemNotFoundException
 from wacruit.src.apps.problem.repositories import CodeSubmissionRepository
 from wacruit.src.apps.problem.repositories import ProblemRepository
 from wacruit.src.apps.problem.schemas import CodeSubmissionResult
@@ -29,9 +30,16 @@ class ProblemService(LoggingMixin):
         self.judge_api_repository = judge_api_repository
 
     def get_all_problems(self, recruiting_id: int) -> list[ProblemResponse]:
-        return ProblemResponse.from_orm_sequence(
-            self.problem_repository.get_problems_by_recruiting_id(recruiting_id)
+        problems = self.problem_repository.get_problems_by_recruiting_id(recruiting_id)
+        return ProblemResponse.from_orm_sequence(problems)
+
+    def get_problem(self, problem_id: int) -> ProblemResponse:
+        problem = self.problem_repository.get_problem_by_id_with_example_testcases(
+            problem_id
         )
+        if not problem:
+            raise ProblemNotFoundException()
+        return ProblemResponse.from_orm(problem)
 
     async def submit_code(
         self,
@@ -39,9 +47,7 @@ class ProblemService(LoggingMixin):
     ) -> dict[int, str]:
         testcase_token_map = {}
         for i, testcase in enumerate(
-            self.problem_repository.get_testcases_by_problem_id(
-                request.problem_id
-            ),  # type: ignore
+            self.problem_repository.get_testcases_by_problem_id(request.problem_id),
             start=1,
         ):
             create_submission_request = JudgeCreateSubmissionRequest(

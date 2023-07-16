@@ -3,7 +3,7 @@ from typing import Sequence
 from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.orm import contains_eager
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import noload
 from sqlalchemy.orm import Session
 
 from wacruit.src.apps.problem.models import CodeSubmission
@@ -22,23 +22,34 @@ class ProblemRepository:
         self.session = session
         self.transaction = transaction
 
-    def get_problems_by_recruiting_id(self, recruiting_id) -> Sequence[Problem]:
+    def get_problems_by_recruiting_id(self, recruiting_id: int) -> Sequence[Problem]:
+        query = (
+            select(Problem)
+            .where(Problem.recruiting_id == recruiting_id)
+            .options(noload(Problem.testcases))
+        )
+        return self.session.execute(query).scalars().all()
+
+    def get_problem_by_id_with_example_testcases(
+        self, problem_id: int
+    ) -> Problem | None:
         query = (
             select(Problem)
             .outerjoin(
                 TestCase, (Problem.id == TestCase.problem_id) & TestCase.is_example
             )
-            .where(Problem.recruiting_id == recruiting_id)
+            .where(Problem.id == problem_id)
             .options(contains_eager(Problem.testcases))
         )
-        return self.session.execute(query).unique().scalars().all()
+        return self.session.execute(query).scalar()
 
-    def get_problem_by_id(self, problem_id) -> Problem | None:
-        return self.session.query(Problem).filter(Problem.id == problem_id).first()
-
-    def get_testcases_by_problem_id(self, problem_id) -> list[TestCase]:
-        problem = self.get_problem_by_id(problem_id)
-        return problem.testcases if problem else []
+    def get_testcases_by_problem_id(
+        self, problem_id: int, is_example: bool = True
+    ) -> Sequence[TestCase]:
+        query = select(TestCase).where(
+            TestCase.problem_id == problem_id, TestCase.is_example == is_example
+        )
+        return self.session.execute(query).scalars().all()
 
     def create_problem(self, problem: Problem) -> Problem:
         with self.transaction:

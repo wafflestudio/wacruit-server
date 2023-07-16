@@ -16,7 +16,7 @@ class TestCase(OrmModel):
 class ProblemResponse(OrmModel):
     num: int
     body: str
-    testcases: list[TestCase] | None
+    testcases: list[TestCase]
 
 
 class CodeSubmitRequest(BaseModel):
