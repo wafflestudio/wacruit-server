@@ -18,7 +18,7 @@ class AWSSecretManager:
         self.secret_name = f"{settings.env}/wacruit"
 
     def is_available(self) -> bool:
-        if settings.is_local:
+        if settings.env in ["local", "test"]:
             return False
         try:
             self.cache.get_secret_string(secret_id=self.secret_name)

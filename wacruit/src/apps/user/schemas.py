@@ -1,15 +1,14 @@
 from pydantic import BaseModel
+from pydantic import EmailStr
 from pydantic import Field
 
 
 class UserCreateUpdateRequest(BaseModel):
-    sso_id: str | None = Field(default=None, max_length=50)
-
     first_name: str = Field(..., max_length=30)
     last_name: str = Field(..., max_length=30)
 
-    phone_number: str | None = Field(default=None, max_length=30)
-    email: str | None = Field(default=None, max_length=50)
+    phone_number: str = Field(max_length=30)
+    email: EmailStr
 
     department: str | None = Field(default=None, max_length=50)
     college: str | None = Field(default=None, max_length=50)
@@ -22,11 +21,17 @@ class UserCreateResponse(BaseModel):
     first_name: str
     last_name: str
 
-    phone_number: str | None = Field(default=None, max_length=30)
-    email: str | None = Field(default=None, max_length=50)
+    phone_number: str | None
+    email: str | None
 
     class Config:
         orm_mode = True
+
+
+class UserUpdateInvitationEmailsRequest(BaseModel):
+    github_email: EmailStr | None = None
+    slack_email: EmailStr | None = None
+    notion_email: EmailStr | None = None
 
 
 class UserDetailResponse(BaseModel):
@@ -42,6 +47,10 @@ class UserDetailResponse(BaseModel):
     department: str | None
     college: str | None
     university: str | None
+
+    github_email: str | None
+    slack_email: str | None
+    notion_email: str | None
 
     class Config:
         orm_mode = True

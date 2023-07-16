@@ -1,4 +1,5 @@
 from fastapi import Depends
+from sqlalchemy import update
 from sqlalchemy.orm import Session
 
 from wacruit.src.apps.user.models import User
@@ -32,3 +33,12 @@ class UserRepository:
     def create_users(self, users: list[User]) -> None:
         with self.transaction:
             self.session.bulk_save_objects(users)
+
+    def update_user(self, user: User) -> User | None:
+        if self.get_user_by_id(user.id) is None:
+            return None
+
+        with self.transaction:
+            self.session.merge(user)
+
+        return user

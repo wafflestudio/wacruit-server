@@ -6,10 +6,16 @@ from sqlalchemy import orm
 
 from wacruit.src.database.base import DeclarativeBase
 from wacruit.src.database.config import db_config
+from wacruit.src.settings import settings
+
+
+@pytest.fixture(autouse=True, scope="session")
+def set_test_env():
+    settings.env = "test"
 
 
 @pytest.fixture(scope="session")
-def db_engine() -> Iterable[sqlalchemy.Engine]:
+def db_engine(set_test_env) -> Iterable[sqlalchemy.Engine]:
     url = db_config.url
     engine = sqlalchemy.create_engine(url)
     DeclarativeBase.metadata.create_all(bind=engine)
@@ -17,6 +23,7 @@ def db_engine() -> Iterable[sqlalchemy.Engine]:
     try:
         yield engine
     finally:
+        DeclarativeBase.metadata.drop_all(bind=engine)
         engine.dispose()
 
 
