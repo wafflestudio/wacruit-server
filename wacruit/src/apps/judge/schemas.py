@@ -9,6 +9,8 @@ class JudgeCreateSubmissionRequest(BaseModel):
     source_code: str = Field(..., max_length=10000)
     language_id: int = Field(..., ge=100, le=111)
     stdin: str
+    expected_output: str
+    cpu_time_limit: float
 
 
 class JudgeCreateSubmissionResponse(BaseModel):
@@ -26,5 +28,5 @@ class JudgeGetSubmissionResponse(BaseModel):
     compile_output: str | None
     message: str | None
     status: JudgeSubmissionStatusModel
-    time: str | None
+    time: float | None
     memory: int | None

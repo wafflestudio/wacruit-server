@@ -8,7 +8,7 @@ from wacruit.src.apps.common.schemas import OrmModel
 from wacruit.src.apps.judge.schemas import JudgeSubmissionStatusModel
 
 
-class TestCase(OrmModel):
+class TestCaseResponse(OrmModel):
     stdin: str
     expected_output: str
 
@@ -16,7 +16,7 @@ class TestCase(OrmModel):
 class ProblemResponse(OrmModel):
     num: int
     body: str
-    testcases: list[TestCase]
+    testcases: list[TestCaseResponse]
 
 
 class CodeSubmitRequest(BaseModel):
@@ -24,14 +24,13 @@ class CodeSubmitRequest(BaseModel):
     language: Language = Field(...)
     source_code: str = Field(..., max_length=10000)
     is_test: bool = Field(False)
-    testcases: list[Any] | None = Field(None, max_items=10)
+    extra_testcases: list[TestCaseResponse] | None = Field(None, max_items=10)
 
 
 class CodeSubmissionResult(BaseModel):
     id: int
-    status: JudgeSubmissionStatusModel
-    result: str
-
-
-class CodeSubmissionResultResponse(BaseModel):
-    results: list[CodeSubmissionResult]
+    status: str
+    msg: str | None
+    stdout: str | None
+    time: float | None
+    memory: int | None
