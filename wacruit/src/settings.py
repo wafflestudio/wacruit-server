@@ -7,7 +7,7 @@ ROOT_PATH = Path(__file__).parent.parent.parent
 
 
 class Settings(BaseSettings):
-    env: Literal["dev", "prod", "local"] = "local"
+    env: Literal["dev", "prod", "local", "test"] = "local"
 
     @property
     def is_dev(self) -> bool:
@@ -22,9 +22,13 @@ class Settings(BaseSettings):
         return self.env == "local"
 
     @property
+    def is_test(self) -> bool:
+        return self.env == "test"
+
+    @property
     def env_files(self) -> tuple[Path, ...]:
-        if self.is_local:
-            return (ROOT_PATH / ".env.local",)
+        if self.env in ["local", "test"]:
+            return (ROOT_PATH / f".env.{self.env}",)
 
         return (
             ROOT_PATH / f".env.{self.env}",

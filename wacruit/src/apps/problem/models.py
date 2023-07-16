@@ -31,10 +31,12 @@ class CodeSubmission(DeclarativeBase):
     __tablename__ = "code_submission"
 
     id: Mapped[intpk]
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"))
+    user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("user.id", ondelete="SET NULL")
+    )
     user: Mapped["User"] = relationship(back_populates="code_submissions")
-    problem_id: Mapped[int] = mapped_column(
-        ForeignKey("problem.id", ondelete="CASCADE")
+    problem_id: Mapped[int | None] = mapped_column(
+        ForeignKey("problem.id", ondelete="SET NULL")
     )
     problem: Mapped["Problem"] = relationship(back_populates="submissions")
     token: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -48,8 +50,8 @@ class TestCase(DeclarativeBase):
     __tablename__ = "testcase"
 
     id: Mapped[intpk]
-    problem_id: Mapped[int] = mapped_column(
-        ForeignKey("problem.id", onupdate="CASCADE")
+    problem_id: Mapped[int | None] = mapped_column(
+        ForeignKey("problem.id", ondelete="SET NULL")
     )
     problem: Mapped["Problem"] = relationship(back_populates="testcases")
     stdin: Mapped[str] = mapped_column(Text, nullable=False)

@@ -3,7 +3,8 @@ from typing import Sequence
 from fastapi import Depends
 from sqlalchemy import delete
 from sqlalchemy import select
-from sqlalchemy.orm import exc
+from sqlalchemy.exc import InvalidRequestError
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import Session
 
 from wacruit.src.apps.resume.exceptions import ResumeNotFound
@@ -25,14 +26,17 @@ class ResumeRepository:
     def get_resumes(self, recruiting_id) -> Sequence[ResumeSubmission]:
         query = (
             select(ResumeSubmission)
-            .join(ResumeSubmission.user)
+            .options(joinedload(ResumeSubmission.user))
             .where(ResumeSubmission.recruiting_id == recruiting_id)
         )
         return self.session.execute(query).scalars().all()
 
     def get_resume_by_id(self, id: int) -> ResumeSubmission:
         query = select(ResumeSubmission).where(ResumeSubmission.id == id)
-        return self.session.execute(query).scalar_one()
+        try:
+            return self.session.execute(query).scalar_one()
+        except InvalidRequestError as exc:
+            raise ResumeNotFound() from exc
 
     def get_resume(
         self, user_id: int, recruiting_id: int

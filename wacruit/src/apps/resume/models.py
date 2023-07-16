@@ -21,9 +21,7 @@ class ResumeQuestion(DeclarativeBase):
     recruiting_id: Mapped[int] = mapped_column(
         ForeignKey("recruiting.id", ondelete="CASCADE")
     )
-    recruiting: Mapped["Recruiting"] = relationship(
-        "Recruiting", back_populates="resume_questions"
-    )
+    recruiting: Mapped["Recruiting"] = relationship(back_populates="resume_questions")
     resume_submissions: Mapped[list["ResumeSubmission"]] = relationship(
         back_populates="question"
     )
@@ -41,14 +39,12 @@ class ResumeSubmission(DeclarativeBase):
         ForeignKey("resume_question.id", ondelete="CASCADE")
     )
     question: Mapped["ResumeQuestion"] = relationship(
-        "ResumeQuestion", back_populates="resume_submissions"
+        back_populates="resume_submissions"
     )
     recruiting_id: Mapped[int] = mapped_column(
         ForeignKey("recruiting.id", ondelete="CASCADE")
     )
-    recruiting: Mapped["Recruiting"] = relationship(
-        "Recruiting", back_populates="resume_submissions"
-    )
+    recruiting: Mapped["Recruiting"] = relationship(back_populates="resume_submissions")
     answer: Mapped[str | None] = mapped_column(String(10000))
 
 

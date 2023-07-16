@@ -6,7 +6,7 @@ from wacruit.src.settings import settings
 
 
 def _add_routers(app: fastapi.FastAPI):
-    app.include_router(router=api_router, prefix="/api")
+    app.include_router(router=api_router)
 
 
 def _register_shutdown_event(app: fastapi.FastAPI):
@@ -18,7 +18,12 @@ def _register_shutdown_event(app: fastapi.FastAPI):
 
 
 def create_app() -> fastapi.FastAPI:
-    app = fastapi.FastAPI(title="wacruit-server", debug=settings.is_dev)
+    app = fastapi.FastAPI(
+        title="wacruit-server",
+        debug=settings.is_dev,
+        docs_url="/api/docs",
+        redoc_url="/api/redoc",
+    )
     _add_routers(app)
     _register_shutdown_event(app)
     return app
