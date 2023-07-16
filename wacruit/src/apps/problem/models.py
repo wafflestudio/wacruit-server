@@ -15,6 +15,7 @@ from wacruit.src.database.base import DeclarativeBase
 from wacruit.src.database.base import intpk
 
 if TYPE_CHECKING:
+    from wacruit.src.apps.recruiting.models import Recruiting
     from wacruit.src.apps.user.models import User
 
 
@@ -22,6 +23,9 @@ class Problem(DeclarativeBase):
     __tablename__ = "problem"
 
     id: Mapped[intpk]
+    recruiting_id: Mapped[intpk]
+    recruiting: Mapped["Recruiting"] = relationship(back_populates="problems")
+    num: Mapped[int]  # recruiting 모델 추가 시 composite unique constraint 추가 예정
     body: Mapped[str] = mapped_column(Text, nullable=False)
     submissions: Mapped[list["CodeSubmission"]] = relationship(back_populates="problem")
     testcases: Mapped[list["TestCase"]] = relationship(back_populates="problem")
