@@ -6,12 +6,15 @@ from sqlalchemy import orm
 from sqlalchemy.orm.session import Session
 
 from wacruit.src.database.config import db_config
+from wacruit.src.settings import settings
 from wacruit.src.utils.singleton import SingletonMeta
 
 
 class DBSessionFactory(metaclass=SingletonMeta):
     def __init__(self):
-        self._engine: sqlalchemy.Engine = sqlalchemy.create_engine(db_config.url)
+        self._engine: sqlalchemy.Engine = sqlalchemy.create_engine(
+            db_config.url, echo=settings.is_local
+        )
         self._session_maker = orm.sessionmaker(
             bind=self._engine, expire_on_commit=False
         )
