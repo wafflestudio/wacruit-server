@@ -16,7 +16,6 @@ from wacruit.src.apps.problem.repositories import ProblemRepository
 from wacruit.src.apps.problem.schemas import CodeSubmissionResult
 from wacruit.src.apps.problem.schemas import CodeSubmitRequest
 from wacruit.src.apps.problem.schemas import ProblemResponse
-from wacruit.src.apps.problem.schemas import TestCaseResponse
 from wacruit.src.apps.user.models import User
 from wacruit.src.utils.mixins import LoggingMixin
 
