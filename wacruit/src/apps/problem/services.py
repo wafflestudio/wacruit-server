@@ -1,5 +1,5 @@
 import asyncio
-from typing import AsyncGenerator, Literal
+from typing import AsyncGenerator
 
 from fastapi import Depends
 from fastapi import Request
@@ -28,11 +28,10 @@ class ProblemService(LoggingMixin):
         self.code_submission_repository = code_submission_repository
         self.judge_api_repository = judge_api_repository
 
-    def get_all_problems(self) -> list[ProblemResponse]:
-        return [
-            ProblemResponse(problem_num=i, body=p.body)
-            for i, p in enumerate(self.problem_repository.get_problems(), start=1)
-        ]
+    def get_all_problems(self, recruiting_id: int) -> list[ProblemResponse]:
+        return ProblemResponse.from_orm_sequence(
+            self.problem_repository.get_problems_by_recruiting_id(recruiting_id)
+        )
 
     async def submit_code(
         self,

@@ -1,4 +1,9 @@
+from typing import Sequence
+
 from fastapi import Depends
+from sqlalchemy import select
+from sqlalchemy.orm import contains_eager
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import Session
 
 from wacruit.src.apps.problem.models import CodeSubmission
@@ -17,8 +22,16 @@ class ProblemRepository:
         self.session = session
         self.transaction = transaction
 
-    def get_problems(self) -> list[Problem]:
-        return self.session.query(Problem.id, Problem.body).all()  # type: ignore
+    def get_problems_by_recruiting_id(self, recruiting_id) -> Sequence[Problem]:
+        query = (
+            select(Problem)
+            .outerjoin(
+                TestCase, (Problem.id == TestCase.problem_id) & TestCase.is_example
+            )
+            .where(Problem.recruiting_id == recruiting_id)
+            .options(contains_eager(Problem.testcases))
+        )
+        return self.session.execute(query).unique().scalars().all()
 
     def get_problem_by_id(self, problem_id) -> Problem | None:
         return self.session.query(Problem).filter(Problem.id == problem_id).first()

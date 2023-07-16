@@ -1,15 +1,22 @@
-from typing import Any, Literal
+from typing import Any
 
 from pydantic import BaseModel
 from pydantic import Field
 
 from wacruit.src.apps.common.enums import Language
+from wacruit.src.apps.common.schemas import OrmModel
 from wacruit.src.apps.judge.schemas import JudgeSubmissionStatusModel
 
 
-class ProblemResponse(BaseModel):
-    problem_num: int
+class TestCase(OrmModel):
+    stdin: str
+    expected_output: str
+
+
+class ProblemResponse(OrmModel):
+    num: int
     body: str
+    testcases: list[TestCase] | None
 
 
 class CodeSubmitRequest(BaseModel):

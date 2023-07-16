@@ -23,7 +23,9 @@ class Problem(DeclarativeBase):
     __tablename__ = "problem"
 
     id: Mapped[intpk]
-    recruiting_id: Mapped[intpk]
+    recruiting_id: Mapped[int | None] = mapped_column(
+        ForeignKey("recruiting.id", ondelete="SET NULL")
+    )
     recruiting: Mapped["Recruiting"] = relationship(back_populates="problems")
     num: Mapped[int]  # recruiting 모델 추가 시 composite unique constraint 추가 예정
     body: Mapped[str] = mapped_column(Text, nullable=False)
