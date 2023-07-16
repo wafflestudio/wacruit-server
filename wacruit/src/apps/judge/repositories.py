@@ -34,7 +34,7 @@ class JudgeApiRepository:
         fields = "stdout,stderr,compile_output,message,status,time,memory"
         res = await self.client.get(
             url=f"/submissions/{token}?base64_encoded=false",
-            params={"base64_encoded": False, "fields": ",".join(fields)},
+            params={"base64_encoded": False, "fields": fields},
             timeout=60,
         )
         res.raise_for_status()
