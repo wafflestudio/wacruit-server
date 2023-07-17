@@ -15,7 +15,10 @@ class JudgeApiRepository:
         self, request: JudgeCreateSubmissionRequest
     ) -> JudgeCreateSubmissionResponse:
         res = await self.client.post(
-            url="/submissions?base64_encoded=false", data=request.dict(), timeout=60
+            url="/submissions",
+            params={"base64_encoded": False},
+            data=request.dict(),
+            timeout=60,
         )
         res.raise_for_status()
         return JudgeCreateSubmissionResponse(**res.json())
@@ -23,8 +26,8 @@ class JudgeApiRepository:
     async def list_submission(self) -> JudgeGetSubmissionResponse:
         fields = "stdout,stderr,compile_output,message,status,time,memory"
         res = await self.client.get(
-            url="/submissions?=false",
-            params={"base64_encoded": False, "fields": ",".join(fields)},
+            url="/submissions",
+            params={"base64_encoded": False, "fields": fields},
             timeout=60,
         )
         res.raise_for_status()
