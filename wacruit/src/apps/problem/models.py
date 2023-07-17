@@ -22,6 +22,7 @@ class Problem(DeclarativeBase):
     __tablename__ = "problem"
 
     id: Mapped[intpk]
+    num: Mapped[int]
     body: Mapped[str] = mapped_column(Text, nullable=False)
     submissions: Mapped[list["CodeSubmission"]] = relationship(back_populates="problem")
     testcases: Mapped[list["TestCase"]] = relationship(back_populates="problem")
