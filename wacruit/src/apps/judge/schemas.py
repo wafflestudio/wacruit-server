@@ -5,10 +5,12 @@ from wacruit.src.apps.common.enums import JudgeSubmissionStatus
 
 
 class JudgeCreateSubmissionRequest(BaseModel):
-    problem_id: int
     source_code: str = Field(..., max_length=10000)
     language_id: int = Field(..., ge=100, le=111)
     stdin: str
+    expected_output: str | None
+    cpu_time_limit: float = Field(5.0)
+    wall_time_limit: float = Field(30.0)
 
 
 class JudgeCreateSubmissionResponse(BaseModel):
