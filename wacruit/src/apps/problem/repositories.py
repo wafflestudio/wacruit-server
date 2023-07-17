@@ -3,7 +3,6 @@ from typing import Sequence
 from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.orm import contains_eager
-from sqlalchemy.orm import join
 from sqlalchemy.orm import Session
 
 from wacruit.src.apps.problem.models import CodeSubmission
@@ -25,8 +24,16 @@ class ProblemRepository:
     def get_problems(self) -> list[Problem]:
         return self.session.query(Problem.id, Problem.body).all()  # type: ignore
 
-    def get_problem_by_id(self, problem_id) -> Problem | None:
-        return self.session.query(Problem).filter(Problem.id == problem_id).first()
+    def get_problem_by_id_with_example(self, problem_id: int) -> Problem | None:
+        query = (
+            select(Problem)
+            .outerjoin(
+                TestCase, (Problem.id == TestCase.problem_id) & TestCase.is_example
+            )
+            .where(Problem.id == problem_id)
+            .options(contains_eager(Problem.testcases))
+        )
+        return self.session.execute(query).scalar()
 
     def get_testcases_by_problem_id(
         self, problem_id: int, is_example: bool = True

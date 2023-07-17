@@ -13,11 +13,12 @@ from wacruit.src.apps.problem.services import ProblemService
 v1_router = APIRouter(prefix="/v1/problem", tags=["problem"])
 
 
-@v1_router.get("/")
-def list_problem(
+@v1_router.get("/{problem_id}")
+def get_problem(
+    problem_id: int,
     problem_service: Annotated[ProblemService, Depends()],
-) -> list[ProblemResponse]:
-    return problem_service.get_all_problems()
+) -> ProblemResponse:
+    return problem_service.get_problem(problem_id)
 
 
 @v1_router.post("/submission")
