@@ -1,4 +1,9 @@
+from typing import Sequence
+
 from fastapi import Depends
+from sqlalchemy import select
+from sqlalchemy.orm import contains_eager
+from sqlalchemy.orm import join
 from sqlalchemy.orm import Session
 
 from wacruit.src.apps.problem.models import CodeSubmission
@@ -23,9 +28,13 @@ class ProblemRepository:
     def get_problem_by_id(self, problem_id) -> Problem | None:
         return self.session.query(Problem).filter(Problem.id == problem_id).first()
 
-    def get_testcases_by_problem_id(self, problem_id) -> list[TestCase]:
-        problem = self.get_problem_by_id(problem_id)
-        return problem.testcases if problem else []
+    def get_testcases_by_problem_id(
+        self, problem_id: int, is_example: bool = True
+    ) -> Sequence[TestCase]:
+        query = select(TestCase).where(
+            TestCase.problem_id == problem_id, TestCase.is_example == is_example
+        )
+        return self.session.execute(query).scalars().all()
 
     def create_problem(self, problem: Problem) -> Problem:
         with self.transaction:

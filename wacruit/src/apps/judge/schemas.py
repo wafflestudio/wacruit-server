@@ -21,6 +21,9 @@ class JudgeSubmissionStatusModel(BaseModel):
     id: JudgeSubmissionStatus
     description: str
 
+    class Config:
+        json_encoders = {JudgeSubmissionStatus: lambda e: e.value}
+
 
 class JudgeGetSubmissionResponse(BaseModel):
     stdout: str | None

@@ -1,12 +1,11 @@
 import asyncio
 from decimal import Decimal
-from typing import AsyncGenerator, List, Literal
+from typing import Any, AsyncGenerator
 
 from fastapi import Depends
 from fastapi import Request
 
 from wacruit.src.apps.common.enums import JudgeSubmissionStatus
-from wacruit.src.apps.common.schemas import ListResponse
 from wacruit.src.apps.judge.repositories import JudgeApiRepository
 from wacruit.src.apps.judge.schemas import JudgeCreateSubmissionRequest
 from wacruit.src.apps.judge.schemas import JudgeGetSubmissionResponse
@@ -40,7 +39,7 @@ class ProblemService(LoggingMixin):
         request: CodeSubmitRequest,
     ) -> list[str]:
         testcases = self.problem_repository.get_testcases_by_problem_id(
-            request.problem_id
+            request.problem_id, request.is_test
         )
         requests = [
             JudgeCreateSubmissionRequest(
@@ -57,8 +56,8 @@ class ProblemService(LoggingMixin):
         return [v.token for v in response]
 
     async def get_submission_result(
-        self, request: Request, tokens: list[str], user_id: str
-    ) -> AsyncGenerator[ListResponse[CodeSubmissionResult], None]:
+        self, request: Request, tokens: list[str], user_id: str, is_test: bool = True
+    ) -> AsyncGenerator[dict[str, Any], None]:
         token_map = dict(enumerate(tokens, start=1))
 
         while len(token_map) > 0:
@@ -84,13 +83,16 @@ class ProblemService(LoggingMixin):
                     CodeSubmissionResult(
                         num=i,
                         status=result.status,
-                        stdout=result.stdout,
+                        stdout=result.stdout if is_test else None,
                         time=Decimal(result.time or 0),
                         memory=Decimal(result.memory or 0),
-                    )
+                    ).json()
                 )
 
-            yield ListResponse(items=responses)
+            yield {
+                "data": {"items": responses},
+                "event": "message" if responses else "skip",
+            }
             await asyncio.sleep(1)
 
     async def check_submission(self, token: str) -> JudgeGetSubmissionResponse:
