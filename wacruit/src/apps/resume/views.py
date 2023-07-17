@@ -10,7 +10,6 @@ from wacruit.src.apps.common.schemas import ListResponse
 from wacruit.src.apps.resume.exceptions import ResumeNotFound
 from wacruit.src.apps.resume.schemas import ResumeListingByIdDto
 from wacruit.src.apps.resume.schemas import ResumeSubmissionCreateDto
-from wacruit.src.apps.resume.schemas import ResumeSubmissionDto
 from wacruit.src.apps.resume.schemas import ResumeSubmissionWithUserDto
 from wacruit.src.apps.resume.services import ResumeService
 from wacruit.src.apps.user.exceptions import UserPermissionDeniedException
@@ -46,9 +45,9 @@ def create_resume(
     current_user: CurrentUser,
     request: Sequence[ResumeSubmissionCreateDto],
     resume_service: ResumeService = Depends(),
-) -> list[ResumeSubmissionWithUserDto]:
+) -> ListResponse[ResumeSubmissionWithUserDto]:
     # TODO: Add permission check
-    return resume_service.create_resume(current_user.id, request)
+    return ListResponse(items=resume_service.create_resume(current_user.id, request))
 
 
 @v1_router.put("/", responses=responses_from(ResumeNotFound))
@@ -56,9 +55,9 @@ def update_resume(
     current_user: CurrentUser,
     request: Sequence[ResumeSubmissionCreateDto],
     resume_service: ResumeService = Depends(),
-) -> list[ResumeSubmissionWithUserDto]:
+) -> ListResponse[ResumeSubmissionWithUserDto]:
     # TODO: Add permission check
-    return resume_service.update_resumes(current_user.id, request)
+    return ListResponse(items=resume_service.update_resumes(current_user.id, request))
 
 
 @v1_router.delete("/", responses=responses_from(ResumeNotFound), status_code=204)

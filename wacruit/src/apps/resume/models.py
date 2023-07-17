@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
@@ -8,24 +9,27 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
-from wacruit.src.apps.user.models import User
 from wacruit.src.database.base import DeclarativeBase
 from wacruit.src.database.base import intpk
 from wacruit.src.database.base import str30
+
+if TYPE_CHECKING:
+    from wacruit.src.apps.user.models import User
 
 
 class ResumeQuestion(DeclarativeBase):
     __tablename__ = "resume_question"
 
     id: Mapped[intpk]
-    recruiting_id: Mapped[int] = mapped_column(
-        ForeignKey("recruiting.id", ondelete="CASCADE")
+    recruiting_id: Mapped[int | None] = mapped_column(
+        ForeignKey("recruiting.id", ondelete="SET NULL")
     )
     recruiting: Mapped["Recruiting"] = relationship(back_populates="resume_questions")
     resume_submissions: Mapped[list["ResumeSubmission"]] = relationship(
         back_populates="question"
     )
     question_num: Mapped[int]
+    content_limit: Mapped[int]
     content: Mapped[str | None] = mapped_column(String(10000))
 
 
@@ -36,7 +40,7 @@ class ResumeSubmission(DeclarativeBase):
     user_id: Mapped[int | None] = mapped_column(
         ForeignKey("user.id", ondelete="SET NULL")
     )
-    user: Mapped["User"] = relationship("User", back_populates="resume_submissions")
+    user: Mapped["User"] = relationship(back_populates="resume_submissions")
     question_id: Mapped[int | None] = mapped_column(
         ForeignKey("resume_question.id", ondelete="SET NULL")
     )

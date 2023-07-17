@@ -6,9 +6,7 @@ from wacruit.src.apps.resume.exceptions import ResumeNotFound
 from wacruit.src.apps.resume.models import ResumeSubmission
 from wacruit.src.apps.resume.repositories import ResumeRepository
 from wacruit.src.apps.resume.schemas import ResumeSubmissionCreateDto
-from wacruit.src.apps.resume.schemas import ResumeSubmissionDto
 from wacruit.src.apps.resume.schemas import ResumeSubmissionWithUserDto
-from wacruit.src.apps.user.models import User
 
 
 class ResumeService:
