@@ -1,4 +1,5 @@
-from typing import Any, Literal
+from decimal import Decimal
+from typing import Any
 
 from pydantic import BaseModel
 from pydantic import Field
@@ -21,10 +22,8 @@ class CodeSubmitRequest(BaseModel):
 
 
 class CodeSubmissionResult(BaseModel):
-    id: int
+    num: int
     status: JudgeSubmissionStatusModel
-    result: str
-
-
-class CodeSubmissionResultResponse(BaseModel):
-    results: list[CodeSubmissionResult]
+    stdout: str | None
+    time: Decimal | None
+    memory: Decimal | None

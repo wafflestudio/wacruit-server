@@ -27,10 +27,7 @@ async def submit_code(
     code_submit_request: CodeSubmitRequest,
     problem_service: Annotated[ProblemService, Depends()],
 ):
-    testcase_token_map = await problem_service.submit_code(code_submit_request)
-    print(testcase_token_map)
+    tokens = await problem_service.submit_code(code_submit_request)
     return EventSourceResponse(
-        problem_service.get_submission_result(
-            request, testcase_token_map, waffle_user_id
-        )
+        problem_service.get_submission_result(request, tokens, waffle_user_id)
     )
