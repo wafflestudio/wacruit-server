@@ -1,9 +1,11 @@
 from datetime import datetime
+from decimal import Decimal
 from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean
 from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
+from sqlalchemy import Numeric
 from sqlalchemy import String
 from sqlalchemy import Text
 from sqlalchemy.orm import Mapped
@@ -77,6 +79,7 @@ class TestCase(DeclarativeBase):
     problem: Mapped["Problem"] = relationship(back_populates="testcases")
     stdin: Mapped[str] = mapped_column(Text, nullable=False)
     expected_output: Mapped[str] = mapped_column(Text, nullable=False)
+    time_limit: Mapped[Decimal] = mapped_column(Numeric(10, 5))
     is_example: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     submission_results: Mapped[list["CodeSubmissionResult"]] = relationship(
         back_populates="testcase"
