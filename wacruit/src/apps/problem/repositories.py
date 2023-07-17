@@ -6,6 +6,7 @@ from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm import Session
 
 from wacruit.src.apps.problem.models import CodeSubmission
+from wacruit.src.apps.problem.models import CodeSubmissionResult
 from wacruit.src.apps.problem.models import Problem
 from wacruit.src.apps.problem.models import TestCase
 from wacruit.src.database.connection import get_db_session
@@ -72,7 +73,20 @@ class CodeSubmissionRepository:
             .first()
         )
 
-    def create_submission(self, submission: CodeSubmission):
+    def create_submission(
+        self,
+        user_id: int,
+        problem_id: int,
+        testcases: list[TestCase],
+        tokens: list[str],
+    ) -> None:
         with self.transaction:
+            submission = CodeSubmission(user_id=user_id, problem_id=problem_id)
             self.session.add(submission)
-        return submission
+            results = (
+                CodeSubmissionResult(
+                    submission_id=submission.id, testcase_id=testcase.id, token=token
+                )
+                for testcase, token in zip(testcases, tokens)
+            )
+            self.session.bulk_save_objects(results)

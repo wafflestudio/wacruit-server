@@ -15,6 +15,7 @@ from wacruit.src.apps.problem.repositories import ProblemRepository
 from wacruit.src.apps.problem.schemas import CodeSubmissionResult
 from wacruit.src.apps.problem.schemas import CodeSubmitRequest
 from wacruit.src.apps.problem.schemas import ProblemResponse
+from wacruit.src.apps.user.models import User
 from wacruit.src.utils.mixins import LoggingMixin
 
 
@@ -40,10 +41,7 @@ class ProblemService(LoggingMixin):
         print(problem.testcases[0].__dict__)
         return ProblemResponse.from_orm(problem)
 
-    async def submit_code(
-        self,
-        request: CodeSubmitRequest,
-    ) -> list[str]:
+    async def submit_code(self, request: CodeSubmitRequest, user: User) -> list[str]:
         testcases = self.problem_repository.get_testcases_by_problem_id(
             request.problem_id, request.is_test
         )
@@ -62,11 +60,19 @@ class ProblemService(LoggingMixin):
             )
             for testcase in testcases
         ]
+
         response = await self.judge_api_repository.create_batch_submissions(requests)
-        return [v.token for v in response]
+        tokens = [v.token for v in response]
+
+        if not request.is_test:
+            self.code_submission_repository.create_submission(
+                user.id, request.problem_id, testcases, tokens  # type: ignore
+            )
+
+        return tokens
 
     async def get_submission_result(
-        self, request: Request, tokens: list[str], user_id: str, is_test: bool = True
+        self, request: Request, tokens: list[str], user: User, is_test: bool = True
     ) -> AsyncGenerator[dict[str, Any], None]:
         token_map = dict(enumerate(tokens, start=1))
 

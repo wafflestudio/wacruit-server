@@ -41,7 +41,6 @@ class CodeSubmission(DeclarativeBase):
     problem_id: Mapped[int | None] = mapped_column(
         ForeignKey("problem.id", ondelete="SET NULL")
     )
-    token: Mapped[str] = mapped_column(String(255), nullable=False)
     create_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),  # pylint: disable=not-callable
