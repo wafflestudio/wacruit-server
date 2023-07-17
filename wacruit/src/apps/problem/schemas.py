@@ -1,11 +1,15 @@
 from decimal import Decimal
-from typing import Any
 
 from pydantic import BaseModel
 from pydantic import Field
 
 from wacruit.src.apps.common.enums import Language
 from wacruit.src.apps.judge.schemas import JudgeSubmissionStatusModel
+
+
+class TestCaseDto(BaseModel):
+    stdin: str
+    expected_output: str
 
 
 class ProblemResponse(BaseModel):
@@ -18,7 +22,7 @@ class CodeSubmitRequest(BaseModel):
     language: Language = Field(...)
     source_code: str = Field(..., max_length=10000)
     is_test: bool = Field(False)
-    testcases: list[Any] | None = Field(None, max_items=10)
+    extra_testcases: list[TestCaseDto] | None = Field(None, max_items=10)
 
 
 class CodeSubmissionResult(BaseModel):

@@ -41,14 +41,18 @@ class ProblemService(LoggingMixin):
         testcases = self.problem_repository.get_testcases_by_problem_id(
             request.problem_id, request.is_test
         )
+
+        if request.is_test and request.extra_testcases:
+            testcases = [*testcases, *request.extra_testcases]
+
         requests = [
             JudgeCreateSubmissionRequest(
                 source_code=request.source_code,
                 language_id=request.language.value,
                 stdin=testcase.stdin,
                 expected_output=testcase.expected_output,
-                cpu_time_limit=float(testcase.time_limit),
-                wall_time_limit=20,
+                cpu_time_limit=1.0 if request.is_test else float(testcase.time_limit),
+                wall_time_limit=20.0,
             )
             for testcase in testcases
         ]
