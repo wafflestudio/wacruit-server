@@ -22,9 +22,6 @@ class ProblemRepository:
         self.session = session
         self.transaction = transaction
 
-    def get_problems(self) -> list[Problem]:
-        return self.session.query(Problem.id, Problem.body).all()  # type: ignore
-
     def get_problem_by_id_with_example(self, problem_id: int) -> Problem | None:
         query = (
             select(Problem)
@@ -44,15 +41,6 @@ class ProblemRepository:
         )
         return self.session.execute(query).scalars().all()
 
-    def create_problem(self, problem: Problem) -> Problem:
-        with self.transaction:
-            self.session.add(problem)
-        return problem
-
-    def create_problems(self, problems: list[Problem]) -> None:
-        with self.transaction:
-            self.session.bulk_save_objects(problems)
-
 
 class CodeSubmissionRepository:
     def __init__(
@@ -62,16 +50,6 @@ class CodeSubmissionRepository:
     ):
         self.session = session
         self.transaction = transaction
-
-    def get_submissions(self) -> list[CodeSubmission]:
-        return self.session.query(CodeSubmission).all()
-
-    def get_submission_by_id(self, submission_id):
-        return (
-            self.session.query(CodeSubmission)
-            .filter(CodeSubmission.id == submission_id)
-            .first()
-        )
 
     def create_submission(
         self,

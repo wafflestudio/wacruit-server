@@ -8,7 +8,6 @@ from fastapi import Request
 from wacruit.src.apps.common.enums import JudgeSubmissionStatus
 from wacruit.src.apps.judge.repositories import JudgeApiRepository
 from wacruit.src.apps.judge.schemas import JudgeCreateSubmissionRequest
-from wacruit.src.apps.judge.schemas import JudgeGetSubmissionResponse
 from wacruit.src.apps.problem.exceptions import ProblemNotFoundException
 from wacruit.src.apps.problem.repositories import CodeSubmissionRepository
 from wacruit.src.apps.problem.repositories import ProblemRepository
@@ -30,15 +29,10 @@ class ProblemService(LoggingMixin):
         self.code_submission_repository = code_submission_repository
         self.judge_api_repository = judge_api_repository
 
-    def get_all_problems(self) -> list[ProblemResponse]:
-        problems = self.problem_repository.get_problems()
-        return ProblemResponse.from_orm_all(problems)
-
     def get_problem(self, problem_id) -> ProblemResponse:
         problem = self.problem_repository.get_problem_by_id_with_example(problem_id)
         if problem is None:
             raise ProblemNotFoundException()
-        print(problem.testcases[0].__dict__)
         return ProblemResponse.from_orm(problem)
 
     async def submit_code(self, request: CodeSubmitRequest, user: User) -> list[str]:
@@ -110,6 +104,3 @@ class ProblemService(LoggingMixin):
                 "event": "message" if responses else "skip",
             }
             await asyncio.sleep(1)
-
-    async def check_submission(self, token: str) -> JudgeGetSubmissionResponse:
-        return await self.judge_api_repository.get_submission(token)
