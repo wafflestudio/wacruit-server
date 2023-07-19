@@ -6,9 +6,10 @@ import botocore
 import botocore.session
 
 from wacruit.src.settings import settings
+from wacruit.src.utils.singleton import SingletonMeta
 
 
-class AWSSecretManager:
+class AWSSecretManager(metaclass=SingletonMeta):
     def __init__(self) -> None:
         client = botocore.session.get_session().create_client(
             "secretsmanager", region_name="ap-northeast-2"
