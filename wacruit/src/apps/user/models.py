@@ -13,6 +13,7 @@ from wacruit.src.database.base import str255
 
 if TYPE_CHECKING:
     from wacruit.src.apps.problem.models import CodeSubmission
+    from wacruit.src.apps.resume.models import ResumeSubmission
 
 
 class User(DeclarativeBase):
@@ -36,6 +37,10 @@ class User(DeclarativeBase):
     notion_email: Mapped[str255 | None]
 
     code_submissions: Mapped[list["CodeSubmission"]] = relationship(
+        back_populates="user"
+    )
+
+    resume_submissions: Mapped[list["ResumeSubmission"]] = relationship(
         back_populates="user"
     )
 
