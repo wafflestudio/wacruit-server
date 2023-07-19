@@ -40,6 +40,9 @@ class ProblemService(LoggingMixin):
             request.problem_id, request.is_test
         )
 
+        if not testcases:
+            raise ProblemNotFoundException()
+
         if request.is_test and request.extra_testcases:
             testcases = [*testcases, *request.extra_testcases]
 
