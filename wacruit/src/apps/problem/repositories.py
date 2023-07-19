@@ -1,4 +1,4 @@
-from typing import Sequence
+from typing import Iterable, Sequence
 
 from fastapi import Depends
 from sqlalchemy import select
@@ -55,8 +55,8 @@ class CodeSubmissionRepository:
         self,
         user_id: int,
         problem_id: int,
-        testcases: list[TestCase],
-        tokens: list[str],
+        testcases: Iterable[TestCase],
+        tokens: Iterable[str],
     ) -> None:
         with self.transaction:
             submission = CodeSubmission(user_id=user_id, problem_id=problem_id)

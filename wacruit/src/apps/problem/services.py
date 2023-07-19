@@ -63,7 +63,7 @@ class ProblemService(LoggingMixin):
 
         if not request.is_test:
             self.code_submission_repository.create_submission(
-                user.id, request.problem_id, testcases, tokens  # type: ignore
+                user.id, request.problem_id, testcases, tokens
             )
 
         return tokens
