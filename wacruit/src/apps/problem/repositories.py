@@ -61,6 +61,7 @@ class CodeSubmissionRepository:
         with self.transaction:
             submission = CodeSubmission(user_id=user_id, problem_id=problem_id)
             self.session.add(submission)
+            self.session.commit()
             results = (
                 CodeSubmissionResult(
                     submission_id=submission.id, testcase_id=testcase.id, token=token
