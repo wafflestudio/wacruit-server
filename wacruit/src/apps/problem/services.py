@@ -4,8 +4,10 @@ from typing import Any, AsyncGenerator
 
 from fastapi import Depends
 from fastapi import Request
+from sse_starlette import ServerSentEvent
 
 from wacruit.src.apps.common.enums import JudgeSubmissionStatus
+from wacruit.src.apps.common.schemas import ListResponse
 from wacruit.src.apps.judge.repositories import JudgeApiRepository
 from wacruit.src.apps.judge.schemas import JudgeCreateSubmissionRequest
 from wacruit.src.apps.problem.exceptions import ProblemNotFoundException
@@ -70,7 +72,7 @@ class ProblemService(LoggingMixin):
 
     async def get_submission_result(
         self, request: Request, tokens: list[str], user: User, is_test: bool = True
-    ) -> AsyncGenerator[dict[str, Any], None]:
+    ) -> AsyncGenerator[ServerSentEvent, None]:
         token_map = dict(enumerate(tokens, start=1))
 
         while len(token_map) > 0:
@@ -98,11 +100,11 @@ class ProblemService(LoggingMixin):
                         stdout=result.stdout if is_test else None,
                         time=Decimal(result.time or 0),
                         memory=Decimal(result.memory or 0),
-                    ).json()
+                    )
                 )
 
-            yield {
-                "data": {"items": responses},
-                "event": "message" if responses else "skip",
-            }
+            yield ServerSentEvent(
+                data=ListResponse(items=responses).json(),
+                event="message" if responses else "skip",
+            )
             await asyncio.sleep(1)
