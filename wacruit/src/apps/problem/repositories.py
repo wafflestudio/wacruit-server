@@ -41,16 +41,6 @@ class ProblemRepository:
         )
         return self.session.execute(query).scalars().all()
 
-
-class CodeSubmissionRepository:
-    def __init__(
-        self,
-        session: Session = Depends(get_db_session),
-        transaction: Transaction = Depends(),
-    ):
-        self.session = session
-        self.transaction = transaction
-
     def create_submission(
         self,
         user_id: int,

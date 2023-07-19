@@ -11,7 +11,6 @@ from wacruit.src.apps.common.schemas import ListResponse
 from wacruit.src.apps.judge.repositories import JudgeApiRepository
 from wacruit.src.apps.judge.schemas import JudgeCreateSubmissionRequest
 from wacruit.src.apps.problem.exceptions import ProblemNotFoundException
-from wacruit.src.apps.problem.repositories import CodeSubmissionRepository
 from wacruit.src.apps.problem.repositories import ProblemRepository
 from wacruit.src.apps.problem.schemas import CodeSubmissionResult
 from wacruit.src.apps.problem.schemas import CodeSubmitRequest
@@ -24,11 +23,9 @@ class ProblemService(LoggingMixin):
     def __init__(
         self,
         problem_repository: ProblemRepository = Depends(),
-        code_submission_repository: CodeSubmissionRepository = Depends(),
         judge_api_repository: JudgeApiRepository = Depends(),
     ):
         self.problem_repository = problem_repository
-        self.code_submission_repository = code_submission_repository
         self.judge_api_repository = judge_api_repository
 
     def get_problem(self, problem_id) -> ProblemResponse:
@@ -64,7 +61,7 @@ class ProblemService(LoggingMixin):
         tokens = [v.token for v in response]
 
         if not request.is_test:
-            self.code_submission_repository.create_submission(
+            self.problem_repository.create_submission(
                 user.id, request.problem_id, testcases, tokens
             )
 
