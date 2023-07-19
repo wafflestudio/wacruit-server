@@ -34,6 +34,6 @@ async def submit_code(
     tokens = await problem_service.submit_code(code_submit_request, user)
     return EventSourceResponse(
         problem_service.get_submission_result(
-            request, tokens, user, code_submit_request.is_test
+            request, tokens, user, code_submit_request.is_example
         )
     )

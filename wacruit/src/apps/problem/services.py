@@ -36,13 +36,13 @@ class ProblemService(LoggingMixin):
 
     async def submit_code(self, request: CodeSubmitRequest, user: User) -> list[str]:
         testcases = self.problem_repository.get_testcases_by_problem_id(
-            request.problem_id, request.is_test
+            request.problem_id, request.is_example
         )
 
         if not testcases:
             raise ProblemNotFoundException()
 
-        if request.is_test and request.extra_testcases:
+        if request.is_example and request.extra_testcases:
             testcases = [*testcases, *request.extra_testcases]
 
         requests = [
@@ -51,7 +51,9 @@ class ProblemService(LoggingMixin):
                 language_id=request.language.value,
                 stdin=testcase.stdin,
                 expected_output=testcase.expected_output,
-                cpu_time_limit=1.0 if request.is_test else float(testcase.time_limit),
+                cpu_time_limit=1.0
+                if request.is_example
+                else float(testcase.time_limit),
                 wall_time_limit=20.0,
             )
             for testcase in testcases
@@ -60,7 +62,7 @@ class ProblemService(LoggingMixin):
         response = await self.judge_api_repository.create_batch_submissions(requests)
         tokens = [v.token for v in response]
 
-        if not request.is_test:
+        if not request.is_example:
             self.problem_repository.create_submission(
                 user.id, request.problem_id, testcases, tokens
             )
@@ -68,7 +70,7 @@ class ProblemService(LoggingMixin):
         return tokens
 
     async def get_submission_result(
-        self, request: Request, tokens: list[str], user: User, is_test: bool = True
+        self, request: Request, tokens: list[str], user: User, is_example: bool = True
     ) -> AsyncGenerator[ServerSentEvent, None]:
         token_map = dict(enumerate(tokens, start=1))
 
@@ -97,7 +99,7 @@ class ProblemService(LoggingMixin):
                     CodeSubmissionResult(
                         num=i,
                         status=result.status,
-                        stdout=result.stdout if is_test else None,
+                        stdout=result.stdout if is_example else None,
                         time=Decimal(result.time or 0),
                         memory=Decimal(result.memory or 0),
                     )
