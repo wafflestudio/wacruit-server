@@ -25,7 +25,6 @@ class JudgeApiRepository:
             json=request.dict(),
             timeout=60,
         )
-        print(res.text)
         res.raise_for_status()
         return JudgeCreateSubmissionResponse(**res.json())
 
