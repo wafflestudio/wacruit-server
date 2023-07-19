@@ -82,12 +82,15 @@ class ProblemService(LoggingMixin):
             responses = []
             for i, result in list(zip(token_map.keys(), results)):
                 match result.status.id:
-                    case JudgeSubmissionStatus.IN_QUEUE | JudgeSubmissionStatus.PROCESSING:  # pylint: disable=line-too-long
+                    case (
+                        JudgeSubmissionStatus.IN_QUEUE
+                        | JudgeSubmissionStatus.PROCESSING
+                    ):
                         continue
                     case JudgeSubmissionStatus.ACCEPTED:
-                        ...  # 뭔가 성공했을 때 하는 로직
+                        ...  # TODO: 뭔가 성공했을 때 하는 로직
                     case _:
-                        ...  # 뭔가 실패했을 때 하는 로직
+                        ...  # TODO: 뭔가 실패했을 때 하는 로직
                 token_map.pop(i)
 
                 responses.append(
