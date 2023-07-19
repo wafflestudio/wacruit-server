@@ -16,6 +16,9 @@ class DBSessionFactory(metaclass=SingletonMeta):
             bind=self._engine, expire_on_commit=False
         )
 
+    def get_engine(self) -> sqlalchemy.Engine:
+        return self._engine
+
     def make_session(self) -> orm.Session:
         session = self._session_maker()
         return session
