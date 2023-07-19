@@ -77,7 +77,6 @@ class ProblemService(LoggingMixin):
             results = await self.judge_api_repository.get_batch_submissions(
                 token_map.values()
             )
-            print(token_map)
             responses = []
             for i, result in list(zip(token_map.keys(), results)):
                 match result.status.id:
