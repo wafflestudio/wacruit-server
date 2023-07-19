@@ -6,7 +6,6 @@ from wacruit.src.apps.judge import get_judge_api_client
 from wacruit.src.apps.judge.repositories import JudgeApiRepository
 from wacruit.src.apps.problem.models import Problem
 from wacruit.src.apps.problem.models import TestCase
-from wacruit.src.apps.problem.repositories import CodeSubmissionRepository
 from wacruit.src.apps.problem.repositories import ProblemRepository
 from wacruit.src.apps.problem.services import ProblemService
 from wacruit.src.database.connection import Transaction
@@ -43,13 +42,6 @@ def problem_repository(db_session: Session):
 
 
 @pytest.fixture
-def code_submission_repository(db_session: Session):
-    return CodeSubmissionRepository(
-        session=db_session, transaction=Transaction(db_session)
-    )
-
-
-@pytest.fixture
 async def judge_api_client():
     return await anext(get_judge_api_client())
 
@@ -62,11 +54,9 @@ def judge_api_repository(judge_api_client: AsyncClient):
 @pytest.fixture
 def problem_service(
     problem_repository: ProblemRepository,
-    code_submission_repository: CodeSubmissionRepository,
     judge_api_repository: JudgeApiRepository,
 ):
     return ProblemService(
         problem_repository=problem_repository,
-        code_submission_repository=code_submission_repository,
         judge_api_repository=judge_api_repository,
     )
