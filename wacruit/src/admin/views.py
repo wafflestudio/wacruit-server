@@ -1,4 +1,4 @@
-from typing import Any, Self, Type
+from typing import Any, Self
 
 from sqladmin import ModelView
 
@@ -44,7 +44,7 @@ class ProblemAdmin(ModelView, model=Problem):
 
 class CodeSubmissionAdmin(ModelView, model=CodeSubmission):
     @staticmethod
-    def user_formatter(table: Type[CodeSubmission], field):
+    def user_formatter(table: type[CodeSubmission], field):
         return table.user.last_name + table.user.first_name
 
     column_list = [

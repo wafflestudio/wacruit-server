@@ -43,6 +43,6 @@ repos:
         args: [
             "-rn", # Only display messages
             "-sn", # Don't display the score
-            '-j 0', # Use all cores
             "--rcfile=.pylintrc", # Link to your config file
+            "-j", "0" # Use all available cores
           ]
