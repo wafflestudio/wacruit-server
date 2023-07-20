@@ -7,10 +7,6 @@ from wacruit.src.apps.common.enums import Language
 from wacruit.src.apps.judge.schemas import JudgeSubmissionStatusModel
 
 
-class UploadPortfolioUrlRequest(BaseModel):
-    file_name: str
-
-
 class PresignedUrlResponse(BaseModel):
     object_name: str
     presigned_url: str

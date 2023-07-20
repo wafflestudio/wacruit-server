@@ -9,11 +9,8 @@ from wacruit.src.utils import mixins
 
 
 class PortfolioService(mixins.LoggingMixin):
-    def __init__(
-        self,
-        s3_client: client.S3Client = client.S3Client()
-    ):
-        self._s3_client = s3_client
+    def __init__(self):
+        self._s3_client = client.S3Client()
 
     @staticmethod
     def get_portfolio_object_name(user_id: int, file_name: str) -> str:
