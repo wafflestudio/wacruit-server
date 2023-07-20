@@ -23,6 +23,7 @@ def create_app() -> fastapi.FastAPI:
         debug=settings.is_dev,
         docs_url="/api/docs",
         redoc_url="/api/redoc",
+        openapi_url="/api/openapi.json",
     )
     _add_routers(app)
     _register_shutdown_event(app)
