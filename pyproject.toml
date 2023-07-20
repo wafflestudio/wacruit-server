@@ -20,6 +20,9 @@ aws-secretsmanager-caching = "^1.1.1.5"
 sse-starlette = "^1.6.1"
 httpx = "^0.24.1"
 email-validator = "^2.0.0.post2"
+sqladmin = "^0.13.0"
+itsdangerous = "^2.1.2"
+pyjwt = "^2.8.0"
 
 
 [tool.poetry.group.dev.dependencies]

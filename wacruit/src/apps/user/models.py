@@ -45,3 +45,6 @@ class User(DeclarativeBase):
     )
 
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    def __str__(self) -> str:
+        return f"<User id={self.id}, name={self.last_name + self.first_name}>"

@@ -1,4 +1,4 @@
-from typing import Any, Type
+from typing import Any
 
 from fastapi import HTTPException
 
@@ -25,7 +25,7 @@ class WacruitException(HTTPException):
 
 
 def responses_from(
-    *exceptions: Type[WacruitException],
+    *exceptions: type[WacruitException],
 ) -> dict[int | str, dict[str, Any]]:
     responses = {}
     for exc in exceptions:
