@@ -30,6 +30,7 @@ class DBConfig(BaseSettings):
         return (
             f"mysql+mysqldb://{self.username}:{self.password}"
             f"@{self.host}:{self.port}/{self.name}"
+            "?charset=utf8mb4"
         )
 
 

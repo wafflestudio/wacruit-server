@@ -1,6 +1,5 @@
 import pytest
 
-from wacruit.src.apps.problem.models import CodeSubmission
 from wacruit.src.apps.user.models import User
 
 
