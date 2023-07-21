@@ -29,6 +29,9 @@ class Problem(DeclarativeBase):
     submissions: Mapped[list["CodeSubmission"]] = relationship(back_populates="problem")
     testcases: Mapped[list["TestCase"]] = relationship(back_populates="problem")
 
+    def __str__(self) -> str:
+        return f"<Problem id={self.id}, num={self.num}, body={self.body[:10]}..>"
+
 
 class CodeSubmission(DeclarativeBase):
     __tablename__ = "code_submission"
@@ -50,6 +53,13 @@ class CodeSubmission(DeclarativeBase):
     results: Mapped[list["CodeSubmissionResult"]] = relationship(
         back_populates="submission"
     )
+
+    def __str__(self) -> str:
+        return (
+            f"<CodeSubmission id={self.id}, "
+            f"user_id={self.user_id}, "
+            f"problem_id={self.problem_id}>"
+        )
 
 
 class CodeSubmissionResult(DeclarativeBase):
@@ -83,3 +93,10 @@ class TestCase(DeclarativeBase):
     submission_results: Mapped[list["CodeSubmissionResult"]] = relationship(
         back_populates="testcase"
     )
+
+    def __str__(self) -> str:
+        return (
+            f"<TestCase id={self.id}, "
+            f"problem_id={self.problem_id}, "
+            f"is_example={self.is_example}>"
+        )

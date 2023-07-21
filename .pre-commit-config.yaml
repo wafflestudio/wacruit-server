@@ -44,4 +44,5 @@ repos:
             "-rn", # Only display messages
             "-sn", # Don't display the score
             "--rcfile=.pylintrc", # Link to your config file
+            "-j", "0" # Use all available cores
           ]
