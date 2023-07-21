@@ -63,5 +63,5 @@ jobs:
       - name: Run alembic migration test
         run: |
           mkdir -p wacruit/src/database/migrations/versions
-          poetry run alembic revision --autogenerate
+          ls wacruit/src/database/migrations/versions/* || poetry run alembic revision --autogenerate
           poetry run alembic upgrade head
