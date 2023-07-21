@@ -24,8 +24,10 @@ class AWSSecretManager(metaclass=SingletonMeta):
         try:
             self.cache.get_secret_string(secret_id=self.secret_name)
             return True
-        except BaseException:
-            return False
+        except BaseException as e:
+            raise ValueError(
+                f"Secret Manager is not available for {self.secret_name}"
+            ) from e
 
     def get_secret(self, key: str) -> str:
         assert self.is_available(), "Secret Manager is not available"

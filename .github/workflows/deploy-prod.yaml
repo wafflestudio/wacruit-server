@@ -37,3 +37,5 @@ jobs:
           context: .
           push: true
           tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+          build-args: |
+            ENV=prod
