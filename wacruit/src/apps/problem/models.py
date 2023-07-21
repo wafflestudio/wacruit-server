@@ -45,7 +45,7 @@ class CodeSubmission(DeclarativeBase):
     )
     create_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        server_default=text("CURRENT_TIMESTAMP"),  # pylint: disable=not-callable
+        server_default=text("CURRENT_TIMESTAMP"),
     )
 
     user: Mapped["User"] = relationship(back_populates="code_submissions")

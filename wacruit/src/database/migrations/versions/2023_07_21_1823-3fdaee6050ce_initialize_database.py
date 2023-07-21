@@ -1,4 +1,4 @@
-"""
+"""initialize database
 Add table
 user, announcement, recruiting, resume_submission, resume_question,
 problem, testcase, code_submission, code_submission_result

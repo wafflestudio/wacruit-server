@@ -17,10 +17,9 @@ class Announcement(DeclarativeBase):
     content: Mapped[str | None] = mapped_column(String(10000))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        server_default=text("CURRENT_TIMESTAMP"),  # pylint: disable=not-callable
+        server_default=text("CURRENT_TIMESTAMP"),
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        onupdate=text("CURRENT_TIMESTAMP"),  # pylint: disable=not-callable
-        server_default=text("CURRENT_TIMESTAMP"),  # pylint: disable=not-callable
+        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
     )
