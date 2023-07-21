@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from sqladmin import Admin
 
+from wacruit.src.admin import Admin
 from wacruit.src.admin.auth import authentication_backend
 from wacruit.src.admin.views import admin_views
 from wacruit.src.apps.router import api_router
