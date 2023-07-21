@@ -24,6 +24,8 @@ def get_download_portfolio_url(
     file_name: str,
     portfolio_service: Annotated[services.PortfolioService, fastapi.Depends()],
 ):
+    if file_name not in portfolio_service.get_portfolio_list(current_user.id):
+        raise exceptions.PortfolioNotFoundException
     object_name = portfolio_service.get_portfolio_object_name(
         user_id=current_user.id,
         file_name=file_name,
