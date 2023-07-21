@@ -10,3 +10,7 @@ from wacruit.src.apps.judge.schemas import JudgeSubmissionStatusModel
 class PresignedUrlResponse(BaseModel):
     object_name: str
     presigned_url: str
+
+
+class PortfolioNameResponse(BaseModel):
+    portfolio_name: str
