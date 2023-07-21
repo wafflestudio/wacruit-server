@@ -1,7 +1,9 @@
 from fastapi import FastAPI
+from sqladmin import Admin
+from starlette.middleware import Middleware
 
-from wacruit.src.admin import Admin
 from wacruit.src.admin.auth import authentication_backend
+from wacruit.src.admin.middlewares import HTTPToHTTPSRequestMiddleware
 from wacruit.src.admin.views import admin_views
 from wacruit.src.apps.router import api_router
 from wacruit.src.database.connection import DBSessionFactory
@@ -27,6 +29,9 @@ def _attach_admin(app: FastAPI):
         engine,
         authentication_backend=authentication_backend,
         base_url="/api/admin",
+        middlewares=None
+        if settings.is_test or settings.is_local
+        else [Middleware(HTTPToHTTPSRequestMiddleware)],
         debug=not settings.is_prod,
     )
     for view in admin_views:
