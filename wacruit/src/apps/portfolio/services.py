@@ -31,7 +31,7 @@ class PortfolioService(LoggingMixin):
         user_id: int,
     ) -> list[PortfolioNameResponse]:
         return [
-            PortfolioNameResponse(portfolio_name=obj[len(str(user_id)) + 1:])
+            PortfolioNameResponse(portfolio_name=obj[len(str(user_id)) + 1 :])
             for obj in self.get_portfolio_list(user_id)
         ]
 
@@ -45,7 +45,7 @@ class PortfolioService(LoggingMixin):
             method_parameters={
                 "Bucket": BUCKET_NAME,
                 "Key": object_name,
-            }
+            },
         )
         return PresignedUrlResponse(object_name=object_name, presigned_url=url)
 
@@ -59,7 +59,7 @@ class PortfolioService(LoggingMixin):
             method_parameters={
                 "Bucket": BUCKET_NAME,
                 "Key": object_name,
-            }
+            },
         )
         return PresignedUrlResponse(object_name=object_name, presigned_url=url)
 
