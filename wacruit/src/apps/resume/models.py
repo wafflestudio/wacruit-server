@@ -3,12 +3,13 @@ from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
-from sqlalchemy import func
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
+from wacruit.src.apps.common.sql import CURRENT_TIMESTAMP
+from wacruit.src.apps.common.sql import CURRENT_TIMESTAMP_ON_UPDATE
 from wacruit.src.database.base import DeclarativeBase
 from wacruit.src.database.base import intpk
 from wacruit.src.database.base import str30
@@ -54,12 +55,11 @@ class ResumeSubmission(DeclarativeBase):
     answer: Mapped[str | None] = mapped_column(String(10000))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        server_default=func.now(),  # pylint: disable=not-callable
+        server_default=CURRENT_TIMESTAMP,
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        onupdate=func.now(),  # pylint: disable=not-callable
-        server_default=func.now(),  # pylint: disable=not-callable
+        server_default=CURRENT_TIMESTAMP_ON_UPDATE,
     )
 
 
