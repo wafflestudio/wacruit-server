@@ -7,6 +7,7 @@ from fastapi import Response
 from wacruit.src.apps.common.dependencies import CurrentUser
 from wacruit.src.apps.common.exceptions import responses_from
 from wacruit.src.apps.common.schemas import ListResponse
+from wacruit.src.apps.resume.exceptions import IncompleteResume
 from wacruit.src.apps.resume.exceptions import ResumeNotFound
 from wacruit.src.apps.resume.schemas import ResumeSubmissionCreateDto
 from wacruit.src.apps.resume.schemas import UserResumeSubmissionDto
@@ -28,7 +29,10 @@ def get_my_resumes(
     return ListResponse(items=resumes)
 
 
-@v1_router.post("/{recruiting_id}/resumes")
+@v1_router.post(
+    "/{recruiting_id}/resumes",
+    responses=responses_from(ResumeNotFound, IncompleteResume),
+)
 def create_resume(
     current_user: CurrentUser,
     recruiting_id: int,
@@ -41,7 +45,10 @@ def create_resume(
     return ListResponse(items=created_items)
 
 
-@v1_router.put("/{recruiting_id}/resumes", responses=responses_from(ResumeNotFound))
+@v1_router.put(
+    "/{recruiting_id}/resumes",
+    responses=responses_from(ResumeNotFound, IncompleteResume),
+)
 def update_resume(
     current_user: CurrentUser,
     recruiting_id: int,
