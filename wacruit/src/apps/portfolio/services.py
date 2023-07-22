@@ -1,10 +1,11 @@
-from wacruit.src.apps.portfolio.schemas import PortfolioNameResponse
-from wacruit.src.apps.portfolio.schemas import PresignedUrlResponse
 from wacruit.src.apps.portfolio.aws.config import BUCKET_NAME
 from wacruit.src.apps.portfolio.aws.s3.client import S3Client
 from wacruit.src.apps.portfolio.aws.s3.method import S3PresignedUrlMethod
-from wacruit.src.apps.portfolio.aws.s3.utils import get_list_of_objects
+from wacruit.src.apps.portfolio.aws.s3.utils import delete_object
 from wacruit.src.apps.portfolio.aws.s3.utils import generate_presigned_url
+from wacruit.src.apps.portfolio.aws.s3.utils import get_list_of_objects
+from wacruit.src.apps.portfolio.schemas import PortfolioNameResponse
+from wacruit.src.apps.portfolio.schemas import PresignedUrlResponse
 from wacruit.src.utils.mixins import LoggingMixin
 
 
@@ -22,14 +23,15 @@ class PortfolioService(LoggingMixin):
             s3_bucket=BUCKET_NAME,
             s3_prefix=f"{user_id}/",
         )
-        return [obj[len(str(user_id)) + 1:] for obj in objects]
+
+        return ["".join(obj.split("/")[1:]) for obj in objects]
 
     def get_portfolio_responses(
         self,
         user_id: int,
-    ) -> list[schemas.PortfolioNameResponse]:
+    ) -> list[PortfolioNameResponse]:
         return [
-            schemas.PortfolioNameResponse(portfolio_name=obj[len(str(user_id)) + 1:])
+            PortfolioNameResponse(portfolio_name=obj[len(str(user_id)) + 1:])
             for obj in self.get_portfolio_list(user_id)
         ]
 
@@ -61,16 +63,8 @@ class PortfolioService(LoggingMixin):
         )
         return PresignedUrlResponse(object_name=object_name, presigned_url=url)
 
-    def get_presigned_url_for_delete_portfolio(
+    def delete_portfolio(
         self,
         object_name: str,
-    ) -> PresignedUrlResponse:
-        url = generate_presigned_url(
-            s3_client=self._s3_client.client,
-            client_method=S3PresignedUrlMethod.DELETE,
-            method_parameters={
-                "Bucket": BUCKET_NAME,
-                "Key": object_name,
-            }
-        )
-        return PresignedUrlResponse(object_name=object_name, presigned_url=url)
+    ) -> None:
+        delete_object(self._s3_client.client, BUCKET_NAME, object_name)

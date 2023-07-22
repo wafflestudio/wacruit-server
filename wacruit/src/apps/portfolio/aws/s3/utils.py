@@ -21,6 +21,20 @@ def get_list_of_objects(
     return [content["Key"] for content in resp["Contents"]]
 
 
+def delete_object(
+    s3_client: BaseClient,
+    s3_bucket: str,
+    s3_object: str,
+):
+    try:
+        s3_client.delete_object(
+            Bucket=s3_bucket,
+            Key=s3_object,
+        )
+    except ClientError as e:
+        raise RuntimeError("AWS S3 client error") from e
+
+
 def generate_presigned_url(
     s3_client: BaseClient,
     client_method: S3PresignedUrlMethod,
