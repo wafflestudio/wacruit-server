@@ -5,12 +5,12 @@ from fastapi import Depends
 from fastapi import Request
 from sse_starlette.sse import EventSourceResponse
 
-from wacruit.src.apps.common.dependencies import CurrentUser
 from wacruit.src.apps.common.exceptions import responses_from
 from wacruit.src.apps.problem.exceptions import ProblemNotFoundException
 from wacruit.src.apps.problem.schemas import CodeSubmitRequest
 from wacruit.src.apps.problem.schemas import ProblemResponse
 from wacruit.src.apps.problem.services import ProblemService
+from wacruit.src.apps.user.dependencies import CurrentUser
 
 v1_router = APIRouter(prefix="/v1/problem", tags=["problem"])
 

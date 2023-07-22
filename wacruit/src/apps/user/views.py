@@ -5,13 +5,8 @@ from typing import Annotated
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import Header
-from fastapi import HTTPException
-from fastapi import Security
-from fastapi.security import APIKeyHeader
 
-from wacruit.src.apps.common.dependencies import CurrentUser
-from wacruit.src.apps.user.models import User
-from wacruit.src.apps.user.repositories import UserRepository
+from wacruit.src.apps.user.dependencies import CurrentUser
 from wacruit.src.apps.user.schemas import UserCreateUpdateRequest
 from wacruit.src.apps.user.schemas import UserDetailResponse
 from wacruit.src.apps.user.schemas import UserUpdateInvitationEmailsRequest

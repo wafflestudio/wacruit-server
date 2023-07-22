@@ -4,7 +4,6 @@ from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import Response
 
-from wacruit.src.apps.common.dependencies import CurrentUser
 from wacruit.src.apps.common.exceptions import responses_from
 from wacruit.src.apps.common.schemas import ListResponse
 from wacruit.src.apps.resume.exceptions import ResumeNotFound
@@ -12,6 +11,7 @@ from wacruit.src.apps.resume.schemas import ResumeListingByIdDto
 from wacruit.src.apps.resume.schemas import ResumeSubmissionCreateDto
 from wacruit.src.apps.resume.schemas import ResumeSubmissionWithUserDto
 from wacruit.src.apps.resume.services import ResumeService
+from wacruit.src.apps.user.dependencies import CurrentUser
 from wacruit.src.apps.user.exceptions import UserPermissionDeniedException
 
 v1_router = APIRouter(prefix="/v1/resumes", tags=["resume"])
