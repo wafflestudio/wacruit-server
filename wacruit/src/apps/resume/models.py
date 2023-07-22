@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
-from sqlalchemy import String
+from sqlalchemy import Text
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
@@ -31,7 +31,7 @@ class ResumeQuestion(DeclarativeBase):
     )
     question_num: Mapped[int]
     content_limit: Mapped[int]
-    content: Mapped[str] = mapped_column(String(10000))
+    content: Mapped[str] = mapped_column(Text)
 
     def __str__(self):
         return (
@@ -62,7 +62,7 @@ class ResumeSubmission(DeclarativeBase):
         ForeignKey("recruiting.id", ondelete="SET NULL")
     )
     recruiting: Mapped["Recruiting"] = relationship(back_populates="resume_submissions")
-    answer: Mapped[str] = mapped_column(String(10000))
+    answer: Mapped[str] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=CURRENT_TIMESTAMP,
