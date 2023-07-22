@@ -4,9 +4,11 @@ from fastapi import Depends
 from sqlalchemy import func
 from sqlalchemy import Row
 from sqlalchemy import select
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm import Session
 
+from wacruit.src.apps.problem.models import CodeSubmission
+from wacruit.src.apps.problem.models import Problem
 from wacruit.src.apps.recruiting.models import Recruiting
 from wacruit.src.apps.resume.models import ResumeSubmission
 from wacruit.src.database.connection import get_db_session
@@ -34,10 +36,21 @@ class RecruitingRepository:
         ).join(ResumeSubmission)
         return self.session.execute(query).all()
 
-    def get_recruiting_by_id(self, recruiting_id: int) -> Recruiting | None:
+    def get_recruiting_by_id(
+        self, recruiting_id: int, user_id: int
+    ) -> Recruiting | None:
         query = (
             select(Recruiting)
+            .outerjoin(Problem, Problem.recruiting_id == recruiting_id)
+            .outerjoin(
+                CodeSubmission,
+                (CodeSubmission.problem_id == Problem.id)
+                & (CodeSubmission.user_id == user_id),
+            )
             .where(Recruiting.id == recruiting_id)
-            .options(joinedload(Recruiting.problems))
+            .order_by(CodeSubmission.create_at.desc())
+            .options(
+                contains_eager(Recruiting.problems).contains_eager(Problem.submissions)
+            )
         )
-        return self.session.execute(query).scalar()
+        return self.session.execute(query).scalars().first()

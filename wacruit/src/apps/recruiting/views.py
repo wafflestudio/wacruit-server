@@ -9,6 +9,7 @@ from wacruit.src.apps.recruiting.exceptions import RecruitingNotFoundException
 from wacruit.src.apps.recruiting.schemas import RecruitingListResponse
 from wacruit.src.apps.recruiting.schemas import RecruitingResponse
 from wacruit.src.apps.recruiting.services import RecruitingService
+from wacruit.src.apps.user.dependencies import CurrentUser
 
 v1_router = APIRouter(prefix="/v1/recruiting", tags=["recruiting"])
 
@@ -24,6 +25,8 @@ def list_recruitings(
     "/{recruiting_id}", responses=responses_from(RecruitingNotFoundException)
 )
 def get_recruiting(
-    recruiting_id: int, recruiting_service: Annotated[RecruitingService, Depends()]
+    user: CurrentUser,
+    recruiting_id: int,
+    recruiting_service: Annotated[RecruitingService, Depends()],
 ) -> RecruitingResponse:
-    return recruiting_service.get_recruiting_by_id(recruiting_id)
+    return recruiting_service.get_recruiting_by_id(recruiting_id, user)

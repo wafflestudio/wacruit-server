@@ -7,6 +7,7 @@ from wacruit.src.apps.recruiting.exceptions import RecruitingNotFoundException
 from wacruit.src.apps.recruiting.repositories import RecruitingRepository
 from wacruit.src.apps.recruiting.schemas import RecruitingListResponse
 from wacruit.src.apps.recruiting.schemas import RecruitingResponse
+from wacruit.src.apps.user.models import User
 
 
 class RecruitingService:
@@ -20,8 +21,12 @@ class RecruitingService:
         recruitings = self.recruiting_repository.get_all_recruitings()
         return ListResponse(items=RecruitingListResponse.from_orm_all(recruitings))
 
-    def get_recruiting_by_id(self, recruiting_id) -> RecruitingResponse:
-        recruiting = self.recruiting_repository.get_recruiting_by_id(recruiting_id)
+    def get_recruiting_by_id(
+        self, recruiting_id: int, user: User
+    ) -> RecruitingResponse:
+        recruiting = self.recruiting_repository.get_recruiting_by_id(
+            recruiting_id, user.id
+        )
         if recruiting is None:
             raise RecruitingNotFoundException()
         return RecruitingResponse.from_orm(recruiting)
