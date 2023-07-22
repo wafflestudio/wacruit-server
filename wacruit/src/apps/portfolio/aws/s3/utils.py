@@ -1,13 +1,13 @@
 from typing import Any
 
-from botocore import client
-from botocore import exceptions
+from botocore.client import BaseClient
+from botocore.exceptions import ClientError
 
-from wacruit.src.apps.portfolio.aws.s3 import method
+from wacruit.src.apps.portfolio.aws.s3.method import S3PresignedUrlMethod
 
 
 def get_list_of_objects(
-    s3_client: client.BaseClient,
+    s3_client: BaseClient,
     s3_bucket: str,
     s3_prefix: str,
 ) -> list[str | None]:
@@ -16,14 +16,14 @@ def get_list_of_objects(
             Bucket=s3_bucket,
             Prefix=s3_prefix,
         )
-    except exceptions.ClientError as e:
+    except ClientError as e:
         raise RuntimeError("AWS S3 client error") from e
     return [content["Key"] for content in resp["Contents"]]
 
 
 def generate_presigned_url(
-    s3_client: client.BaseClient,
-    client_method: method.S3PresignedUrlMethod,
+    s3_client: BaseClient,
+    client_method: S3PresignedUrlMethod,
     method_parameters: dict[str, Any],
     expires_in: int = 3600,
 ):
@@ -42,7 +42,7 @@ def generate_presigned_url(
             Params=method_parameters,
             ExpiresIn=expires_in
         )
-    except exceptions.ClientError as e:
+    except ClientError as e:
         raise ValueError(
             f"Couldn't get a presigned URL for client method '{client_method}'"
         ) from e

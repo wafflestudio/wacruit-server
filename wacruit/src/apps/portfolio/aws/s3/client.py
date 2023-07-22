@@ -1,11 +1,11 @@
 import boto3
 
-from wacruit.src.apps.portfolio.aws import config
-from wacruit.src.utils import singleton as singleton_utils
+from wacruit.src.apps.portfolio.aws.config import REGION
+from wacruit.src.utils.singleton import SingletonMeta
 
 
-class S3Client(metaclass=singleton_utils.SingletonMeta):
-    def __init__(self, region_name: str = config.REGION):
+class S3Client(metaclass=SingletonMeta):
+    def __init__(self, region_name: str = REGION):
         self._client = boto3.client("s3", region_name=region_name)
 
     @property

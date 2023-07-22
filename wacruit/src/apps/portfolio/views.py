@@ -2,30 +2,32 @@ from typing import Annotated
 
 import fastapi
 
-from wacruit.src.apps.common import dependencies as common_deps
-from wacruit.src.apps.portfolio import exceptions
-from wacruit.src.apps.portfolio import services
-from wacruit.src.apps.portfolio import schemas
+from wacruit.src.apps.common.dependencies import CurrentUser
+from wacruit.src.apps.portfolio.exceptions import PortfolioNotFoundException
+from wacruit.src.apps.portfolio.exceptions import NumPortfolioLimitException
+from wacruit.src.apps.portfolio.schemas import PortfolioNameResponse
+from wacruit.src.apps.portfolio.schemas import PresignedUrlResponse
+from wacruit.src.apps.portfolio.services import PortfolioService
 
 v1_router = fastapi.APIRouter(prefix="/v1/portfolios", tags=["portfolios"])
 
 
-@v1_router.get("/", response_model=list[schemas.PortfolioNameResponse])
+@v1_router.get("/", response_model=list[PortfolioNameResponse])
 def get_list_of_portfolios(
-    current_user: common_deps.CurrentUser,
-    portfolio_service: Annotated[services.PortfolioService, fastapi.Depends()],
+    current_user: CurrentUser,
+    portfolio_service: Annotated[PortfolioService, fastapi.Depends()],
 ):
     return portfolio_service.get_portfolio_responses(current_user.id)
 
 
 @v1_router.get("/url/download/{file_name}")
 def get_download_portfolio_url(
-    current_user: common_deps.CurrentUser,
+    current_user: CurrentUser,
     file_name: str,
-    portfolio_service: Annotated[services.PortfolioService, fastapi.Depends()],
+    portfolio_service: Annotated[PortfolioService, fastapi.Depends()],
 ):
     if file_name not in portfolio_service.get_portfolio_list(current_user.id):
-        raise exceptions.PortfolioNotFoundException
+        raise PortfolioNotFoundException
     object_name = portfolio_service.get_portfolio_object_name(
         user_id=current_user.id,
         file_name=file_name,
@@ -35,12 +37,12 @@ def get_download_portfolio_url(
 
 @v1_router.get("/url/upload/{file_name}")
 def get_upload_portfolio_url(
-    current_user: common_deps.CurrentUser,
+    current_user: CurrentUser,
     file_name: str,
-    portfolio_service: Annotated[services.PortfolioService, fastapi.Depends()],
+    portfolio_service: Annotated[PortfolioService, fastapi.Depends()],
 ):
     if len(portfolio_service.get_portfolio_list(current_user.id)) > 0:
-        raise exceptions.NumPortfolioLimitException
+        raise NumPortfolioLimitException
     object_name = portfolio_service.get_portfolio_object_name(
         user_id=current_user.id,
         file_name=file_name,
@@ -50,12 +52,12 @@ def get_upload_portfolio_url(
 
 @v1_router.get("/url/delete/{file_name}")
 def get_delete_portfolio_url(
-    current_user: common_deps.CurrentUser,
+    current_user: CurrentUser,
     file_name: str,
-    portfolio_service: Annotated[services.PortfolioService, fastapi.Depends()],
+    portfolio_service: Annotated[PortfolioService, fastapi.Depends()],
 ):
     if file_name not in portfolio_service.get_portfolio_list(current_user.id):
-        raise exceptions.PortfolioNotFoundException
+        raise PortfolioNotFoundException
     object_name = portfolio_service.get_portfolio_object_name(
         user_id=current_user.id,
         file_name=file_name,
