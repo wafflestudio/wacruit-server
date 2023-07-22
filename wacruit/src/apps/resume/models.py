@@ -31,7 +31,17 @@ class ResumeQuestion(DeclarativeBase):
     )
     question_num: Mapped[int]
     content_limit: Mapped[int]
-    content: Mapped[str | None] = mapped_column(String(10000))
+    content: Mapped[str] = mapped_column(String(10000))
+
+    def __str__(self):
+        return (
+            f"<ResumeQuestion id={self.id}, "
+            f"recruiting_id={self.recruiting_id}, "
+            f"num={self.question_num}, "
+            f"limit={self.content_limit}, "
+            f"content={self.content[:10]}"
+            f"{'...' if len(self.content) > 10 else ''}>"
+        )
 
 
 class ResumeSubmission(DeclarativeBase):
@@ -52,7 +62,7 @@ class ResumeSubmission(DeclarativeBase):
         ForeignKey("recruiting.id", ondelete="SET NULL")
     )
     recruiting: Mapped["Recruiting"] = relationship(back_populates="resume_submissions")
-    answer: Mapped[str | None] = mapped_column(String(10000))
+    answer: Mapped[str] = mapped_column(String(10000))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=CURRENT_TIMESTAMP,
@@ -61,3 +71,13 @@ class ResumeSubmission(DeclarativeBase):
         DateTime(timezone=True),
         server_default=CURRENT_TIMESTAMP_ON_UPDATE,
     )
+
+    def __str__(self):
+        return (
+            f"<ResumeSubmission id={self.id}, "
+            f"user_id={self.user_id}, "
+            f"recruiting_id={self.recruiting_id}, "
+            f"question_id={self.question_id}"
+            f"answer={self.answer[:10]}"
+            f"{'...' if len(self.answer) > 10 else ''}>"
+        )

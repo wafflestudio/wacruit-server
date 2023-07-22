@@ -38,3 +38,12 @@ class Recruiting(DeclarativeBase):
         back_populates="recruiting"
     )
     problems: Mapped[list["Problem"]] = relationship(back_populates="recruiting")
+
+    def __str__(self):
+        return (
+            f"<Recruiting id={self.id}, "
+            f"name={self.name}, "
+            f"is_active={self.is_active}, "
+            f"from={self.from_date}, "
+            f"to={self.to_date}>"
+        )
