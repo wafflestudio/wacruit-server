@@ -14,22 +14,29 @@ class ResumeService:
         self.resume_repository = resume_repository
 
     def create_resume(
-        self, user_id: int, request: Sequence[ResumeSubmissionCreateDto]
+        self, user_id: int, resume_submissions: Sequence[ResumeSubmissionCreateDto]
     ) -> list[ResumeSubmissionWithUserDto]:
-        return [
-            ResumeSubmissionWithUserDto.from_orm(
-                self.resume_repository.create_resume_submission(
-                    ResumeSubmission(user_id=user_id, **resume.dict())
-                )
+        result = []
+        for resume_submission_dto in resume_submissions:
+            resume_submission = ResumeSubmission()
+            resume_submission.user_id = user_id
+            resume_submission.recruiting_id = resume_submission_dto.recruiting_id
+            resume_submission.question_id = resume_submission_dto.question_id
+            resume_submission.answer = resume_submission_dto.answer
+            saved_resume_submission = self.resume_repository.create_resume_submission(
+                resume_submission
             )
-            for resume in request
-        ]
+            result.append(ResumeSubmissionWithUserDto.from_orm(saved_resume_submission))
 
-    def list_resumes(self, recruiting_id: int) -> list[ResumeSubmissionWithUserDto]:
+        return result
+
+    def get_resumes_by_recruiting_id(
+        self, recruiting_id: int
+    ) -> list[ResumeSubmissionWithUserDto]:
         resumes = self.resume_repository.get_resumes(recruiting_id)
         return [ResumeSubmissionWithUserDto.from_orm(resume) for resume in resumes]
 
-    def get_resumes(
+    def get_resumes_by_user_and_recruiting_id(
         self, user_id: int, recruiting_id: int
     ) -> list[ResumeSubmissionWithUserDto]:
         resumes = self.resume_repository.get_resume(user_id, recruiting_id)

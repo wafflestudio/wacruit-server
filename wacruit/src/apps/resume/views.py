@@ -26,7 +26,7 @@ def list_resumes(
     if not current_user.is_admin:
         raise UserPermissionDeniedException
 
-    resumes = resume_service.list_resumes(request.recruiting_id)
+    resumes = resume_service.get_resumes_by_recruiting_id(request.recruiting_id)
     return ListResponse(items=resumes)
 
 
@@ -36,7 +36,9 @@ def get_resume(
     request: ResumeListingByIdDto,
     resume_service: ResumeService = Depends(),
 ) -> ListResponse[ResumeSubmissionWithUserDto]:
-    resumes = resume_service.get_resumes(current_user.id, request.recruiting_id)
+    resumes = resume_service.get_resumes_by_user_and_recruiting_id(
+        current_user.id, request.recruiting_id
+    )
     return ListResponse(items=resumes)
 
 
