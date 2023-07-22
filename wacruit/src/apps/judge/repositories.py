@@ -3,10 +3,10 @@ from typing import Iterable
 from fastapi import Depends
 from httpx import AsyncClient
 
-from wacruit.src.apps.judge.connections import get_judge_api_client
-from wacruit.src.apps.judge.schemas import JudgeCreateSubmissionRequest
-from wacruit.src.apps.judge.schemas import JudgeCreateSubmissionResponse
-from wacruit.src.apps.judge.schemas import JudgeGetSubmissionResponse
+from . import get_judge_api_client
+from .schemas import JudgeCreateSubmissionRequest
+from .schemas import JudgeCreateSubmissionResponse
+from .schemas import JudgeGetSubmissionResponse
 
 DEFAULT_PARAMS = {"base64_encoded": False}
 DEFAULT_FIELDS = "stdout,stderr,compile_output,message,status,time,memory"
