@@ -1,16 +1,19 @@
 import asyncio
 from decimal import Decimal
-from typing import Any, AsyncGenerator
+from typing import Any, AsyncGenerator, Tuple
 
 from fastapi import Depends
 from fastapi import Request
 from sse_starlette import ServerSentEvent
 
+from wacruit.src.apps.common.enums import CodeSubmissionStatus
 from wacruit.src.apps.common.enums import JudgeSubmissionStatus
 from wacruit.src.apps.common.schemas import ListResponse
 from wacruit.src.apps.judge.repositories import JudgeApiRepository
 from wacruit.src.apps.judge.schemas import JudgeCreateSubmissionRequest
+from wacruit.src.apps.problem.exceptions import CodeSubmissionFailedException
 from wacruit.src.apps.problem.exceptions import ProblemNotFoundException
+from wacruit.src.apps.problem.models import CodeSubmission
 from wacruit.src.apps.problem.repositories import ProblemRepository
 from wacruit.src.apps.problem.schemas import CodeSubmissionResult
 from wacruit.src.apps.problem.schemas import CodeSubmitRequest
@@ -34,7 +37,9 @@ class ProblemService(LoggingMixin):
             raise ProblemNotFoundException()
         return ProblemResponse.from_orm(problem)
 
-    async def submit_code(self, request: CodeSubmitRequest, user: User) -> list[str]:
+    async def submit_code(
+        self, request: CodeSubmitRequest, user: User
+    ) -> Tuple[list[str], CodeSubmission | None]:
         testcases = self.problem_repository.get_testcases_by_problem_id(
             request.problem_id, request.is_example
         )
@@ -61,49 +66,66 @@ class ProblemService(LoggingMixin):
 
         response = await self.judge_api_repository.create_batch_submissions(requests)
         tokens = [v.token for v in response]
+        submission = None
 
         if not request.is_example:
-            self.problem_repository.create_submission(
-                user.id, request.problem_id, testcases, tokens
+            submission = self.problem_repository.create_submission(
+                user.id,
+                request.problem_id,
+                request.language,
+                testcases,
+                tokens,
             )
 
-        return tokens
+            if submission is None:
+                raise CodeSubmissionFailedException()
+
+        return tokens, submission
 
     async def get_submission_result(
-        self, request: Request, tokens: list[str], user: User, is_example: bool = True
+        self,
+        request: Request,
+        tokens: list[str],
+        submission: CodeSubmission | None,
+        user: User,
+        is_example: bool = True,
     ) -> AsyncGenerator[ServerSentEvent, None]:
         token_map = dict(enumerate(tokens, start=1))
+        submission_result = CodeSubmissionStatus.SOLVED
 
         while len(token_map) > 0:
             if await request.is_disconnected():
                 break
 
-            results = await self.judge_api_repository.get_batch_submissions(
+            testcase_results = await self.judge_api_repository.get_batch_submissions(
                 token_map.values()
             )
             responses = []
-            for i, result in list(zip(token_map.keys(), results)):
-                match result.status.id:
+            for i, testcase_result in list(zip(token_map.keys(), testcase_results)):
+                match testcase_result.status.id:
                     case (
                         JudgeSubmissionStatus.IN_QUEUE
                         | JudgeSubmissionStatus.PROCESSING
                     ):
                         continue
                     case JudgeSubmissionStatus.ACCEPTED:
-                        ...  # TODO: 뭔가 성공했을 때 하는 로직
+                        ...
                     case _:
-                        ...  # TODO: 뭔가 실패했을 때 하는 로직
+                        submission_result = CodeSubmissionStatus.WRONG
                 token_map.pop(i)
 
                 responses.append(
                     CodeSubmissionResult(
                         num=i,
-                        status=result.status,
-                        stdout=result.stdout if is_example else None,
-                        time=Decimal(result.time or 0),
-                        memory=Decimal(result.memory or 0),
+                        status=testcase_result.status,
+                        stdout=testcase_result.stdout if is_example else None,
+                        time=Decimal(testcase_result.time or 0),
+                        memory=Decimal(testcase_result.memory or 0),
                     )
                 )
+
+            if submission is not None:
+                self.problem_repository.update_submission(submission, submission_result)
 
             yield ServerSentEvent(
                 data=ListResponse(items=responses).json(),

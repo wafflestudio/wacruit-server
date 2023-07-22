@@ -11,6 +11,8 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
+from wacruit.src.apps.common.enums import CodeSubmissionStatus
+from wacruit.src.apps.common.enums import Language
 from wacruit.src.apps.common.sql import CURRENT_TIMESTAMP
 from wacruit.src.database.base import DeclarativeBase
 from wacruit.src.database.base import intpk
@@ -48,6 +50,10 @@ class CodeSubmission(DeclarativeBase):
     )
     problem_id: Mapped[int | None] = mapped_column(
         ForeignKey("problem.id", ondelete="SET NULL")
+    )
+    language: Mapped[Language]
+    status: Mapped[CodeSubmissionStatus] = mapped_column(
+        default=CodeSubmissionStatus.RUNNING
     )
     create_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

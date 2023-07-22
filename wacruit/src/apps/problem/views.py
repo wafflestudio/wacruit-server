@@ -31,9 +31,9 @@ async def submit_code(
     code_submit_request: CodeSubmitRequest,
     problem_service: Annotated[ProblemService, Depends()],
 ):
-    tokens = await problem_service.submit_code(code_submit_request, user)
+    tokens, submission = await problem_service.submit_code(code_submit_request, user)
     return EventSourceResponse(
         problem_service.get_submission_result(
-            request, tokens, user, code_submit_request.is_example
+            request, tokens, submission, user, code_submit_request.is_example
         )
     )

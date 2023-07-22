@@ -69,6 +69,8 @@ class CodeSubmissionAdmin(ModelView, model=CodeSubmission):
         CodeSubmission.id,
         CodeSubmission.user,
         CodeSubmission.problem,
+        CodeSubmission.language,
+        CodeSubmission.status,
         CodeSubmission.create_at,
     ]
 

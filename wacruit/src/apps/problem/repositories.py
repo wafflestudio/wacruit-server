@@ -5,6 +5,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm import Session
 
+from wacruit.src.apps.common.enums import CodeSubmissionStatus
+from wacruit.src.apps.common.enums import Language
 from wacruit.src.apps.problem.models import CodeSubmission
 from wacruit.src.apps.problem.models import CodeSubmissionResult
 from wacruit.src.apps.problem.models import Problem
@@ -45,11 +47,14 @@ class ProblemRepository:
         self,
         user_id: int,
         problem_id: int,
+        language: Language,
         testcases: Iterable[TestCase],
         tokens: Iterable[str],
-    ) -> None:
+    ) -> CodeSubmission | None:
         with self.transaction:
-            submission = CodeSubmission(user_id=user_id, problem_id=problem_id)
+            submission = CodeSubmission(
+                user_id=user_id, problem_id=problem_id, language=language
+            )
             self.session.add(submission)
             self.session.commit()
             results = (
@@ -59,3 +64,11 @@ class ProblemRepository:
                 for testcase, token in zip(testcases, tokens)
             )
             self.session.bulk_save_objects(results)
+            return submission
+
+    def update_submission(
+        self, submission: CodeSubmission, status: CodeSubmissionStatus
+    ):
+        with self.transaction:
+            submission.status = status
+            self.session.merge(submission)
