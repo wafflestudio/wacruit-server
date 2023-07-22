@@ -2,7 +2,6 @@ from typing import Annotated, Sequence
 
 from fastapi import Depends
 
-from wacruit.src.apps.resume.exceptions import IncompleteResume
 from wacruit.src.apps.resume.exceptions import ResumeNotFound
 from wacruit.src.apps.resume.models import ResumeSubmission
 from wacruit.src.apps.resume.repositories import ResumeRepository
@@ -26,8 +25,6 @@ class ResumeService:
         recruiting_id: int,
         resume_submissions: Sequence[ResumeSubmissionCreateDto],
     ) -> list[UserResumeSubmissionDto]:
-        self.check_or_raise_incomplete_resume(recruiting_id, resume_submissions)
-
         result = []
         for resume_submission_dto in resume_submissions:
             resume_submission = ResumeSubmission()
@@ -41,17 +38,6 @@ class ResumeService:
             result.append(UserResumeSubmissionDto.from_orm(saved_resume_submission))
 
         return result
-
-    def check_or_raise_incomplete_resume(
-        self,
-        recruiting_id: int,
-        resume_submissions: Sequence[ResumeSubmissionCreateDto],
-    ) -> None:
-        all_questions = self.resume_repository.get_questions_by_recruiting_id(
-            recruiting_id
-        )
-        if len(all_questions) != len(resume_submissions):
-            raise IncompleteResume
 
     def get_resumes_by_recruiting_id(
         self, recruiting_id: int
@@ -73,8 +59,6 @@ class ResumeService:
         recruiting_id: int,
         resume_submissions: Sequence[ResumeSubmissionCreateDto],
     ) -> list[UserResumeSubmissionDto]:
-        self.check_or_raise_incomplete_resume(recruiting_id, resume_submissions)
-
         resumes = [
             # TODO : get_resume_by_id를 호출하는 부분에서 쿼리 수정이 필요
             self.resume_repository.get_resume_by_id(1)
