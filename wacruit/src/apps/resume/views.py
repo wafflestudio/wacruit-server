@@ -54,23 +54,15 @@ def update_resume(
     return ListResponse(items=updated_items)
 
 
-# @v1_router.delete("/", responses=responses_from(ResumeNotFound), status_code=204)
-# def delete_resume(
-#     current_user: CurrentUser,
-#     resume_service: ResumeService = Depends(),
-# ):
-#     resume_service.delete_resume(current_user.id)
-#     return Response(status_code=204)
-
-
-# @v1_router.post("/withdraw")
-# def withdraw_resume(
-#     current_user: CurrentUser,
-#     resume_service: ResumeService = Depends(),
-# ):
-#     """
-#     유저가 제출한
-#     """
-#     resume_service.withdraw_resume(current_user.id)
-
-#     return Response(status_code=204)
+@v1_router.delete("/{recruiting_id}/withdraw", status_code=204)
+def withdraw_resume(
+    current_user: CurrentUser,
+    recruiting_id: int,
+    resume_service: ResumeService = Depends(),
+):
+    """
+    유저가 제출한 모든 이력서를 삭제하고 관련 정보를 초기화합니다.
+    이 작업은 되돌릴 수 없으므로 사전에 유저에게 확인을 받아야 합니다.
+    """
+    resume_service.withdraw_resume(current_user.id, recruiting_id)
+    return Response(status_code=204)

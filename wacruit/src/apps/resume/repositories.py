@@ -73,3 +73,13 @@ class ResumeRepository:
             self.session.execute(
                 delete(ResumeSubmission).where(ResumeSubmission.id == id)
             )
+
+    def delete_resumes_by_user_recruiting_id(
+        self, user_id: int, recruiting_id: int
+    ) -> None:
+        with self.transaction:
+            self.session.execute(
+                delete(ResumeSubmission)
+                .where(ResumeSubmission.user_id == user_id)
+                .where(ResumeSubmission.recruiting_id == recruiting_id)
+            )

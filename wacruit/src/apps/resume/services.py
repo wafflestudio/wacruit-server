@@ -1,4 +1,4 @@
-from typing import Sequence
+from typing import Annotated, Sequence
 
 from fastapi import Depends
 
@@ -8,11 +8,17 @@ from wacruit.src.apps.resume.models import ResumeSubmission
 from wacruit.src.apps.resume.repositories import ResumeRepository
 from wacruit.src.apps.resume.schemas import ResumeSubmissionCreateDto
 from wacruit.src.apps.resume.schemas import UserResumeSubmissionDto
+from wacruit.src.apps.user.services import UserService
 
 
 class ResumeService:
-    def __init__(self, resume_repository: ResumeRepository = Depends()) -> None:
+    def __init__(
+        self,
+        resume_repository: Annotated[ResumeRepository, Depends()],
+        user_service: Annotated[UserService, Depends()],
+    ) -> None:
         self.resume_repository = resume_repository
+        self.user_service = user_service
 
     def create_resume(
         self,
@@ -92,3 +98,9 @@ class ResumeService:
 
     def delete_resume(self, id: int) -> None:
         self.resume_repository.delete_resume_submission(id)
+
+    def withdraw_resume(self, user_id: int, recruiting_id: int) -> None:
+        self.user_service.remove_sensitive_information(user_id)
+        self.resume_repository.delete_resumes_by_user_recruiting_id(
+            user_id, recruiting_id
+        )
