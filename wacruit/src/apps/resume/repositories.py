@@ -1,8 +1,10 @@
 from typing import Sequence
 
 from fastapi import Depends
+from sqlalchemy import and_
 from sqlalchemy import delete
 from sqlalchemy import select
+from sqlalchemy import update
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import Session
@@ -61,12 +63,26 @@ class ResumeRepository:
             self.session.add(resume_submission)
         return resume_submission
 
-    def update_resume_submission(
+    def update_or_create_resume_submission(
         self, resume_submission: ResumeSubmission
-    ) -> ResumeSubmission:
+    ) -> ResumeSubmission | None:
+        filter_conditions = and_(
+            ResumeSubmission.user_id == resume_submission.user_id,
+            ResumeSubmission.recruiting_id == resume_submission.recruiting_id,
+            ResumeSubmission.question_id == resume_submission.question_id,
+        )
+        select_stmt = select(ResumeSubmission).where(filter_conditions)
+        update_stmt = (
+            update(ResumeSubmission)
+            .where(filter_conditions)
+            .values(answer=resume_submission.answer)
+        )
         with self.transaction:
-            self.session.merge(resume_submission)
-        return resume_submission
+            if self.session.execute(select_stmt).scalar():
+                self.session.execute(update_stmt)
+            else:
+                self.session.add(resume_submission)
+            return self.session.execute(select_stmt).scalar()
 
     def delete_resume_submission(self, id: int) -> None:
         with self.transaction:

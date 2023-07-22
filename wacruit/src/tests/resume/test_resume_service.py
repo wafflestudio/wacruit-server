@@ -90,3 +90,93 @@ def test_withdraw_resume(
     assert user_from_db.university is None
     assert user_from_db.github_email is None
     assert user_from_db.slack_email is None
+
+
+def test_update_resumes(
+    user: User,
+    resume_service: ResumeService,
+    recruiting: Recruiting,
+    resume_questions: list[ResumeQuestion],
+):
+    # user initially creates resume
+    answers = list(
+        f"Initial answer for question {i}" for i in range(len(resume_questions))
+    )
+    initial_resume_submissions = list(
+        ResumeSubmissionCreateDto(
+            question_id=question.id,
+            answer=answer,
+        )
+        for question, answer in zip(resume_questions, answers)
+    )
+    resume_service.create_resume(
+        user_id=user.id,
+        recruiting_id=recruiting.id,
+        resume_submissions=initial_resume_submissions,
+    )
+
+    # user updates their resume
+    new_answers = list(
+        f"Updated answer for question {i}" for i in range(len(resume_questions))
+    )
+    updated_resume_submissions = list(
+        ResumeSubmissionCreateDto(
+            question_id=question.id,
+            answer=answer,
+        )
+        for question, answer in zip(resume_questions, new_answers)
+    )
+    updated_submissions = resume_service.update_resumes(
+        user_id=user.id,
+        recruiting_id=recruiting.id,
+        resume_submissions=updated_resume_submissions,
+    )
+    assert len(updated_submissions) == len(new_answers)
+
+    # retrieve the updated resumes and verify they match the new answers
+    submissions_by_user_and_recruiting = (
+        resume_service.get_resumes_by_user_and_recruiting_id(user.id, recruiting.id)
+    )
+
+    assert len(submissions_by_user_and_recruiting) == len(updated_submissions)
+    for i, submission in enumerate(submissions_by_user_and_recruiting):
+        assert submission.answer == new_answers[i]
+
+
+def test_update_resumes_create_new_submission(
+    user: User,
+    resume_service: ResumeService,
+    recruiting: Recruiting,
+    resume_questions: list[ResumeQuestion],
+):
+    # user has not submitted any resume
+    submissions_by_user_and_recruiting = (
+        resume_service.get_resumes_by_user_and_recruiting_id(user.id, recruiting.id)
+    )
+    assert len(submissions_by_user_and_recruiting) == 0
+
+    # user creates a new resume via update_resumes
+    new_answers = list(f"Answer for question {i}" for i in range(len(resume_questions)))
+    new_resume_submissions = list(
+        ResumeSubmissionCreateDto(
+            question_id=question.id,
+            answer=answer,
+        )
+        for question, answer in zip(resume_questions, new_answers)
+    )
+    updated_submissions = resume_service.update_resumes(
+        user_id=user.id,
+        recruiting_id=recruiting.id,
+        resume_submissions=new_resume_submissions,
+    )
+
+    assert len(updated_submissions) == len(new_answers)
+
+    # retrieve the new resumes and verify they match the new answers
+    submissions_by_user_and_recruiting = (
+        resume_service.get_resumes_by_user_and_recruiting_id(user.id, recruiting.id)
+    )
+
+    assert len(submissions_by_user_and_recruiting) == len(updated_submissions)
+    for i, submission in enumerate(submissions_by_user_and_recruiting):
+        assert submission.answer == new_answers[i]

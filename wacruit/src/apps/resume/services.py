@@ -59,24 +59,23 @@ class ResumeService:
         recruiting_id: int,
         resume_submissions: Sequence[ResumeSubmissionCreateDto],
     ) -> list[UserResumeSubmissionDto]:
-        resumes = [
-            # TODO : get_resume_by_id를 호출하는 부분에서 쿼리 수정이 필요
-            self.resume_repository.get_resume_by_id(1)
-            for resume_info in resume_submissions
-        ]
         resume_dtos = []
 
-        for i, resume_info in enumerate(resume_submissions):
-            if not resumes[i]:
+        for resume_info in resume_submissions:
+            resume_submission = ResumeSubmission()
+            resume_submission.user_id = user_id
+            resume_submission.recruiting_id = recruiting_id
+            resume_submission.question_id = resume_info.question_id
+            resume_submission.answer = resume_info.answer
+            updated_resume_submission = (
+                self.resume_repository.update_or_create_resume_submission(
+                    resume_submission
+                )
+            )
+            if not updated_resume_submission:
                 raise ResumeNotFound
-
-            resume = resumes[i]
-            resume.user_id = user_id
-            resume.question_id = resume_info.question_id
-            resume.recruiting_id = recruiting_id
-            resume.answer = resume_info.answer
-            resume = self.resume_repository.update_resume_submission(resume)
-            resume_dtos.append(UserResumeSubmissionDto.from_orm(resume))
+            dto = UserResumeSubmissionDto.from_orm(updated_resume_submission)
+            resume_dtos.append(dto)
 
         return resume_dtos
 
