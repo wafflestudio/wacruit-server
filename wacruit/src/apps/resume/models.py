@@ -12,9 +12,9 @@ from wacruit.src.apps.common.sql import CURRENT_TIMESTAMP
 from wacruit.src.apps.common.sql import CURRENT_TIMESTAMP_ON_UPDATE
 from wacruit.src.database.base import DeclarativeBase
 from wacruit.src.database.base import intpk
-from wacruit.src.database.base import str30
 
 if TYPE_CHECKING:
+    from wacruit.src.apps.recruiting.models import Recruiting
     from wacruit.src.apps.user.models import User
 
 
@@ -61,25 +61,3 @@ class ResumeSubmission(DeclarativeBase):
         DateTime(timezone=True),
         server_default=CURRENT_TIMESTAMP_ON_UPDATE,
     )
-
-
-class Recruiting(DeclarativeBase):
-    __tablename__ = "recruiting"
-
-    id: Mapped[intpk]
-    name: Mapped[str30]
-    is_active: Mapped[bool]
-    from_date: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-    )
-    to_date: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-    )
-    resume_submissions: Mapped[list["ResumeSubmission"]] = relationship(
-        back_populates="recruiting"
-    )
-    resume_questions: Mapped[list["ResumeQuestion"]] = relationship(
-        back_populates="recruiting"
-    )
-
-    description: Mapped[str | None] = mapped_column(String(10000))

@@ -17,6 +17,7 @@ from wacruit.src.database.base import intpk
 from wacruit.src.database.base import str255
 
 if TYPE_CHECKING:
+    from wacruit.src.apps.recruiting.models import Recruiting
     from wacruit.src.apps.user.models import User
 
 
@@ -24,8 +25,13 @@ class Problem(DeclarativeBase):
     __tablename__ = "problem"
 
     id: Mapped[intpk]
+    recruiting_id: Mapped[int | None] = mapped_column(
+        ForeignKey("recruiting.id", ondelete="SET NULL")
+    )
     num: Mapped[int]
     body: Mapped[str] = mapped_column(Text, nullable=False)
+
+    recruiting: Mapped["Recruiting"] = relationship(back_populates="problems")
     submissions: Mapped[list["CodeSubmission"]] = relationship(back_populates="problem")
     testcases: Mapped[list["TestCase"]] = relationship(back_populates="problem")
 

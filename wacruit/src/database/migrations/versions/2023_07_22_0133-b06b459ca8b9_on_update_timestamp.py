@@ -1,4 +1,4 @@
-"""empty message
+"""Add ON UPDATE CURRENT_TIMESTAMP
 
 Revision ID: b06b459ca8b9
 Revises: 3fdaee6050ce
