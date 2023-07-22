@@ -1,9 +1,10 @@
-from typing import Any, Sequence
+from typing import Sequence
 
 from fastapi import Depends
 from sqlalchemy import func
 from sqlalchemy import Row
 from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import Session
 
 from wacruit.src.apps.recruiting.models import Recruiting
@@ -31,5 +32,12 @@ class RecruitingRepository:
             func.max(Recruiting.to_date).label("to_date"),
             func.count(ResumeSubmission.id).label("applicant_count"),
         ).join(ResumeSubmission)
-        print("\n", query)
         return self.session.execute(query).all()
+
+    def get_recruiting_by_id(self, recruiting_id: int) -> Recruiting | None:
+        query = (
+            select(Recruiting)
+            .where(Recruiting.id == recruiting_id)
+            .options(joinedload(Recruiting.problems))
+        )
+        return self.session.execute(query).scalar()
