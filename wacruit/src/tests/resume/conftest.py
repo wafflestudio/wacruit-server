@@ -9,6 +9,8 @@ from wacruit.src.apps.resume.repositories import ResumeRepository
 from wacruit.src.apps.resume.schemas import ResumeSubmissionCreateDto
 from wacruit.src.apps.resume.services import ResumeService
 from wacruit.src.apps.user.models import User
+from wacruit.src.apps.user.repositories import UserRepository
+from wacruit.src.apps.user.services import UserService
 from wacruit.src.database.connection import Transaction
 
 
@@ -42,16 +44,19 @@ def recruiting(db_session: Session):
 
 
 @pytest.fixture
-def resume_question(db_session: Session, recruiting: Recruiting):
-    resume_question = ResumeQuestion(
-        recruiting_id=recruiting.id,
-        question_num=1,
-        content_limit=100,
-        content="This is a test question",
-    )
-    db_session.add(resume_question)
+def resume_questions(db_session: Session, recruiting: Recruiting):
+    resume_questions = []
+    for i in range(1, 3):
+        resume_question = ResumeQuestion(
+            recruiting_id=recruiting.id,
+            question_num=i,
+            content_limit=100,
+            content=f"This is a test question {i}",
+        )
+        db_session.add(resume_question)
+        resume_questions.append(resume_question)
     db_session.commit()
-    return resume_question
+    return resume_questions
 
 
 @pytest.fixture
@@ -60,5 +65,15 @@ def resume_repository(db_session: Session):
 
 
 @pytest.fixture
-def resume_service(resume_repository: ResumeRepository):
-    return ResumeService(resume_repository=resume_repository)
+def user_repository(db_session: Session):
+    return UserRepository(session=db_session, transaction=Transaction(db_session))
+
+
+@pytest.fixture
+def user_service(user_repository: UserRepository):
+    return UserService(user_repository=user_repository)
+
+
+@pytest.fixture
+def resume_service(resume_repository: ResumeRepository, user_service: UserService):
+    return ResumeService(resume_repository=resume_repository, user_service=user_service)

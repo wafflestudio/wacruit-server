@@ -54,7 +54,7 @@ def update_resume(
     return ListResponse(items=updated_items)
 
 
-@v1_router.delete("/{recruiting_id}/withdraw", status_code=204)
+@v1_router.delete("/{recruiting_id}/resumes/withdraw", status_code=204)
 def withdraw_resume(
     current_user: CurrentUser,
     recruiting_id: int,
