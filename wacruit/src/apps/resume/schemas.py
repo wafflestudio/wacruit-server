@@ -33,15 +33,10 @@ class ResumeSubmissionDto(BaseModel):
         orm_mode = True
 
 
-class ResumeSubmissionWithUserDto(ResumeSubmissionDto):
+class UserResumeSubmissionDto(ResumeSubmissionDto):
     user: UserDetailResponse = Field(...)
 
 
 class ResumeSubmissionCreateDto(BaseModel):
-    recruiting_id: int = Field(...)
     question_id: int = Field(...)
     answer: str = Field(..., min_length=1, max_length=10000)
-
-
-class ResumeListingByIdDto(BaseModel):
-    recruiting_id: int = Field(...)

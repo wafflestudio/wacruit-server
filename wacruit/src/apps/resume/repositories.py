@@ -23,11 +23,17 @@ class ResumeRepository:
         self.session = session
         self.transaction = transaction
 
-    def get_resumes(self, recruiting_id) -> Sequence[ResumeSubmission]:
+    def get_resumes_by_recruiting_id(self, recruiting_id) -> Sequence[ResumeSubmission]:
         query = (
             select(ResumeSubmission)
             .options(joinedload(ResumeSubmission.user))
             .where(ResumeSubmission.recruiting_id == recruiting_id)
+        )
+        return self.session.execute(query).scalars().all()
+
+    def get_questions_by_recruiting_id(self, recruiting_id) -> Sequence[ResumeQuestion]:
+        query = select(ResumeQuestion).where(
+            ResumeQuestion.recruiting_id == recruiting_id
         )
         return self.session.execute(query).scalars().all()
 
@@ -38,7 +44,7 @@ class ResumeRepository:
         except InvalidRequestError as exc:
             raise ResumeNotFound() from exc
 
-    def get_resume(
+    def get_resumes_by_user_recruiting_id(
         self, user_id: int, recruiting_id: int
     ) -> Sequence[ResumeSubmission]:
         query = (
