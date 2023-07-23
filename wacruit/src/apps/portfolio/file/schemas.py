@@ -8,3 +8,4 @@ class PortfolioNameResponse(BaseModel):
 class PresignedUrlResponse(BaseModel):
     object_name: str
     presigned_url: str
+    fields: dict[str, str] | None = None
