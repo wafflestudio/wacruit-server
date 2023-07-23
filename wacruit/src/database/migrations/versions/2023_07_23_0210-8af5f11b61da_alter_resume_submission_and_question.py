@@ -1,6 +1,7 @@
-"""Alter resume submission and question
-alter question contents and answer type from Varchar to Text
-alter question contents and answer to non-nullable
+"""Alter resume and recruiting column type
+alter resume question contents from String(10000), nullable to Text, non-nullable
+alter resume submission answer from String(10000), nullable to Text, non-nullable
+alter recruiting description from String(10000), nullable to Text, non-nullable
 
 Revision ID: 8af5f11b61da
 Revises: 51ee6d9fff87
@@ -34,6 +35,13 @@ def upgrade() -> None:
         type_=sa.Text(),
         nullable=False,
     )
+    op.alter_column(
+        "recruiting",
+        "description",
+        existing_type=mysql.VARCHAR(length=10000),
+        type_=sa.Text(),
+        nullable=False,
+    )
     # ### end Alembic commands ###
 
 
@@ -49,6 +57,13 @@ def downgrade() -> None:
     op.alter_column(
         "resume_question",
         "content",
+        existing_type=sa.Text(),
+        type_=mysql.VARCHAR(length=10000),
+        nullable=True,
+    )
+    op.alter_column(
+        "recruiting",
+        "description",
         existing_type=sa.Text(),
         type_=mysql.VARCHAR(length=10000),
         nullable=True,

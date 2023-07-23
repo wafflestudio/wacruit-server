@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime
-from sqlalchemy import String
+from sqlalchemy import Text
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
@@ -29,7 +29,7 @@ class Recruiting(DeclarativeBase):
     to_date: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
     )
-    description: Mapped[str | None] = mapped_column(String(10000))
+    description: Mapped[str] = mapped_column(Text)
 
     resume_submissions: Mapped[list["ResumeSubmission"]] = relationship(
         back_populates="recruiting"
