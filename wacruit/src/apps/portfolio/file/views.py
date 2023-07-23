@@ -12,10 +12,13 @@ from wacruit.src.apps.portfolio.file.schemas import PortfolioNameResponse
 from wacruit.src.apps.portfolio.file.schemas import PresignedUrlResponse
 from wacruit.src.apps.portfolio.file.services import PortfolioFileService
 
-v1_router = fastapi.APIRouter(prefix="/file", tags=["file"])
+v1_router = fastapi.APIRouter(prefix="/file", tags=["portfolio-file"])
 
 
-@v1_router.get(path="/")
+@v1_router.get(
+    path="/",
+    status_code=HTTPStatus.OK,
+)
 def get_list_of_portfolios(
     current_user: CurrentUser,
     service: Annotated[PortfolioFileService, fastapi.Depends()],
@@ -25,8 +28,9 @@ def get_list_of_portfolios(
 
 
 @v1_router.get(
-    path="/url/download/{file_name}",
+    path="/url/download/?file_name={file_name}",
     responses=responses_from(PortfolioNotFoundException),
+    status_code=HTTPStatus.OK,
 )
 def get_download_portfolio_url(
     current_user: CurrentUser,
@@ -40,8 +44,9 @@ def get_download_portfolio_url(
 
 
 @v1_router.get(
-    path="/url/upload/{file_name}",
+    path="/url/upload/?file_name={file_name}",
     responses=responses_from(NumPortfolioLimitException),
+    status_code=HTTPStatus.OK,
 )
 def get_upload_portfolio_url(
     current_user: CurrentUser,
@@ -55,7 +60,7 @@ def get_upload_portfolio_url(
 
 
 @v1_router.delete(
-    path="/delete/{file_name}",
+    path="/delete/?file_name={file_name}",
     responses=responses_from(PortfolioNotFoundException),
     status_code=HTTPStatus.NO_CONTENT,
 )

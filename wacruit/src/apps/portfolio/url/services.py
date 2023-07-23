@@ -21,7 +21,7 @@ class PortfolioUrlService:
         )
         return PortfolioUrlResponse.from_orm(portfolio_url)
 
-    def list_portfolio_urls(self, user_id: int) -> list[PortfolioUrlResponse]:
+    def list_portfolio_urls(self, user_id: int) -> list[PortfolioUrlResponse | None]:
         portfolio_urls = self._portfolio_url_repository.get_portfolio_urls(user_id)
         return [
             PortfolioUrlResponse.from_orm(portfolio_url)

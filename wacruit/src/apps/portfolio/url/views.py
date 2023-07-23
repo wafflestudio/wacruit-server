@@ -4,14 +4,20 @@ from typing import Annotated
 import fastapi
 
 from wacruit.src.apps.common.dependencies import CurrentUser
+from wacruit.src.apps.common.exceptions import responses_from
 from wacruit.src.apps.common.schemas import ListResponse
+from wacruit.src.apps.portfolio.url.exceptions import PortfolioUrlNotAuthorized
+from wacruit.src.apps.portfolio.url.exceptions import PortfolioUrlNotFound
 from wacruit.src.apps.portfolio.url.schemas import PortfolioUrlResponse
 from wacruit.src.apps.portfolio.url.services import PortfolioUrlService
 
-v1_router = fastapi.APIRouter(prefix="/url", tags=["url"])
+v1_router = fastapi.APIRouter(prefix="/url", tags=["portfolio-url"])
 
 
-@v1_router.get(path="/")
+@v1_router.get(
+    path="/",
+    status_code=HTTPStatus.OK,
+)
 def list_portfolio_urls(
     current_user: CurrentUser,
     service: Annotated[PortfolioUrlService, fastapi.Depends()],
@@ -19,7 +25,10 @@ def list_portfolio_urls(
     return ListResponse(items=service.list_portfolio_urls(current_user.id))
 
 
-@v1_router.post(path="/")
+@v1_router.post(
+    path="/?url={url}",
+    status_code=HTTPStatus.CREATED,
+)
 def create_portfolio_url(
     current_user: CurrentUser,
     url: str,
@@ -30,6 +39,7 @@ def create_portfolio_url(
 
 @v1_router.delete(
     path="/{portfolio_url_id}",
+    responses=responses_from(PortfolioUrlNotAuthorized, PortfolioUrlNotFound),
     status_code=HTTPStatus.NO_CONTENT,
 )
 def delete_portfolio_url(
