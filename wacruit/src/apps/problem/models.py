@@ -10,8 +10,8 @@ from sqlalchemy import Text
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
 
+from wacruit.src.apps.common.sql import CURRENT_TIMESTAMP
 from wacruit.src.database.base import DeclarativeBase
 from wacruit.src.database.base import intpk
 from wacruit.src.database.base import str255
@@ -45,7 +45,7 @@ class CodeSubmission(DeclarativeBase):
     )
     create_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        server_default=func.now(),  # pylint: disable=not-callable
+        server_default=CURRENT_TIMESTAMP,
     )
 
     user: Mapped["User"] = relationship(back_populates="code_submissions")

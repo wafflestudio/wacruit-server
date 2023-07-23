@@ -29,6 +29,8 @@ COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
 COPY wacruit ./wacruit
 
+COPY alembic.ini ./alembic.ini
+
 EXPOSE 8080
 
 CMD ["uvicorn", "wacruit.src.main:app", "--host", "0.0.0.0", "--port", "8080"]
