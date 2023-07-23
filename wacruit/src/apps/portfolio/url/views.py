@@ -6,6 +6,7 @@ import fastapi
 from wacruit.src.apps.common.dependencies import CurrentUser
 from wacruit.src.apps.common.exceptions import responses_from
 from wacruit.src.apps.common.schemas import ListResponse
+from wacruit.src.apps.portfolio.url.exceptions import NumPortfolioUrlLimitException
 from wacruit.src.apps.portfolio.url.exceptions import PortfolioUrlNotAuthorized
 from wacruit.src.apps.portfolio.url.exceptions import PortfolioUrlNotFound
 from wacruit.src.apps.portfolio.url.schemas import PortfolioUrlResponse
@@ -27,9 +28,10 @@ def list_portfolio_urls(
 
 @v1_router.post(
     path="/?url={url}",
+    responses=responses_from(NumPortfolioUrlLimitException),
     status_code=HTTPStatus.CREATED,
 )
-def create_portfolio_url(
+def register_portfolio_url(
     current_user: CurrentUser,
     url: str,
     service: Annotated[PortfolioUrlService, fastapi.Depends()],

@@ -2,6 +2,7 @@ from typing import Sequence
 
 from fastapi import Depends
 
+from wacruit.src.apps.portfolio.url.exceptions import NumPortfolioUrlLimitException
 from wacruit.src.apps.portfolio.url.exceptions import PortfolioUrlNotAuthorized
 from wacruit.src.apps.portfolio.url.exceptions import PortfolioUrlNotFound
 from wacruit.src.apps.portfolio.url.models import PortfolioUrl
@@ -14,8 +15,14 @@ class PortfolioUrlService:
         self, portfolio_url_repository: PortfolioUrlRepository = Depends()
     ) -> None:
         self._portfolio_url_repository = portfolio_url_repository
+        self._num_url_limit = 3
 
     def create_portfolio_url(self, user_id: int, url: str) -> PortfolioUrlResponse:
+        if (
+            len(self._portfolio_url_repository.get_portfolio_urls(user_id))
+            >= self._num_url_limit
+        ):
+            raise NumPortfolioUrlLimitException
         portfolio_url = self._portfolio_url_repository.create_portfolio_url(
             PortfolioUrl(user_id=user_id, url=url)
         )
