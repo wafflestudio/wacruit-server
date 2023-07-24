@@ -1,8 +1,10 @@
 from typing import Sequence
 
 from fastapi import Depends
+from sqlalchemy import and_
 from sqlalchemy import delete
 from sqlalchemy import select
+from sqlalchemy import update
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import Session
@@ -23,11 +25,17 @@ class ResumeRepository:
         self.session = session
         self.transaction = transaction
 
-    def get_resumes(self, recruiting_id) -> Sequence[ResumeSubmission]:
+    def get_resumes_by_recruiting_id(self, recruiting_id) -> Sequence[ResumeSubmission]:
         query = (
             select(ResumeSubmission)
             .options(joinedload(ResumeSubmission.user))
             .where(ResumeSubmission.recruiting_id == recruiting_id)
+        )
+        return self.session.execute(query).scalars().all()
+
+    def get_questions_by_recruiting_id(self, recruiting_id) -> Sequence[ResumeQuestion]:
+        query = select(ResumeQuestion).where(
+            ResumeQuestion.recruiting_id == recruiting_id
         )
         return self.session.execute(query).scalars().all()
 
@@ -38,7 +46,7 @@ class ResumeRepository:
         except InvalidRequestError as exc:
             raise ResumeNotFound() from exc
 
-    def get_resume(
+    def get_resumes_by_user_recruiting_id(
         self, user_id: int, recruiting_id: int
     ) -> Sequence[ResumeSubmission]:
         query = (
@@ -55,15 +63,39 @@ class ResumeRepository:
             self.session.add(resume_submission)
         return resume_submission
 
-    def update_resume_submission(
+    def update_or_create_resume_submission(
         self, resume_submission: ResumeSubmission
-    ) -> ResumeSubmission:
+    ) -> ResumeSubmission | None:
+        filter_conditions = and_(
+            ResumeSubmission.user_id == resume_submission.user_id,
+            ResumeSubmission.recruiting_id == resume_submission.recruiting_id,
+            ResumeSubmission.question_id == resume_submission.question_id,
+        )
+        select_stmt = select(ResumeSubmission).where(filter_conditions)
+        update_stmt = (
+            update(ResumeSubmission)
+            .where(filter_conditions)
+            .values(answer=resume_submission.answer)
+        )
         with self.transaction:
-            self.session.merge(resume_submission)
-        return resume_submission
+            if self.session.execute(select_stmt).scalar():
+                self.session.execute(update_stmt)
+            else:
+                self.session.add(resume_submission)
+            return self.session.execute(select_stmt).scalar()
 
     def delete_resume_submission(self, id: int) -> None:
         with self.transaction:
             self.session.execute(
                 delete(ResumeSubmission).where(ResumeSubmission.id == id)
+            )
+
+    def delete_resumes_by_user_recruiting_id(
+        self, user_id: int, recruiting_id: int
+    ) -> None:
+        with self.transaction:
+            self.session.execute(
+                delete(ResumeSubmission)
+                .where(ResumeSubmission.user_id == user_id)
+                .where(ResumeSubmission.recruiting_id == recruiting_id)
             )
