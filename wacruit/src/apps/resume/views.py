@@ -16,7 +16,9 @@ from wacruit.src.apps.user.exceptions import UserPermissionDeniedException
 v1_router = APIRouter(prefix="/v1/recruiting", tags=["resume"])
 
 
-@v1_router.get("/{recruiting_id}/resumes")
+@v1_router.get(
+    "/{recruiting_id}/resumes", responses=responses_from(UserPermissionDeniedException)
+)
 def get_my_resumes(
     current_user: CurrentUser,
     recruiting_id: int,
@@ -30,7 +32,7 @@ def get_my_resumes(
 
 @v1_router.post(
     "/{recruiting_id}/resumes",
-    responses=responses_from(ResumeNotFound),
+    responses=responses_from(ResumeNotFound, UserPermissionDeniedException),
 )
 def create_resume(
     current_user: CurrentUser,
@@ -46,7 +48,7 @@ def create_resume(
 
 @v1_router.put(
     "/{recruiting_id}/resumes",
-    responses=responses_from(ResumeNotFound),
+    responses=responses_from(ResumeNotFound, UserPermissionDeniedException),
 )
 def update_resume(
     current_user: CurrentUser,
@@ -60,7 +62,11 @@ def update_resume(
     return ListResponse(items=updated_items)
 
 
-@v1_router.delete("/{recruiting_id}/resumes/withdraw", status_code=204)
+@v1_router.delete(
+    "/{recruiting_id}/resumes",
+    status_code=204,
+    responses=responses_from(UserPermissionDeniedException),
+)
 def withdraw_resume(
     current_user: CurrentUser,
     recruiting_id: int,
