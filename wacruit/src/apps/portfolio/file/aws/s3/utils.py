@@ -10,7 +10,7 @@ def get_list_of_objects(
     s3_client: BaseClient,
     s3_bucket: str,
     s3_prefix: str,
-) -> list[str | None]:
+) -> list[str]:
     try:
         resp = s3_client.list_objects(
             Bucket=s3_bucket,
