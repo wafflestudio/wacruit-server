@@ -32,6 +32,14 @@ class ResumeQuestion(DeclarativeBase):
     question_num: Mapped[int]
     content_limit: Mapped[int]
     content: Mapped[str | None] = mapped_column(String(10000))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=CURRENT_TIMESTAMP,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=CURRENT_TIMESTAMP_ON_UPDATE,
+    )
 
 
 class ResumeSubmission(DeclarativeBase):

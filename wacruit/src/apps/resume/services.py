@@ -5,6 +5,7 @@ from fastapi import Depends
 from wacruit.src.apps.resume.exceptions import ResumeNotFound
 from wacruit.src.apps.resume.models import ResumeSubmission
 from wacruit.src.apps.resume.repositories import ResumeRepository
+from wacruit.src.apps.resume.schemas import ResumeQuestionDto
 from wacruit.src.apps.resume.schemas import ResumeSubmissionCreateDto
 from wacruit.src.apps.resume.schemas import UserResumeSubmissionDto
 from wacruit.src.apps.user.services import UserService
@@ -18,6 +19,12 @@ class ResumeService:
     ) -> None:
         self.resume_repository = resume_repository
         self.user_service = user_service
+
+    def get_questions_by_recruiting_id(
+        self, recruiting_id: int
+    ) -> list[ResumeQuestionDto]:
+        questions = self.resume_repository.get_questions_by_recruiting_id(recruiting_id)
+        return [ResumeQuestionDto.from_orm(question) for question in questions]
 
     def create_resume(
         self,

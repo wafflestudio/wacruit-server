@@ -11,6 +11,22 @@ from wacruit.src.apps.user.schemas import UserUpdateInvitationEmailsRequest
 from wacruit.src.apps.user.services import UserService
 
 
+def test_get_questions(
+    resume_service: ResumeService,
+    recruiting: Recruiting,
+    resume_questions: list[ResumeQuestion],
+):
+    questions = resume_service.get_questions_by_recruiting_id(recruiting.id)
+    assert len(questions) == len(resume_questions)
+    for i, question in enumerate(questions):
+        assert question.recruiting_id == resume_questions[i].recruiting_id
+        assert question.question_num == resume_questions[i].question_num
+        assert question.content_limit == resume_questions[i].content_limit
+        assert question.content == resume_questions[i].content
+        assert question.created_at is not None
+        assert question.updated_at is not None
+
+
 def test_create_resume(
     user: User,
     resume_service: ResumeService,

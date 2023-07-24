@@ -8,12 +8,26 @@ from wacruit.src.apps.common.dependencies import CurrentUser
 from wacruit.src.apps.common.exceptions import responses_from
 from wacruit.src.apps.common.schemas import ListResponse
 from wacruit.src.apps.resume.exceptions import ResumeNotFound
+from wacruit.src.apps.resume.schemas import ResumeQuestionDto
 from wacruit.src.apps.resume.schemas import ResumeSubmissionCreateDto
 from wacruit.src.apps.resume.schemas import UserResumeSubmissionDto
 from wacruit.src.apps.resume.services import ResumeService
 from wacruit.src.apps.user.exceptions import UserPermissionDeniedException
 
 v1_router = APIRouter(prefix="/v1/recruiting", tags=["resume"])
+
+
+@v1_router.get(
+    "/{recruiting_id}/questions",
+    responses=responses_from(UserPermissionDeniedException),
+)
+def get_questions(
+    current_user: CurrentUser,
+    recruiting_id: int,
+    resume_service: ResumeService = Depends(),
+) -> ListResponse[ResumeQuestionDto]:
+    questions = resume_service.get_questions_by_recruiting_id(recruiting_id)
+    return ListResponse(items=questions)
 
 
 @v1_router.get(

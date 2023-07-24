@@ -10,9 +10,10 @@ from wacruit.src.database.base import intpk
 
 
 class ResumeQuestionDto(BaseModel):
-    screening_id: int
+    recruiting_id: int
     question_num: int
     content: str
+    content_limit: int
     created_at: datetime
     updated_at: datetime
 
@@ -21,12 +22,12 @@ class ResumeQuestionDto(BaseModel):
 
 
 class ResumeSubmissionDto(BaseModel):
-    id: intpk = Field(...)
-    user_id: int = Field(...)
-    recruiting_id: int = Field(...)
-    question_id: int = Field(...)
-    created_at: datetime = Field(...)
-    updated_at: datetime = Field(...)
+    id: int
+    user_id: int
+    recruiting_id: int
+    question_id: int
+    created_at: datetime
+    updated_at: datetime
     answer: str = Field(..., min_length=1, max_length=10000)
 
     class Config:
@@ -34,9 +35,9 @@ class ResumeSubmissionDto(BaseModel):
 
 
 class UserResumeSubmissionDto(ResumeSubmissionDto):
-    user: UserDetailResponse = Field(...)
+    user: UserDetailResponse
 
 
 class ResumeSubmissionCreateDto(BaseModel):
-    question_id: int = Field(...)
+    question_id: int
     answer: str = Field(..., min_length=1, max_length=10000)
