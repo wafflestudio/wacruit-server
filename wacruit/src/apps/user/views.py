@@ -9,6 +9,7 @@ from fastapi import HTTPException
 from fastapi import Security
 from fastapi.security import APIKeyHeader
 
+from wacruit.src.apps.common.dependencies import AdminUser
 from wacruit.src.apps.common.dependencies import CurrentUser
 from wacruit.src.apps.user.models import User
 from wacruit.src.apps.user.repositories import UserRepository
@@ -31,11 +32,9 @@ def create_user(
 
 @v1_router.get("")
 def list_users(
+    admin_user: AdminUser,
     user_service: Annotated[UserService, Depends()],
-    # current_user: User = Depends(get_current_user),
 ):
-    # if not current_user.is_admin:
-    #     raise UserPermissionDeniedException
     return user_service.list_users()
 
 
