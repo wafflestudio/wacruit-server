@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from wacruit.src.apps.problem.models import Problem
 
 
-class RecruitingListResponse(OrmModel):
+class RecruitingApplicantDto(OrmModel):
     id: int
     name: str
     is_active: bool
@@ -17,12 +17,12 @@ class RecruitingListResponse(OrmModel):
     applicant_count: int
 
 
-class ProblemListResponse(OrmModel):
+class ProblemStatusDto(OrmModel):
     num: int
     status: int
 
     @classmethod
-    def from_orm(cls, problem: "Problem") -> "ProblemListResponse":
+    def from_orm(cls, problem: "Problem") -> "ProblemStatusDto":
         status = 0
         if problem.submissions:
             try:
@@ -40,7 +40,7 @@ class ProblemListResponse(OrmModel):
                 else:
                     status = CodeSubmissionStatus.WRONG.value
 
-        return ProblemListResponse(num=problem.num, status=status)
+        return ProblemStatusDto(num=problem.num, status=status)
 
 
 class RecruitingResponse(OrmModel):
@@ -49,4 +49,4 @@ class RecruitingResponse(OrmModel):
     from_date: datetime
     to_date: datetime
     description: str
-    problems: list[ProblemListResponse]
+    problems: list[ProblemStatusDto]

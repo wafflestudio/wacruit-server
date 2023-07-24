@@ -5,7 +5,7 @@ from fastapi import Depends
 from wacruit.src.apps.common.schemas import ListResponse
 from wacruit.src.apps.recruiting.exceptions import RecruitingNotFoundException
 from wacruit.src.apps.recruiting.repositories import RecruitingRepository
-from wacruit.src.apps.recruiting.schemas import RecruitingListResponse
+from wacruit.src.apps.recruiting.schemas import RecruitingApplicantDto
 from wacruit.src.apps.recruiting.schemas import RecruitingResponse
 from wacruit.src.apps.user.models import User
 
@@ -17,9 +17,9 @@ class RecruitingService:
     ):
         self.recruiting_repository = recruiting_repository
 
-    def get_all_recruiting(self) -> ListResponse[RecruitingListResponse]:
+    def get_all_recruiting(self) -> ListResponse[RecruitingApplicantDto]:
         recruitings = self.recruiting_repository.get_all_recruitings()
-        return ListResponse(items=RecruitingListResponse.from_orm_all(recruitings))
+        return ListResponse(items=RecruitingApplicantDto.from_orm_all(recruitings))
 
     def get_recruiting_by_id(
         self, recruiting_id: int, user: User
