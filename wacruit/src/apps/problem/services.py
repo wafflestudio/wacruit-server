@@ -18,6 +18,7 @@ from wacruit.src.apps.problem.repositories import ProblemRepository
 from wacruit.src.apps.problem.schemas import CodeSubmissionResult
 from wacruit.src.apps.problem.schemas import CodeSubmitRequest
 from wacruit.src.apps.problem.schemas import ProblemResponse
+from wacruit.src.apps.problem.schemas import TokenStr
 from wacruit.src.apps.user.models import User
 from wacruit.src.utils.mixins import LoggingMixin
 
@@ -39,7 +40,7 @@ class ProblemService(LoggingMixin):
 
     async def submit_code(
         self, request: CodeSubmitRequest, user: User
-    ) -> Tuple[list[str], CodeSubmission | None]:
+    ) -> Tuple[list[TokenStr], CodeSubmission | None]:
         testcases = self.problem_repository.get_testcases_by_problem_id(
             request.problem_id, request.is_example
         )
@@ -85,7 +86,7 @@ class ProblemService(LoggingMixin):
     async def get_submission_result(
         self,
         request: Request,
-        tokens: list[str],
+        tokens: list[TokenStr],
         submission: CodeSubmission | None,
         user: User,
         is_example: bool = True,
