@@ -33,7 +33,9 @@ class RecruitingRepository:
                 Recruiting.is_active.label("is_active"),
                 Recruiting.from_date.label("from_date"),
                 Recruiting.to_date.label("to_date"),
-                func.count(ResumeSubmission.id).label("applicant_count"),
+                func.count(ResumeSubmission.user_id.distinct()).label(
+                    "applicant_count"
+                ),
             )
             .outerjoin(ResumeSubmission)
             .group_by(
