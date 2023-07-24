@@ -12,7 +12,7 @@ from wacruit.src.apps.problem.schemas import ProblemResponse
 from wacruit.src.apps.problem.services import ProblemService
 from wacruit.src.apps.user.dependencies import CurrentUser
 
-v1_router = APIRouter(prefix="/v1/problem", tags=["problem"])
+v1_router = APIRouter(prefix="/v1/problems", tags=["problems"])
 
 
 @v1_router.get("/{problem_id}", responses=responses_from(ProblemNotFoundException))
