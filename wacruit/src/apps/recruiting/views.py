@@ -11,7 +11,7 @@ from wacruit.src.apps.recruiting.schemas import RecruitingResponse
 from wacruit.src.apps.recruiting.services import RecruitingService
 from wacruit.src.apps.user.dependencies import CurrentUser
 
-v1_router = APIRouter(prefix="/v1/recruiting", tags=["recruiting"])
+v1_router = APIRouter(prefix="/v1/recruitings", tags=["recruitings"])
 
 
 @v1_router.get("")
