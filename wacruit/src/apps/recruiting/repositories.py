@@ -26,14 +26,24 @@ class RecruitingRepository:
 
     # pylint: disable=not-callable
     def get_all_recruitings(self) -> Sequence[Row]:
-        query = select(
-            func.max(Recruiting.id).label("id"),
-            func.max(Recruiting.name).label("name"),
-            func.max(Recruiting.is_active).label("is_active"),
-            func.max(Recruiting.from_date).label("from_date"),
-            func.max(Recruiting.to_date).label("to_date"),
-            func.count(ResumeSubmission.id).label("applicant_count"),
-        ).join(ResumeSubmission)
+        query = (
+            select(
+                Recruiting.id.label("id"),
+                Recruiting.name.label("name"),
+                Recruiting.is_active.label("is_active"),
+                Recruiting.from_date.label("from_date"),
+                Recruiting.to_date.label("to_date"),
+                func.count(ResumeSubmission.id).label("applicant_count"),
+            )
+            .outerjoin(ResumeSubmission)
+            .group_by(
+                Recruiting.id,
+                Recruiting.name,
+                Recruiting.is_active,
+                Recruiting.from_date,
+                Recruiting.to_date,
+            )
+        )
         return self.session.execute(query).all()
 
     def get_recruiting_by_id(
