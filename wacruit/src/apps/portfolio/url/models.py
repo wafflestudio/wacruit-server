@@ -1,19 +1,15 @@
 from datetime import datetime
-from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
-from sqlalchemy import func
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import relationship
 
+from wacruit.src.apps.common.sql import CURRENT_TIMESTAMP
+from wacruit.src.apps.common.sql import CURRENT_TIMESTAMP_ON_UPDATE
 from wacruit.src.database.base import DeclarativeBase
 from wacruit.src.database.base import intpk
 from wacruit.src.database.base import str255
-
-if TYPE_CHECKING:
-    from wacruit.src.apps.user.models import User
 
 
 class PortfolioUrl(DeclarativeBase):
@@ -26,12 +22,11 @@ class PortfolioUrl(DeclarativeBase):
     url: Mapped[str255] = mapped_column(nullable=False)
 
     # user: Mapped["User"] = relationship(back_populates="portfolio_upload")
-    created_at: Mapped[datetime] = mapped_column(
+    create_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        server_default=func.now(),  # pylint: disable=not-callable
+        server_default=CURRENT_TIMESTAMP,
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        onupdate=func.now(),  # pylint: disable=not-callable
-        server_default=func.now(),  # pylint: disable=not-callable
+        server_default=CURRENT_TIMESTAMP_ON_UPDATE,
     )
