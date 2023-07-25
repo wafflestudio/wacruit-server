@@ -3,10 +3,9 @@ from datetime import datetime
 import pytest
 from sqlalchemy.orm import Session
 
-from wacruit.src.apps.resume.models import Recruiting
+from wacruit.src.apps.recruiting.models import Recruiting
 from wacruit.src.apps.resume.models import ResumeQuestion
 from wacruit.src.apps.resume.repositories import ResumeRepository
-from wacruit.src.apps.resume.schemas import ResumeSubmissionCreateDto
 from wacruit.src.apps.resume.services import ResumeService
 from wacruit.src.apps.user.models import User
 from wacruit.src.apps.user.repositories import UserRepository

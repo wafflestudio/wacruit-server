@@ -1,7 +1,7 @@
 from pydantic import EmailStr
 import pytest
 
-from wacruit.src.apps.resume.models import Recruiting
+from wacruit.src.apps.recruiting.models import Recruiting
 from wacruit.src.apps.resume.models import ResumeQuestion
 from wacruit.src.apps.resume.models import ResumeSubmission
 from wacruit.src.apps.resume.schemas import ResumeSubmissionCreateDto
