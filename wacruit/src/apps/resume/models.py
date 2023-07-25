@@ -32,6 +32,14 @@ class ResumeQuestion(DeclarativeBase):
     question_num: Mapped[int]
     content_limit: Mapped[int]
     content: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=CURRENT_TIMESTAMP,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=CURRENT_TIMESTAMP_ON_UPDATE,
+    )
 
     def __str__(self):
         return (

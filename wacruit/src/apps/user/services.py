@@ -58,3 +58,18 @@ class UserService:
         if updated_user is None:
             raise UserNotFoundException
         return UserDetailResponse.from_orm(user)
+
+    def remove_sensitive_information(self, user_id: int) -> UserDetailResponse:
+        user = self.user_repository.get_user_by_id(user_id)
+        if user is None:
+            raise UserNotFoundException
+        user.department = None
+        user.college = None
+        user.university = None
+        user.github_email = None
+        user.notion_email = None
+        user.slack_email = None
+        updated_user = self.user_repository.update_user(user)
+        if updated_user is None:
+            raise UserNotFoundException
+        return UserDetailResponse.from_orm(user)
