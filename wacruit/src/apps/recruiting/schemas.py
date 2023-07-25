@@ -21,26 +21,9 @@ class ProblemStatusDto(OrmModel):
     num: int
     status: int
 
-    @classmethod
-    def from_orm(cls, problem: "Problem") -> "ProblemStatusDto":
-        status = 0
-        if problem.submissions:
-            try:
-                next(
-                    filter(
-                        lambda submission: submission.status
-                        == CodeSubmissionStatus.SOLVED,
-                        problem.submissions,
-                    )
-                )
-                status = CodeSubmissionStatus.SOLVED.value
-            except StopIteration:
-                if problem.submissions[0].status == CodeSubmissionStatus.RUNNING:
-                    status = CodeSubmissionStatus.RUNNING.value
-                else:
-                    status = CodeSubmissionStatus.WRONG.value
-
-        return ProblemStatusDto(num=problem.num, status=status)
+    # @classmethod
+    # def from_orm(cls, problem: "Problem") -> "ProblemStatusDto":
+    #     ...
 
 
 class RecruitingResponse(OrmModel):

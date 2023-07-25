@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import Depends
 
+from wacruit.src.apps.common.enums import CodeSubmissionStatus
 from wacruit.src.apps.common.schemas import ListResponse
 from wacruit.src.apps.recruiting.exceptions import RecruitingNotFoundException
 from wacruit.src.apps.recruiting.repositories import RecruitingRepository
@@ -29,4 +30,23 @@ class RecruitingService:
         )
         if recruiting is None:
             raise RecruitingNotFoundException()
-        return RecruitingResponse.from_orm(recruiting)
+
+        problems = []
+        for problem in recruiting.problems:
+            status = 0
+            if problem.submissions:
+                status = problem.submissions[0].status.value
+                for submission in problem.submissions:
+                    if submission.status == CodeSubmissionStatus.SOLVED:
+                        status = CodeSubmissionStatus.SOLVED.value
+                        break
+            problems.append({"num": problem.num, "status": status})
+
+        return RecruitingResponse(
+            name=recruiting.name,
+            is_active=recruiting.is_active,
+            from_date=recruiting.from_date,
+            to_date=recruiting.to_date,
+            description=recruiting.description,
+            problems=problems,
+        )

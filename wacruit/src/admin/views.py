@@ -11,7 +11,7 @@ from wacruit.src.apps.user.models import User
 
 
 def recruiting_formatter(table, field):
-    return table.recruiting.name
+    return table.recruiting and table.recruiting.name
 
 
 class UserAdmin(ModelView, model=User):
