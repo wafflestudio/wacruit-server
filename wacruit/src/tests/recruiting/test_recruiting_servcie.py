@@ -25,5 +25,5 @@ def test_get_recruiting_by_id(
     assert recruiting_response.to_date == recruiting.to_date
     assert recruiting_response.description == recruiting.description
 
-    problems = recruiting_response.problems
+    problems = recruiting_response.problem_status
     assert len(problems) == 1

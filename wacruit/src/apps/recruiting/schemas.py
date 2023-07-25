@@ -32,4 +32,4 @@ class RecruitingResponse(OrmModel):
     from_date: datetime
     to_date: datetime
     description: str
-    problems: list[ProblemStatusDto]
+    problem_status: list[ProblemStatusDto]

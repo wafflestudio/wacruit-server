@@ -7,6 +7,7 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
+from wacruit.src.apps.common.enums import CodeSubmissionStatus
 from wacruit.src.database.base import DeclarativeBase
 from wacruit.src.database.base import intpk
 from wacruit.src.database.base import str30
@@ -38,6 +39,20 @@ class Recruiting(DeclarativeBase):
         back_populates="recruiting"
     )
     problems: Mapped[list["Problem"]] = relationship(back_populates="recruiting")
+
+    @property
+    def problem_status(self):
+        problems = []
+        for problem in self.problems:
+            status = 0
+            if problem.submissions:
+                status = problem.submissions[0].status.value
+                for submission in problem.submissions:
+                    if submission.status == CodeSubmissionStatus.SOLVED:
+                        status = CodeSubmissionStatus.SOLVED.value
+                        break
+            problems.append({"num": problem.num, "status": status})
+        return problems
 
     def __str__(self):
         return (
