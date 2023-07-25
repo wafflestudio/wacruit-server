@@ -44,7 +44,7 @@ class Recruiting(DeclarativeBase):
     def problem_status(self):
         problems = []
         for problem in self.problems:
-            status = 0
+            status = CodeSubmissionStatus.NOT_SUBMITTED
             if problem.submissions:
                 status = problem.submissions[0].status.value
                 for submission in problem.submissions:

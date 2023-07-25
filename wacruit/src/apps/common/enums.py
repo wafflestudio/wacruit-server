@@ -37,3 +37,8 @@ class CodeSubmissionStatus(Enum):
     RUNNING = 1
     SOLVED = 2
     WRONG = 3
+
+    @classmethod
+    @property
+    def NOT_SUBMITTED(cls):
+        return 0

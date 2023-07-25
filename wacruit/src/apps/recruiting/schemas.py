@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import Literal, TYPE_CHECKING
 
 from wacruit.src.apps.common.enums import CodeSubmissionStatus
 from wacruit.src.apps.common.schemas import OrmModel
@@ -19,11 +19,7 @@ class RecruitingApplicantDto(OrmModel):
 
 class ProblemStatusDto(OrmModel):
     num: int
-    status: int
-
-    # @classmethod
-    # def from_orm(cls, problem: "Problem") -> "ProblemStatusDto":
-    #     ...
+    status: CodeSubmissionStatus | Literal[0]  # 0 means NOT_SUBMITTED
 
 
 class RecruitingResponse(OrmModel):
