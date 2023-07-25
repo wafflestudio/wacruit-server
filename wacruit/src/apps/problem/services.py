@@ -149,9 +149,6 @@ class ProblemService(LoggingMixin):
                         )
                     )
 
-                if submission is not None:
-                    self.problem_repository.update_submission_status(submission, status)
-
                 data = ListResponse(items=responses).json()
                 if responses:
                     event = "message"
@@ -167,3 +164,6 @@ class ProblemService(LoggingMixin):
             finally:
                 yield ServerSentEvent(data=data, event=event)
                 await asyncio.sleep(1)
+
+        if submission is not None:
+            self.problem_repository.update_submission_status(submission, status)
