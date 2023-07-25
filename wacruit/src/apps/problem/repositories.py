@@ -66,7 +66,7 @@ class ProblemRepository:
             self.session.bulk_save_objects(results)
             return submission
 
-    def update_submission(
+    def update_submission_status(
         self, submission: CodeSubmission, status: CodeSubmissionStatus
     ):
         with self.transaction:

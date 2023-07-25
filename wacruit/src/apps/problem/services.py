@@ -4,6 +4,7 @@ from typing import Any, AsyncGenerator, Tuple
 
 from fastapi import Depends
 from fastapi import Request
+from httpx import HTTPStatusError
 from sse_starlette import ServerSentEvent
 
 from wacruit.src.apps.common.enums import CodeSubmissionStatus
@@ -11,6 +12,7 @@ from wacruit.src.apps.common.enums import JudgeSubmissionStatus
 from wacruit.src.apps.common.schemas import ListResponse
 from wacruit.src.apps.judge.repositories import JudgeApiRepository
 from wacruit.src.apps.judge.schemas import JudgeCreateSubmissionRequest
+from wacruit.src.apps.problem.exceptions import CodeSubmissionErrorException
 from wacruit.src.apps.problem.exceptions import CodeSubmissionFailedException
 from wacruit.src.apps.problem.exceptions import ProblemNotFoundException
 from wacruit.src.apps.problem.models import CodeSubmission
@@ -45,7 +47,7 @@ class ProblemService(LoggingMixin):
             request.problem_id, request.is_example
         )
 
-        if not testcases:
+        if not testcases and (not request.is_example or not request.extra_testcases):
             raise ProblemNotFoundException()
 
         if request.is_example and request.extra_testcases:
@@ -92,44 +94,76 @@ class ProblemService(LoggingMixin):
         is_example: bool = True,
     ) -> AsyncGenerator[ServerSentEvent, None]:
         token_map = dict(enumerate(tokens, start=1))
-        submission_result = CodeSubmissionStatus.SOLVED
+        status = CodeSubmissionStatus.SOLVED
 
         while len(token_map) > 0:
+            data = ""
+            event = "skip"
+
             if await request.is_disconnected():
                 break
 
-            testcase_results = await self.judge_api_repository.get_batch_submissions(
-                token_map.values()
-            )
-            responses = []
-            for i, testcase_result in list(zip(token_map.keys(), testcase_results)):
-                match testcase_result.status.id:
-                    case (
-                        JudgeSubmissionStatus.IN_QUEUE
-                        | JudgeSubmissionStatus.PROCESSING
-                    ):
-                        continue
-                    case JudgeSubmissionStatus.ACCEPTED:
-                        ...
-                    case _:
-                        submission_result = CodeSubmissionStatus.WRONG
-                token_map.pop(i)
-
-                responses.append(
-                    CodeSubmissionResult(
-                        num=i,
-                        status=testcase_result.status,
-                        stdout=testcase_result.stdout if is_example else None,
-                        time=Decimal(testcase_result.time or 0),
-                        memory=Decimal(testcase_result.memory or 0),
+            try:
+                testcase_results = (
+                    await self.judge_api_repository.get_batch_submissions(
+                        token_map.values()
                     )
                 )
+                responses = []
+                for i, testcase_result in list(zip(token_map.keys(), testcase_results)):
+                    match testcase_result.status.id:
+                        case (
+                            JudgeSubmissionStatus.IN_QUEUE
+                            | JudgeSubmissionStatus.PROCESSING
+                        ):
+                            continue
+                        case JudgeSubmissionStatus.ACCEPTED:
+                            ...
+                        case (
+                            JudgeSubmissionStatus.WRONG_ANSWER
+                            | JudgeSubmissionStatus.TIME_LIMIT_EXCEEDED
+                            | JudgeSubmissionStatus.COMPILATION_ERROR
+                            | JudgeSubmissionStatus.RUNTIME_ERROR_SIGSEGV
+                            | JudgeSubmissionStatus.RUNTIME_ERROR_SIGXFSZ
+                            | JudgeSubmissionStatus.RUNTIME_ERROR_SIGFPE
+                            | JudgeSubmissionStatus.RUNTIME_ERROR_SIGABRT
+                            | JudgeSubmissionStatus.RUNTIME_ERROR_NZEC
+                            | JudgeSubmissionStatus.RUNTIME_ERROR_OTHER
+                        ):
+                            status = CodeSubmissionStatus.WRONG
+                        case (
+                            JudgeSubmissionStatus.INTERNAL_ERROR
+                            | JudgeSubmissionStatus.EXEC_FORMAT_ERROR
+                        ):
+                            raise CodeSubmissionErrorException()
 
-            if submission is not None:
-                self.problem_repository.update_submission(submission, submission_result)
+                    token_map.pop(i)
 
-            yield ServerSentEvent(
-                data=ListResponse(items=responses).json(),
-                event="message" if responses else "skip",
-            )
-            await asyncio.sleep(1)
+                    responses.append(
+                        CodeSubmissionResult(
+                            num=i,
+                            status=testcase_result.status,
+                            stdout=testcase_result.stdout if is_example else None,
+                            time=Decimal(testcase_result.time or 0),
+                            memory=Decimal(testcase_result.memory or 0),
+                        )
+                    )
+
+                if submission is not None:
+                    self.problem_repository.update_submission_status(submission, status)
+
+                data = ListResponse(items=responses).json()
+                if responses:
+                    event = "message"
+
+            except HTTPStatusError as e:
+                data = {"detail": "채점 서버에 일시적인 문제가 생겼습니다. 잠시 후 다시 시도해주세요."}
+                event = "error"
+                token_map = {}
+            except CodeSubmissionErrorException as e:
+                data = {"detail": e.detail}
+                event = "error"
+                token_map = {}
+            finally:
+                yield ServerSentEvent(data=data, event=event)
+                await asyncio.sleep(1)
