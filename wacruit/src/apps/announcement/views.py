@@ -6,9 +6,9 @@ from wacruit.src.apps.announcement.exceptions import AnnouncementNotFound
 from wacruit.src.apps.announcement.schemas import AnnouncementCreateDto
 from wacruit.src.apps.announcement.schemas import AnnouncementDto
 from wacruit.src.apps.announcement.services import AnnouncementService
-from wacruit.src.apps.common.dependencies import AdminUser
 from wacruit.src.apps.common.exceptions import responses_from
 from wacruit.src.apps.common.schemas import ListResponse
+from wacruit.src.apps.user.dependencies import AdminUser
 
 v1_router = APIRouter(prefix="/v1/announcements", tags=["announcements"])
 
