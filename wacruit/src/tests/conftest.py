@@ -14,7 +14,7 @@ def set_test_env():
     settings.env = "test"
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def db_engine(set_test_env) -> Iterable[sqlalchemy.Engine]:
     url = db_config.url
     engine = sqlalchemy.create_engine(url)
