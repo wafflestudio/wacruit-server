@@ -31,3 +31,14 @@ class JudgeSubmissionStatus(Enum):
     RUNTIME_ERROR_OTHER = 12
     INTERNAL_ERROR = 13
     EXEC_FORMAT_ERROR = 14
+
+
+class CodeSubmissionStatus(Enum):
+    RUNNING = 1
+    SOLVED = 2
+    WRONG = 3
+
+    @classmethod
+    @property
+    def NOT_SUBMITTED(cls):
+        return 0

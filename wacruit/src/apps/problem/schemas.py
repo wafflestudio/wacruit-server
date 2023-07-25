@@ -33,3 +33,6 @@ class CodeSubmissionResult(BaseModel):
     stdout: str | None
     time: Decimal | None
     memory: Decimal | None
+
+
+TokenStr = str
