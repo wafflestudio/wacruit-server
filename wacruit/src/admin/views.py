@@ -83,6 +83,10 @@ class TestCaseAdmin(ModelView, model=TestCase):
     column_list = [
         TestCase.id,
         TestCase.problem,
+        TestCase.time_limit,
+        TestCase.extra_time,
+        TestCase.memory_limit,
+        TestCase.stack_limit,
         TestCase.is_example,
     ]
 
