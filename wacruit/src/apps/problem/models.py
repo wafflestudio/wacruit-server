@@ -6,6 +6,7 @@ from sqlalchemy import Boolean
 from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
 from sqlalchemy import Numeric
+from sqlalchemy import text
 from sqlalchemy import Text
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
@@ -99,6 +100,11 @@ class TestCase(DeclarativeBase):
     stdin: Mapped[str] = mapped_column(Text, nullable=False)
     expected_output: Mapped[str] = mapped_column(Text, nullable=False)
     time_limit: Mapped[Decimal] = mapped_column(Numeric(10, 5))
+    extra_time: Mapped[Decimal] = mapped_column(
+        Numeric(10, 5), server_default=text("0")
+    )
+    memory_limit: Mapped[int] = mapped_column(server_default=text("128000"))
+    stack_limit: Mapped[int] = mapped_column(server_default=text("64000"))
     is_example: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
     problem: Mapped["Problem"] = relationship(back_populates="testcases")
