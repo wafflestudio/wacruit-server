@@ -1,5 +1,10 @@
-from sqladmin import ModelView
+from typing import Any
 
+from sqladmin import ModelView
+from sqlalchemy import Column
+
+from wacruit.src.admin.formatters import recruiting_formatter
+from wacruit.src.admin.formatters import shorten_column
 from wacruit.src.apps.announcement.models import Announcement
 from wacruit.src.apps.problem.models import CodeSubmission
 from wacruit.src.apps.problem.models import Problem
@@ -8,10 +13,6 @@ from wacruit.src.apps.recruiting.models import Recruiting
 from wacruit.src.apps.resume.models import ResumeQuestion
 from wacruit.src.apps.resume.models import ResumeSubmission
 from wacruit.src.apps.user.models import User
-
-
-def recruiting_formatter(table, field):
-    return table.recruiting and table.recruiting.name
 
 
 class UserAdmin(ModelView, model=User):
@@ -37,6 +38,8 @@ class AnnouncementAdmin(ModelView, model=Announcement):
         Announcement.updated_at,
     ]
 
+    column_formatters = {Announcement.content: shorten_column(width=20)}
+
 
 class RecruitingAdmin(ModelView, model=Recruiting):
     column_list = [
@@ -48,6 +51,8 @@ class RecruitingAdmin(ModelView, model=Recruiting):
         Recruiting.description,
     ]
 
+    column_formatters = {Recruiting.description: shorten_column(width=20)}
+
 
 class ProblemAdmin(ModelView, model=Problem):
     column_list = [
@@ -57,13 +62,16 @@ class ProblemAdmin(ModelView, model=Problem):
         Problem.body,
     ]
 
-    column_formatters = {Problem.recruiting: recruiting_formatter}
+    column_formatters = {
+        Problem.recruiting: recruiting_formatter,
+        Problem.body: shorten_column(width=20),
+    }
 
 
 class CodeSubmissionAdmin(ModelView, model=CodeSubmission):
     @staticmethod
-    def user_formatter(table: type[CodeSubmission], field):
-        return table.user.last_name + table.user.first_name
+    def user_formatter(code_submission: type[CodeSubmission], attribute: Column[Any]):
+        return code_submission.user.last_name + code_submission.user.first_name
 
     column_list = [
         CodeSubmission.id,
@@ -90,6 +98,11 @@ class TestCaseAdmin(ModelView, model=TestCase):
         TestCase.is_example,
     ]
 
+    column_formatters = {
+        TestCase.stdin: shorten_column(),
+        TestCase.expected_output: shorten_column(),
+    }
+
 
 class ResumeQuestionAdmin(ModelView, model=ResumeQuestion):
     column_list = [
@@ -100,13 +113,18 @@ class ResumeQuestionAdmin(ModelView, model=ResumeQuestion):
         ResumeQuestion.content,
     ]
 
-    column_formatters = {ResumeQuestion.recruiting: recruiting_formatter}
+    column_formatters = {
+        ResumeQuestion.recruiting: recruiting_formatter,
+        ResumeQuestion.content: shorten_column(width=20),
+    }
 
 
 class ResumeSubmissionAdmin(ModelView, model=ResumeSubmission):
     @staticmethod
-    def question_formatter(table: type[ResumeSubmission], field):
-        return table.question.question_num
+    def question_formatter(
+        resume_submission: type[ResumeSubmission], attribute: Column[Any]
+    ):
+        return resume_submission.question.question_num
 
     column_list = [
         ResumeSubmission.id,
