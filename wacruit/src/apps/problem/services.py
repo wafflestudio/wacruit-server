@@ -14,6 +14,7 @@ from wacruit.src.apps.judge.repositories import JudgeApiRepository
 from wacruit.src.apps.judge.schemas import JudgeCreateSubmissionRequest
 from wacruit.src.apps.problem.exceptions import CodeSubmissionErrorException
 from wacruit.src.apps.problem.exceptions import CodeSubmissionFailedException
+from wacruit.src.apps.problem.exceptions import EmptyTestcaseException
 from wacruit.src.apps.problem.exceptions import ProblemNotFoundException
 from wacruit.src.apps.problem.models import CodeSubmission
 from wacruit.src.apps.problem.repositories import ProblemRepository
@@ -35,7 +36,7 @@ class ProblemService(LoggingMixin):
         self.judge_api_repository = judge_api_repository
 
     def get_problem(self, problem_id) -> ProblemResponse:
-        problem = self.problem_repository.get_problem_by_id_with_example(problem_id)
+        problem = self.problem_repository.get_problem_by_id(problem_id, is_example=True)
         if problem is None:
             raise ProblemNotFoundException()
         return ProblemResponse.from_orm(problem)
@@ -43,15 +44,20 @@ class ProblemService(LoggingMixin):
     async def submit_code(
         self, request: CodeSubmitRequest, user: User
     ) -> Tuple[list[TokenStr], CodeSubmission | None]:
-        testcases = self.problem_repository.get_testcases_by_problem_id(
+        problem = self.problem_repository.get_problem_by_id(
             request.problem_id, request.is_example
         )
 
-        if not testcases and (not request.is_example or not request.extra_testcases):
+        if problem is None:
             raise ProblemNotFoundException()
 
-        if request.is_example and request.extra_testcases:
+        testcases = problem.testcases
+
+        if request.is_example:
             testcases = [*testcases, *request.extra_testcases]
+
+        if len(testcases) == 0:
+            raise EmptyTestcaseException()
 
         requests = (
             [

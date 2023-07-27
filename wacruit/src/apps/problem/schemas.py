@@ -24,7 +24,7 @@ class CodeSubmitRequest(BaseModel):
     language: Language = Field(...)
     source_code: str = Field(..., max_length=10000)
     is_example: bool = Field(False)
-    extra_testcases: list[TestCaseDto] | None = Field(None, max_items=10)
+    extra_testcases: list[TestCaseDto] = Field([], max_items=10)
 
 
 class CodeSubmissionResult(BaseModel):
