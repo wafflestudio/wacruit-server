@@ -53,19 +53,37 @@ class ProblemService(LoggingMixin):
         if request.is_example and request.extra_testcases:
             testcases = [*testcases, *request.extra_testcases]
 
-        requests = [
-            JudgeCreateSubmissionRequest(
-                source_code=request.source_code,
-                language_id=request.language.value,
-                stdin=testcase.stdin,
-                expected_output=testcase.expected_output,
-                cpu_time_limit=1.0
-                if request.is_example
-                else float(testcase.time_limit),
-                wall_time_limit=20.0,
-            )
-            for testcase in testcases
-        ]
+        requests = (
+            [
+                JudgeCreateSubmissionRequest(
+                    source_code=request.source_code,
+                    language_id=request.language.value,
+                    stdin=testcase.stdin,
+                    expected_output=testcase.expected_output,
+                    cpu_time_limit=1.0,
+                    cpu_extra_time=0.0,
+                    wall_time_limit=20.0,
+                    memory_limit=128000,
+                    stack_limit=64000,
+                )
+                for testcase in testcases
+            ]
+            if request.is_example
+            else [
+                JudgeCreateSubmissionRequest(
+                    source_code=request.source_code,
+                    language_id=request.language.value,
+                    stdin=testcase.stdin,
+                    expected_output=testcase.expected_output,
+                    cpu_time_limit=float(testcase.time_limit),
+                    cpu_extra_time=float(testcase.extra_time),
+                    wall_time_limit=20.0,
+                    memory_limit=testcase.memory_limit,
+                    stack_limit=testcase.stack_limit,
+                )
+                for testcase in testcases
+            ]
+        )
 
         response = await self.judge_api_repository.create_batch_submissions(requests)
         tokens = [v.token for v in response]
