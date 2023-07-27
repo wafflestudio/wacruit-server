@@ -60,7 +60,7 @@ class RecruitingRepository:
                 & (CodeSubmission.user_id == user_id),
             )
             .where(Recruiting.id == recruiting_id)
-            .order_by(CodeSubmission.create_at.desc())
+            .order_by(CodeSubmission.created_at.desc())
             .options(
                 contains_eager(Recruiting.problems).contains_eager(Problem.submissions)
             )

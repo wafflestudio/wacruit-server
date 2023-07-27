@@ -4,7 +4,7 @@ from datetime import timedelta
 import pytest
 
 from wacruit.src.apps.problem.models import Problem
-from wacruit.src.apps.problem.models import TestCase
+from wacruit.src.apps.problem.models import Testcase
 from wacruit.src.apps.recruiting.models import Recruiting
 from wacruit.src.apps.recruiting.repositories import RecruitingRepository
 from wacruit.src.apps.recruiting.services import RecruitingService
@@ -29,7 +29,7 @@ def recruiting(db_session: Session) -> Recruiting:
     db_session.add(problem)
     db_session.commit()
 
-    example_testcase = TestCase(
+    example_testcase = Testcase(
         problem_id=problem.id,
         stdin="example_input",
         expected_output="example_output",
@@ -39,7 +39,7 @@ def recruiting(db_session: Session) -> Recruiting:
     db_session.add(example_testcase)
     db_session.commit()
 
-    real_testcase = TestCase(
+    real_testcase = Testcase(
         problem_id=problem.id,
         stdin="real_input",
         expected_output="real_output",

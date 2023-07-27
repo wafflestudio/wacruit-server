@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from wacruit.src.apps.judge import get_judge_api_client
 from wacruit.src.apps.judge.repositories import JudgeApiRepository
 from wacruit.src.apps.problem.models import Problem
-from wacruit.src.apps.problem.models import TestCase
+from wacruit.src.apps.problem.models import Testcase
 from wacruit.src.apps.problem.repositories import ProblemRepository
 from wacruit.src.apps.problem.services import ProblemService
 from wacruit.src.apps.recruiting.models import Recruiting
@@ -31,7 +31,7 @@ def problem(db_session: Session) -> Problem:
     db_session.add(problem)
     db_session.commit()
 
-    example_testcase = TestCase(
+    example_testcase = Testcase(
         problem_id=problem.id,
         stdin="example_input",
         expected_output="example_output",
@@ -41,7 +41,7 @@ def problem(db_session: Session) -> Problem:
     db_session.add(example_testcase)
     db_session.commit()
 
-    real_testcase = TestCase(
+    real_testcase = Testcase(
         problem_id=problem.id,
         stdin="real_input",
         expected_output="real_output",

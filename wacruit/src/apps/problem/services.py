@@ -15,6 +15,7 @@ from wacruit.src.apps.judge.schemas import JudgeCreateSubmissionRequest
 from wacruit.src.apps.problem.exceptions import CodeSubmissionErrorException
 from wacruit.src.apps.problem.exceptions import CodeSubmissionFailedException
 from wacruit.src.apps.problem.exceptions import ProblemNotFoundException
+from wacruit.src.apps.problem.exceptions import TestcaseNotFoundException
 from wacruit.src.apps.problem.models import CodeSubmission
 from wacruit.src.apps.problem.repositories import ProblemRepository
 from wacruit.src.apps.problem.schemas import CodeSubmissionResult
@@ -35,7 +36,7 @@ class ProblemService(LoggingMixin):
         self.judge_api_repository = judge_api_repository
 
     def get_problem(self, problem_id) -> ProblemResponse:
-        problem = self.problem_repository.get_problem_by_id_with_example(problem_id)
+        problem = self.problem_repository.get_problem_by_id(problem_id, is_example=True)
         if problem is None:
             raise ProblemNotFoundException()
         return ProblemResponse.from_orm(problem)
@@ -43,29 +44,52 @@ class ProblemService(LoggingMixin):
     async def submit_code(
         self, request: CodeSubmitRequest, user: User
     ) -> Tuple[list[TokenStr], CodeSubmission | None]:
-        testcases = self.problem_repository.get_testcases_by_problem_id(
+        problem = self.problem_repository.get_problem_by_id(
             request.problem_id, request.is_example
         )
 
-        if not testcases and (not request.is_example or not request.extra_testcases):
+        if problem is None:
             raise ProblemNotFoundException()
 
-        if request.is_example and request.extra_testcases:
+        testcases = problem.testcases
+
+        if request.is_example:
             testcases = [*testcases, *request.extra_testcases]
 
-        requests = [
-            JudgeCreateSubmissionRequest(
-                source_code=request.source_code,
-                language_id=request.language.value,
-                stdin=testcase.stdin,
-                expected_output=testcase.expected_output,
-                cpu_time_limit=1.0
-                if request.is_example
-                else float(testcase.time_limit),
-                wall_time_limit=20.0,
-            )
-            for testcase in testcases
-        ]
+        if len(testcases) == 0:
+            raise TestcaseNotFoundException()
+
+        requests = (
+            [
+                JudgeCreateSubmissionRequest(
+                    source_code=request.source_code,
+                    language_id=request.language.value,
+                    stdin=testcase.stdin,
+                    expected_output=testcase.expected_output,
+                    cpu_time_limit=1.0,
+                    cpu_extra_time=0.0,
+                    wall_time_limit=20.0,
+                    memory_limit=128000,
+                    stack_limit=64000,
+                )
+                for testcase in testcases
+            ]
+            if request.is_example
+            else [
+                JudgeCreateSubmissionRequest(
+                    source_code=request.source_code,
+                    language_id=request.language.value,
+                    stdin=testcase.stdin,
+                    expected_output=testcase.expected_output,
+                    cpu_time_limit=float(testcase.time_limit),
+                    cpu_extra_time=float(testcase.extra_time),
+                    wall_time_limit=20.0,
+                    memory_limit=testcase.memory_limit,
+                    stack_limit=testcase.stack_limit,
+                )
+                for testcase in testcases
+            ]
+        )
 
         response = await self.judge_api_repository.create_batch_submissions(requests)
         tokens = [v.token for v in response]

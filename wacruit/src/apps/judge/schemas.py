@@ -11,6 +11,9 @@ class JudgeCreateSubmissionRequest(BaseModel):
     expected_output: str | None
     cpu_time_limit: float = Field(5.0)
     wall_time_limit: float = Field(30.0)
+    cpu_extra_time: float = Field(0.0)
+    memory_limit: int | None
+    stack_limit: int | None
 
 
 class JudgeCreateSubmissionResponse(BaseModel):
