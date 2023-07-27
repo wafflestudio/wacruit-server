@@ -51,7 +51,12 @@ def upgrade() -> None:
     )
     op.add_column("problem", sa.Column("recruiting_id", sa.Integer(), nullable=True))
     op.create_foreign_key(
-        None, "problem", "recruiting", ["recruiting_id"], ["id"], ondelete="SET NULL"
+        "problem_ibfk_1",
+        "problem",
+        "recruiting",
+        ["recruiting_id"],
+        ["id"],
+        ondelete="SET NULL",
     )
     op.alter_column(
         "recruiting",
@@ -100,7 +105,7 @@ def downgrade() -> None:
         type_=mysql.VARCHAR(length=10000),
         nullable=True,
     )
-    op.drop_constraint(None, "problem", type_="foreignkey")
+    op.drop_constraint("problem_ibfk_1", "problem", type_="foreignkey")
     op.drop_column("problem", "recruiting_id")
     op.drop_column("code_submission", "status")
     op.drop_column("code_submission", "language")
