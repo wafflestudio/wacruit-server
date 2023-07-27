@@ -8,7 +8,7 @@ from wacruit.src.admin.formatters import shorten_column
 from wacruit.src.apps.announcement.models import Announcement
 from wacruit.src.apps.problem.models import CodeSubmission
 from wacruit.src.apps.problem.models import Problem
-from wacruit.src.apps.problem.models import TestCase
+from wacruit.src.apps.problem.models import Testcase
 from wacruit.src.apps.recruiting.models import Recruiting
 from wacruit.src.apps.resume.models import ResumeQuestion
 from wacruit.src.apps.resume.models import ResumeSubmission
@@ -87,20 +87,20 @@ class CodeSubmissionAdmin(ModelView, model=CodeSubmission):
     }
 
 
-class TestCaseAdmin(ModelView, model=TestCase):
+class TestcaseAdmin(ModelView, model=Testcase):
     column_list = [
-        TestCase.id,
-        TestCase.problem,
-        TestCase.time_limit,
-        TestCase.extra_time,
-        TestCase.memory_limit,
-        TestCase.stack_limit,
-        TestCase.is_example,
+        Testcase.id,
+        Testcase.problem,
+        Testcase.time_limit,
+        Testcase.extra_time,
+        Testcase.memory_limit,
+        Testcase.stack_limit,
+        Testcase.is_example,
     ]
 
     column_formatters = {
-        TestCase.stdin: shorten_column(),
-        TestCase.expected_output: shorten_column(),
+        Testcase.stdin: shorten_column(),
+        Testcase.expected_output: shorten_column(),
     }
 
 
@@ -144,7 +144,7 @@ admin_views = [
     AnnouncementAdmin,
     ProblemAdmin,
     CodeSubmissionAdmin,
-    TestCaseAdmin,
+    TestcaseAdmin,
     ResumeQuestionAdmin,
     ResumeSubmissionAdmin,
 ]

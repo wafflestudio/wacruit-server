@@ -14,8 +14,8 @@ from wacruit.src.apps.judge.repositories import JudgeApiRepository
 from wacruit.src.apps.judge.schemas import JudgeCreateSubmissionRequest
 from wacruit.src.apps.problem.exceptions import CodeSubmissionErrorException
 from wacruit.src.apps.problem.exceptions import CodeSubmissionFailedException
-from wacruit.src.apps.problem.exceptions import EmptyTestcaseException
 from wacruit.src.apps.problem.exceptions import ProblemNotFoundException
+from wacruit.src.apps.problem.exceptions import TestcaseNotFoundException
 from wacruit.src.apps.problem.models import CodeSubmission
 from wacruit.src.apps.problem.repositories import ProblemRepository
 from wacruit.src.apps.problem.schemas import CodeSubmissionResult
@@ -57,7 +57,7 @@ class ProblemService(LoggingMixin):
             testcases = [*testcases, *request.extra_testcases]
 
         if len(testcases) == 0:
-            raise EmptyTestcaseException()
+            raise TestcaseNotFoundException()
 
         requests = (
             [

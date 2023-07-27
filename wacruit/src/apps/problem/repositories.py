@@ -10,7 +10,7 @@ from wacruit.src.apps.common.enums import Language
 from wacruit.src.apps.problem.models import CodeSubmission
 from wacruit.src.apps.problem.models import CodeSubmissionResult
 from wacruit.src.apps.problem.models import Problem
-from wacruit.src.apps.problem.models import TestCase
+from wacruit.src.apps.problem.models import Testcase
 from wacruit.src.database.connection import get_db_session
 from wacruit.src.database.connection import Transaction
 
@@ -28,9 +28,9 @@ class ProblemRepository:
         query = (
             select(Problem)
             .outerjoin(
-                TestCase,
-                (Problem.id == TestCase.problem_id)
-                & (TestCase.is_example == is_example),
+                Testcase,
+                (Problem.id == Testcase.problem_id)
+                & (Testcase.is_example == is_example),
             )
             .where(Problem.id == problem_id)
             .options(contains_eager(Problem.testcases))
@@ -42,7 +42,7 @@ class ProblemRepository:
         user_id: int,
         problem_id: int,
         language: Language,
-        testcases: Iterable[TestCase],
+        testcases: Iterable[Testcase],
         tokens: Iterable[str],
     ) -> CodeSubmission | None:
         with self.transaction:

@@ -21,7 +21,7 @@ class CodeSubmissionErrorException(WacruitException):
         )
 
 
-class EmptyTestcaseException(WacruitException):
+class TestcaseNotFoundException(WacruitException):
     def __init__(self):
         super().__init__(
             status_code=404,

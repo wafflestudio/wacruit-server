@@ -36,7 +36,7 @@ class Problem(DeclarativeBase):
 
     recruiting: Mapped["Recruiting"] = relationship(back_populates="problems")
     submissions: Mapped[list["CodeSubmission"]] = relationship(back_populates="problem")
-    testcases: Mapped[list["TestCase"]] = relationship(back_populates="problem")
+    testcases: Mapped[list["Testcase"]] = relationship(back_populates="problem")
 
     def __str__(self) -> str:
         return f"<Problem id={self.id}, num={self.num}, body={self.body[:10]}..>"
@@ -87,10 +87,10 @@ class CodeSubmissionResult(DeclarativeBase):
     token: Mapped[str255]
 
     submission: Mapped["CodeSubmission"] = relationship(back_populates="results")
-    testcase: Mapped["TestCase"] = relationship(back_populates="submission_results")
+    testcase: Mapped["Testcase"] = relationship(back_populates="submission_results")
 
 
-class TestCase(DeclarativeBase):
+class Testcase(DeclarativeBase):
     __tablename__ = "testcase"
 
     id: Mapped[intpk]
@@ -114,7 +114,7 @@ class TestCase(DeclarativeBase):
 
     def __str__(self) -> str:
         return (
-            f"<TestCase id={self.id}, "
+            f"<Testcase id={self.id}, "
             f"problem_id={self.problem_id}, "
             f"is_example={self.is_example}>"
         )
