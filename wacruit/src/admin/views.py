@@ -79,7 +79,7 @@ class CodeSubmissionAdmin(ModelView, model=CodeSubmission):
         CodeSubmission.problem,
         CodeSubmission.language,
         CodeSubmission.status,
-        CodeSubmission.create_at,
+        CodeSubmission.created_at,
     ]
 
     column_formatters = {

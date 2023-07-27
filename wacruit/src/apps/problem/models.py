@@ -56,7 +56,7 @@ class CodeSubmission(DeclarativeBase):
     status: Mapped[CodeSubmissionStatus] = mapped_column(
         default=CodeSubmissionStatus.RUNNING
     )
-    create_at: Mapped[datetime] = mapped_column(
+    created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=CURRENT_TIMESTAMP,
     )
@@ -101,7 +101,7 @@ class Testcase(DeclarativeBase):
     expected_output: Mapped[str] = mapped_column(Text, nullable=False)
     time_limit: Mapped[Decimal] = mapped_column(Numeric(10, 5))
     extra_time: Mapped[Decimal] = mapped_column(
-        Numeric(10, 5), server_default=text("0")
+        Numeric(10, 5), server_default=text("'0.00000'")
     )
     memory_limit: Mapped[int] = mapped_column(server_default=text("128000"))
     stack_limit: Mapped[int] = mapped_column(server_default=text("64000"))

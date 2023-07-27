@@ -22,7 +22,7 @@ def upgrade() -> None:
         sa.Column(
             "extra_time",
             sa.Numeric(precision=10, scale=5),
-            server_default=sa.text("0"),
+            server_default=sa.text("'0.00000'"),
             nullable=False,
         ),
     )
