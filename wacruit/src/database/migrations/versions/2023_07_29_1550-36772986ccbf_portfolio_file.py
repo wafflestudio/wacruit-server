@@ -1,16 +1,16 @@
-"""empty message
+"""portfolio_file
 
-Revision ID: bb3237279aab
-Revises: b06b459ca8b9
-Create Date: 2023-07-23 21:33:46.659128
+Revision ID: 36772986ccbf
+Revises: 6eb442d2b80e
+Create Date: 2023-07-29 15:50:23.310191
 
 """
 from alembic import op
 import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
-revision = "bb3237279aab"
-down_revision = "b06b459ca8b9"
+revision = "36772986ccbf"
+down_revision = "6eb442d2b80e"
 branch_labels = None
 depends_on = None
 
