@@ -3,7 +3,6 @@ from typing import Annotated
 
 import fastapi
 
-from wacruit.src.apps.common.dependencies import CurrentUser
 from wacruit.src.apps.common.exceptions import responses_from
 from wacruit.src.apps.common.schemas import ListResponse
 from wacruit.src.apps.portfolio.url.exceptions import NumPortfolioUrlLimitException
@@ -11,6 +10,7 @@ from wacruit.src.apps.portfolio.url.exceptions import PortfolioUrlNotAuthorized
 from wacruit.src.apps.portfolio.url.exceptions import PortfolioUrlNotFound
 from wacruit.src.apps.portfolio.url.schemas import PortfolioUrlResponse
 from wacruit.src.apps.portfolio.url.services import PortfolioUrlService
+from wacruit.src.apps.user.dependencies import CurrentUser
 
 v1_router = fastapi.APIRouter(prefix="/url", tags=["portfolio-url"])
 
