@@ -3,6 +3,9 @@ from datetime import datetime
 import pytest
 from sqlalchemy.orm import Session
 
+from wacruit.src.apps.portfolio.file.services import PortfolioFileService
+from wacruit.src.apps.portfolio.url.repositories import PortfolioUrlRepository
+from wacruit.src.apps.portfolio.url.services import PortfolioUrlService
 from wacruit.src.apps.recruiting.models import Recruiting
 from wacruit.src.apps.resume.models import ResumeQuestion
 from wacruit.src.apps.resume.repositories import ResumeRepository
@@ -59,8 +62,20 @@ def resume_questions(db_session: Session, recruiting: Recruiting):
 
 
 @pytest.fixture
-def resume_repository(db_session: Session):
-    return ResumeRepository(session=db_session, transaction=Transaction(db_session))
+def portfolio_file_service():
+    return PortfolioFileService()
+
+
+@pytest.fixture
+def portfolio_url_repository(db_session: Session):
+    return PortfolioUrlRepository(
+        session=db_session, transaction=Transaction(db_session)
+    )
+
+
+@pytest.fixture
+def portfolio_url_service(portfolio_url_repository: PortfolioUrlRepository):
+    return PortfolioUrlService(portfolio_url_repository=portfolio_url_repository)
 
 
 @pytest.fixture
@@ -74,5 +89,20 @@ def user_service(user_repository: UserRepository):
 
 
 @pytest.fixture
-def resume_service(resume_repository: ResumeRepository, user_service: UserService):
-    return ResumeService(resume_repository=resume_repository, user_service=user_service)
+def resume_repository(db_session: Session):
+    return ResumeRepository(session=db_session, transaction=Transaction(db_session))
+
+
+@pytest.fixture
+def resume_service(
+    portfolio_file_service: PortfolioFileService,
+    portfolio_url_service: PortfolioUrlService,
+    resume_repository: ResumeRepository,
+    user_service: UserService,
+):
+    return ResumeService(
+        portfolio_file_service=portfolio_file_service,
+        portfolio_url_service=portfolio_url_service,
+        resume_repository=resume_repository,
+        user_service=user_service,
+    )
