@@ -4,66 +4,91 @@ from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import Response
 
-from wacruit.src.apps.common.dependencies import CurrentUser
 from wacruit.src.apps.common.exceptions import responses_from
 from wacruit.src.apps.common.schemas import ListResponse
 from wacruit.src.apps.resume.exceptions import ResumeNotFound
-from wacruit.src.apps.resume.schemas import ResumeListingByIdDto
+from wacruit.src.apps.resume.schemas import ResumeQuestionDto
 from wacruit.src.apps.resume.schemas import ResumeSubmissionCreateDto
-from wacruit.src.apps.resume.schemas import ResumeSubmissionWithUserDto
+from wacruit.src.apps.resume.schemas import UserResumeSubmissionDto
 from wacruit.src.apps.resume.services import ResumeService
+from wacruit.src.apps.user.dependencies import CurrentUser
 from wacruit.src.apps.user.exceptions import UserPermissionDeniedException
 
-v1_router = APIRouter(prefix="/v1/resumes", tags=["resume"])
+v1_router = APIRouter(prefix="/v1/recruiting", tags=["resume"])
 
 
-@v1_router.get("/")
-def list_resumes(
+@v1_router.get(
+    "/{recruiting_id}/questions",
+    responses=responses_from(UserPermissionDeniedException),
+)
+def get_questions(
     current_user: CurrentUser,
-    request: ResumeListingByIdDto,
+    recruiting_id: int,
     resume_service: ResumeService = Depends(),
-) -> ListResponse[ResumeSubmissionWithUserDto]:
-    if not current_user.is_admin:
-        raise UserPermissionDeniedException
+) -> ListResponse[ResumeQuestionDto]:
+    questions = resume_service.get_questions_by_recruiting_id(recruiting_id)
+    return ListResponse(items=questions)
 
-    resumes = resume_service.list_resumes(request.recruiting_id)
+
+@v1_router.get(
+    "/{recruiting_id}/resumes", responses=responses_from(UserPermissionDeniedException)
+)
+def get_my_resumes(
+    current_user: CurrentUser,
+    recruiting_id: int,
+    resume_service: ResumeService = Depends(),
+) -> ListResponse[UserResumeSubmissionDto]:
+    resumes = resume_service.get_resumes_by_user_and_recruiting_id(
+        current_user.id, recruiting_id
+    )
     return ListResponse(items=resumes)
 
 
-@v1_router.get("/my")
-def get_resume(
-    current_user: CurrentUser,
-    request: ResumeListingByIdDto,
-    resume_service: ResumeService = Depends(),
-) -> ListResponse[ResumeSubmissionWithUserDto]:
-    resumes = resume_service.get_resumes(current_user.id, request.recruiting_id)
-    return ListResponse(items=resumes)
-
-
-@v1_router.post("/")
+@v1_router.post(
+    "/{recruiting_id}/resumes",
+    responses=responses_from(ResumeNotFound, UserPermissionDeniedException),
+)
 def create_resume(
     current_user: CurrentUser,
-    request: Sequence[ResumeSubmissionCreateDto],
+    recruiting_id: int,
+    answers: Sequence[ResumeSubmissionCreateDto],
     resume_service: ResumeService = Depends(),
-) -> ListResponse[ResumeSubmissionWithUserDto]:
-    # TODO: Add permission check
-    return ListResponse(items=resume_service.create_resume(current_user.id, request))
+) -> ListResponse[UserResumeSubmissionDto]:
+    created_items = resume_service.create_resume(
+        current_user.id, recruiting_id, answers
+    )
+    return ListResponse(items=created_items)
 
 
-@v1_router.put("/", responses=responses_from(ResumeNotFound))
+@v1_router.put(
+    "/{recruiting_id}/resumes",
+    responses=responses_from(ResumeNotFound, UserPermissionDeniedException),
+)
 def update_resume(
     current_user: CurrentUser,
+    recruiting_id: int,
     request: Sequence[ResumeSubmissionCreateDto],
     resume_service: ResumeService = Depends(),
-) -> ListResponse[ResumeSubmissionWithUserDto]:
-    # TODO: Add permission check
-    return ListResponse(items=resume_service.update_resumes(current_user.id, request))
+) -> ListResponse[UserResumeSubmissionDto]:
+    updated_items = resume_service.update_resumes(
+        current_user.id, recruiting_id, request
+    )
+    return ListResponse(items=updated_items)
 
 
-@v1_router.delete("/", responses=responses_from(ResumeNotFound), status_code=204)
-def delete_resume(
+@v1_router.delete(
+    "/{recruiting_id}/resumes",
+    status_code=204,
+    responses=responses_from(UserPermissionDeniedException),
+)
+def withdraw_resume(
     current_user: CurrentUser,
+    recruiting_id: int,
     resume_service: ResumeService = Depends(),
 ):
-    resume_service.delete_resume(current_user.id)
+    """
+    유저가 제출한 모든 이력서를 삭제하고 관련 정보를 초기화합니다.
+    이 작업은 되돌릴 수 없으므로 사전에 유저에게 확인을 받아야 합니다.
+    """
+    resume_service.withdraw_resume(current_user.id, recruiting_id)
     return Response(status_code=204)

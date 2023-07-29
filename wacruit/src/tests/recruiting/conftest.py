@@ -1,22 +1,20 @@
 from datetime import datetime
 from datetime import timedelta
 
-from httpx import AsyncClient
 import pytest
-from sqlalchemy.orm import Session
 
-from wacruit.src.apps.judge import get_judge_api_client
-from wacruit.src.apps.judge.repositories import JudgeApiRepository
 from wacruit.src.apps.problem.models import Problem
 from wacruit.src.apps.problem.models import Testcase
-from wacruit.src.apps.problem.repositories import ProblemRepository
-from wacruit.src.apps.problem.services import ProblemService
 from wacruit.src.apps.recruiting.models import Recruiting
+from wacruit.src.apps.recruiting.repositories import RecruitingRepository
+from wacruit.src.apps.recruiting.services import RecruitingService
+from wacruit.src.apps.user.models import User
+from wacruit.src.database.connection import Session
 from wacruit.src.database.connection import Transaction
 
 
 @pytest.fixture
-def problem(db_session: Session) -> Problem:
+def recruiting(db_session: Session) -> Recruiting:
     recruiting = Recruiting(
         name="2023-루키-리크루팅",
         is_active=True,
@@ -51,30 +49,32 @@ def problem(db_session: Session) -> Problem:
     db_session.add(real_testcase)
     db_session.commit()
 
-    return problem
+    return recruiting
 
 
 @pytest.fixture
-def problem_repository(db_session: Session):
-    return ProblemRepository(session=db_session, transaction=Transaction(db_session))
-
-
-@pytest.fixture
-async def judge_api_client():
-    return await anext(get_judge_api_client())
-
-
-@pytest.fixture
-def judge_api_repository(judge_api_client: AsyncClient):
-    return JudgeApiRepository(client=judge_api_client)
-
-
-@pytest.fixture
-def problem_service(
-    problem_repository: ProblemRepository,
-    judge_api_repository: JudgeApiRepository,
-):
-    return ProblemService(
-        problem_repository=problem_repository,
-        judge_api_repository=judge_api_repository,
+def user(db_session: Session) -> User:
+    user = User(
+        sso_id="abcdef123",
+        first_name="Test",
+        last_name="User",
+        phone_number="010-0000-0000",
+        email="example@email.com",
+        is_admin=False,
     )
+    db_session.add(user)
+    db_session.commit()
+
+    return user
+
+
+@pytest.fixture
+def recruiting_repository(db_session: Session) -> RecruitingRepository:
+    return RecruitingRepository(db_session, Transaction(db_session))
+
+
+@pytest.fixture
+def recruiting_service(
+    recruiting_repository: RecruitingRepository,
+) -> RecruitingService:
+    return RecruitingService(recruiting_repository)
