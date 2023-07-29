@@ -1,5 +1,6 @@
 from pydantic import EmailStr
 import pytest
+import pytest_mock
 
 from wacruit.src.apps.recruiting.models import Recruiting
 from wacruit.src.apps.resume.models import ResumeQuestion
@@ -64,12 +65,14 @@ def test_create_resume(
 
 
 def test_withdraw_resume(
+    mocker: pytest_mock.MockerFixture,
     user: User,
     resume_service: ResumeService,
     user_service: UserService,
     recruiting: Recruiting,
     resume_questions: list[ResumeQuestion],
 ):
+    mock_file_delete = mocker.patch("wacruit.src.apps.portfolio.file.services.PortfolioFileService.delete_all_portfolios")
     # user updated with university, github_email, slack_email
     user_service.update_invitaion_emails(
         user,
@@ -96,6 +99,7 @@ def test_withdraw_resume(
 
     # user withdraws resume
     resume_service.withdraw_resume(user.id, recruiting.id)
+    mock_file_delete.assert_called_once_with(user.id)
     submissions_by_user_and_recruiting = (
         resume_service.get_resumes_by_user_and_recruiting_id(user.id, recruiting.id)
     )

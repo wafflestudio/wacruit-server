@@ -24,6 +24,7 @@ boto3 = "^1.28.3"
 sqladmin = "^0.13.0"
 itsdangerous = "^2.1.2"
 pyjwt = "^2.8.0"
+pytest-mock = "3.8.2"
 
 
 [tool.poetry.group.dev.dependencies]

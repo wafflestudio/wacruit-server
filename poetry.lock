@@ -564,7 +564,6 @@ requirements-deprecated-finder = ["pip-api", "pipreqs"]
 name = "itsdangerous"
 version = "2.1.2"
 description = "Safely pass data to untrusted environments and back."
-category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -576,7 +575,6 @@ files = [
 name = "jinja2"
 version = "3.1.2"
 description = "A very fast and expressive template engine."
-category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -920,7 +918,6 @@ email = ["email-validator (>=1.0.3)"]
 name = "pyjwt"
 version = "2.8.0"
 description = "JSON Web Token implementation in Python"
-category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -997,6 +994,23 @@ pluggy = ">=0.12,<2.0"
 testing = ["argcomplete", "attrs (>=19.2.0)", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.7.2)", "requests", "setuptools", "xmlschema"]
 
 [[package]]
+name = "pytest-mock"
+version = "3.8.2"
+description = "Thin-wrapper around the mock package for easier use with pytest"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "pytest-mock-3.8.2.tar.gz", hash = "sha256:77f03f4554392558700295e05aed0b1096a20d4a60a4f3ddcde58b0c31c8fca2"},
+    {file = "pytest_mock-3.8.2-py3-none-any.whl", hash = "sha256:8a9e226d6c0ef09fcf20c94eb3405c388af438a90f3e39687f84166da82d5948"},
+]
+
+[package.dependencies]
+pytest = ">=5.0"
+
+[package.extras]
+dev = ["pre-commit", "pytest-asyncio", "tox"]
+
+[[package]]
 name = "python-dateutil"
 version = "2.8.2"
 description = "Extensions to the standard Python datetime module"
@@ -1028,7 +1042,6 @@ cli = ["click (>=5.0)"]
 name = "python-multipart"
 version = "0.0.6"
 description = "A streaming multipart parser for Python"
-category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -1147,7 +1160,6 @@ files = [
 name = "sqladmin"
 version = "0.13.0"
 description = "SQLAlchemy admin for FastAPI and Starlette"
-category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -1449,7 +1461,6 @@ files = [
 name = "wtforms"
 version = "3.0.1"
 description = "Form validation and rendering for Python web development."
-category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -1466,4 +1477,4 @@ email = ["email-validator"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "4c2dbdc726a0e95ac0ca37b479e7101235dd8d3a3f346c8c5e374c9537657777"
+content-hash = "980f8d46767da78b6f67c667bad61db5f9bf5f7da6802168903d4dd8f318ebe0"
