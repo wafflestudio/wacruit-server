@@ -108,3 +108,23 @@ def test_delete_portfolio_url(
             user_id=created_user1.id,
             portfolio_url_id=portfolio2.id,
         )
+
+
+def test_delete_all_portfolio_urls(
+    created_user1: User,
+    portfolio_url_service: PortfolioUrlService,
+):
+    portfolio_url_service.create_portfolio_url(
+        user_id=created_user1.id,
+        url="https://test1.com",
+    )
+
+    portfolio_url_service.create_portfolio_url(
+        user_id=created_user1.id,
+        url="https://test2.com",
+    )
+
+    portfolio_url_service.delete_all_portfolio_urls(user_id=created_user1.id)
+    response = portfolio_url_service.list_portfolio_urls(user_id=created_user1.id)
+    expected = []
+    assert response == expected

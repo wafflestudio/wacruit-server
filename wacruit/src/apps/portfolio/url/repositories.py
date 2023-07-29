@@ -45,3 +45,9 @@ class PortfolioUrlRepository:
     def delete_portfolio_url(self, id: int) -> None:
         with self.transaction:
             self.session.execute(delete(PortfolioUrl).where(PortfolioUrl.id == id))
+
+    def delete_all_portfolio_urls(self, user_id: int) -> None:
+        with self.transaction:
+            self.session.execute(
+                delete(PortfolioUrl).where(PortfolioUrl.user_id == user_id)
+            )

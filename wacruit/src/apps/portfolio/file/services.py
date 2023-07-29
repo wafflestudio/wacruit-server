@@ -103,3 +103,15 @@ class PortfolioFileService(LoggingMixin):
         self.check_portfolio_object_exist(user_id, file_name)
         object_name = PortfolioFileService.get_portfolio_object_name(user_id, file_name)
         delete_object(self._s3_client.client, self._s3_config.bucket_name, object_name)
+
+    def delete_all_portfolios(
+        self,
+        user_id: int,
+    ) -> None:
+        objects = get_list_of_objects(
+            s3_client=self._s3_client.client,
+            s3_bucket=self._s3_config.bucket_name,
+            s3_prefix=f"{user_id}/",
+        )
+        for obj in objects:
+            delete_object(self._s3_client.client, self._s3_config.bucket_name, obj)

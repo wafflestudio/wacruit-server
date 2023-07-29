@@ -46,3 +46,6 @@ class PortfolioUrlService:
             raise PortfolioUrlNotAuthorized
 
         self._portfolio_url_repository.delete_portfolio_url(portfolio_url_id)
+
+    def delete_all_portfolio_urls(self, user_id: int) -> None:
+        self._portfolio_url_repository.delete_all_portfolio_urls(user_id)
