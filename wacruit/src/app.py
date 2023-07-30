@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from sqladmin import Admin
 from starlette.middleware import Middleware
 
@@ -8,6 +9,22 @@ from wacruit.src.admin.views import admin_views
 from wacruit.src.apps.router import api_router
 from wacruit.src.database.connection import DBSessionFactory
 from wacruit.src.settings import settings
+
+
+_DEV_ORIGINS = [
+    "http://localhost:5173",
+]
+
+
+def _add_middlewares(app: FastAPI):
+    if settings.is_dev:
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=_DEV_ORIGINS,
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
 
 
 def _add_routers(app: FastAPI):
@@ -46,6 +63,7 @@ def create_app() -> FastAPI:
         redoc_url="/api/redoc",
         openapi_url="/api/openapi.json",
     )
+    _add_middlewares(app)
     _add_routers(app)
     _attach_admin(app)
     _register_shutdown_event(app)
