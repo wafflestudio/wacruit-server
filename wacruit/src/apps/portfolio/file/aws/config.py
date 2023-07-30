@@ -16,9 +16,12 @@ class S3PortfolioConfig(BaseSettings):
     def __init__(self):
         super().__init__()
         aws_secrets = AWSSecretManager()
-        self.bucket_region = "ap-northeast-2"
         if aws_secrets.is_available():
             self.bucket_name = aws_secrets.get_secret("portfolio_bucket_name")
+
+    @property
+    def bucket_region(self) -> str:
+        return "ap-northeast-2"
 
 
 s3_config = S3PortfolioConfig()
