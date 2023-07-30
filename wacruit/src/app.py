@@ -11,19 +11,20 @@ from wacruit.src.database.connection import DBSessionFactory
 from wacruit.src.settings import settings
 
 
-_ORIGINS = [
+_DEV_ORIGINS = [
     "http://localhost:5173",
 ]
 
 
 def _add_middlewares(app: FastAPI):
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=_ORIGINS,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+    if settings.is_dev:
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=_DEV_ORIGINS,
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
 
 
 def _add_routers(app: FastAPI):
