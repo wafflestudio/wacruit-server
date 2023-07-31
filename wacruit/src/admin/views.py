@@ -5,6 +5,7 @@ from sqlalchemy import Column
 
 from wacruit.src.admin.formatters import recruiting_formatter
 from wacruit.src.admin.formatters import shorten_column
+from wacruit.src.admin.formatters import user_formatter
 from wacruit.src.apps.announcement.models import Announcement
 from wacruit.src.apps.problem.models import CodeSubmission
 from wacruit.src.apps.problem.models import Problem
@@ -69,10 +70,6 @@ class ProblemAdmin(ModelView, model=Problem):
 
 
 class CodeSubmissionAdmin(ModelView, model=CodeSubmission):
-    @staticmethod
-    def user_formatter(code_submission: type[CodeSubmission], attribute: Column[Any]):
-        return code_submission.user.last_name + code_submission.user.first_name
-
     column_list = [
         CodeSubmission.id,
         CodeSubmission.user,
