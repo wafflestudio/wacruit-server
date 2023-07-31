@@ -121,7 +121,8 @@ class ResumeSubmissionAdmin(ModelView, model=ResumeSubmission):
     def question_formatter(
         resume_submission: type[ResumeSubmission], attribute: Column[Any]
     ):
-        return resume_submission.question.question_num
+        question = getattr(resume_submission, "question")
+        return question and question.question_num
 
     column_list = [
         ResumeSubmission.id,
