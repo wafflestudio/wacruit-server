@@ -15,6 +15,11 @@ def recruiting_formatter(
     return recruiting and recruiting.name
 
 
+def user_formatter(model: type[DeclarativeBase], attribute: Column[Any]) -> str | None:
+    user = getattr(model, "user")
+    return user and f"{user.last_name} {user.first_name}"
+
+
 @cache
 def shorten_column(width: int = 10, placeholder: str = "...", **kwargs) -> Formatter:
     def formatter(model: type[DeclarativeBase], attribute: Column[Any]):
