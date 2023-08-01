@@ -71,6 +71,31 @@ def test_update_user(created_user: User, user_service: UserService):
     assert created_user.university == updated_request.university
 
 
+def test_partial_update_user(created_user: User, user_service: UserService):
+    original_first_name = created_user.first_name
+    original_last_name = created_user.last_name
+    original_phone_number = created_user.phone_number
+    original_email = created_user.email
+
+    updated_request = UserUpdateRequest(  # type: ignore
+        department="test",
+        college="test",
+        university="test",
+    )
+    user_service.update_user(created_user, updated_request)
+
+    # check original value is kept
+    assert created_user.first_name == original_first_name
+    assert created_user.last_name == original_last_name
+    assert created_user.phone_number == original_phone_number
+    assert created_user.email == original_email
+
+    # check updated value is applied
+    assert created_user.department == updated_request.department
+    assert created_user.college == updated_request.college
+    assert created_user.university == updated_request.university
+
+
 def test_update_user_duplicate_email(created_user: User, user_service: UserService):
     sso_id = "test"
     create_request = UserCreateRequest(
@@ -81,8 +106,8 @@ def test_update_user_duplicate_email(created_user: User, user_service: UserServi
     )
     user_service.create_user(sso_id, create_request)
     with pytest.raises(IntegrityError):
-        update_request = UserUpdateRequest(
-            email=create_request.email,  # type: ignore
+        update_request = UserUpdateRequest(  # type: ignore
+            email=create_request.email,
         )
         user_service.update_user(created_user, update_request)
 
