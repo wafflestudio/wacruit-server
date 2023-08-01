@@ -8,22 +8,31 @@ from fastapi import Header
 
 from wacruit.src.apps.user.dependencies import AdminUser
 from wacruit.src.apps.user.dependencies import CurrentUser
-from wacruit.src.apps.user.models import User
-from wacruit.src.apps.user.repositories import UserRepository
-from wacruit.src.apps.user.schemas import UserCreateUpdateRequest
+from wacruit.src.apps.user.schemas import UserCreateRequest
+from wacruit.src.apps.user.schemas import UserCreateUpdateResponse
 from wacruit.src.apps.user.schemas import UserDetailResponse
 from wacruit.src.apps.user.schemas import UserUpdateInvitationEmailsRequest
+from wacruit.src.apps.user.schemas import UserUpdateRequest
 from wacruit.src.apps.user.services import UserService
 
 v1_router = APIRouter(prefix="/v1/users", tags=["users"])
 
 
+@v1_router.patch("")
+def update_user(
+    current_user: CurrentUser,
+    request: UserUpdateRequest,
+    user_service: Annotated[UserService, Depends()],
+) -> UserCreateUpdateResponse:
+    return user_service.update_user(user=current_user, request=request)
+
+
 @v1_router.post("")
 def create_user(
-    request: UserCreateUpdateRequest,
+    request: UserCreateRequest,
     waffle_user_id: Annotated[str, Header()],
     user_service: Annotated[UserService, Depends()],
-):
+) -> UserCreateUpdateResponse:
     return user_service.create_user(waffle_user_id, request)
 
 
@@ -31,7 +40,7 @@ def create_user(
 def list_users(
     admin_user: AdminUser,
     user_service: Annotated[UserService, Depends()],
-):
+) -> list[UserDetailResponse]:
     return user_service.list_users()
 
 

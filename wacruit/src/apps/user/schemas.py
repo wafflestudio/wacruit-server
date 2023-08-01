@@ -2,8 +2,10 @@ from pydantic import BaseModel
 from pydantic import EmailStr
 from pydantic import Field
 
+from wacruit.src.apps.common.schemas import OrmModel
 
-class UserCreateUpdateRequest(BaseModel):
+
+class UserCreateRequest(BaseModel):
     first_name: str = Field(..., max_length=30)
     last_name: str = Field(..., max_length=30)
 
@@ -15,7 +17,19 @@ class UserCreateUpdateRequest(BaseModel):
     university: str | None = Field(default=None, max_length=50)
 
 
-class UserCreateResponse(BaseModel):
+class UserUpdateRequest(BaseModel):
+    first_name: str | None = Field(max_length=30)
+    last_name: str | None = Field(max_length=30)
+
+    phone_number: str | None = Field(max_length=30)
+    email: EmailStr | None
+
+    department: str | None = Field(max_length=50)
+    college: str | None = Field(max_length=50)
+    university: str | None = Field(max_length=50)
+
+
+class UserCreateUpdateResponse(OrmModel):
     id: int
 
     first_name: str
@@ -24,8 +38,9 @@ class UserCreateResponse(BaseModel):
     phone_number: str | None
     email: str | None
 
-    class Config:
-        orm_mode = True
+    department: str | None
+    college: str | None
+    university: str | None
 
 
 class UserUpdateInvitationEmailsRequest(BaseModel):
