@@ -14,6 +14,7 @@ class TestcaseDto(OrmModel):
 
 
 class ProblemResponse(OrmModel):
+    id: int
     num: int
     body: str
     testcases: list[TestcaseDto]
