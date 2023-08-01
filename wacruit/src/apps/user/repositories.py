@@ -16,6 +16,12 @@ class UserRepository:
         self.session = session
         self.transaction = transaction
 
+    def check_signup_by_sso_id(self, sso_id: str) -> bool:
+        return (
+            self.session.query(User).filter(User.sso_id == sso_id).one_or_none()
+            is not None
+        )
+
     def get_users(self) -> list[User]:
         return self.session.query(User).all()
 
