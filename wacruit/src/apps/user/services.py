@@ -44,8 +44,8 @@ class UserService:
     def update_user(
         self, user: User, request: UserUpdateRequest
     ) -> UserCreateUpdateResponse:
-        for field in request.dict(exclude_none=True):
-            setattr(user, field, getattr(request, field))
+        for key, value in request.dict(exclude_none=True).items():
+            setattr(user, key, value)
         updated_user = self.user_repository.update_user(user)
         if updated_user is None:
             raise UserNotFoundException
