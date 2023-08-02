@@ -16,3 +16,8 @@ class UserAlreadyExistsException(WacruitException):
 class UserPermissionDeniedException(WacruitException):
     def __init__(self):
         super().__init__(status_code=403, detail="권한이 없습니다.")
+
+
+class EmailAlreadyExistsException(WacruitException):
+    def __init__(self):
+        super().__init__(status_code=409, detail="이미 존재하는 이메일입니다.")

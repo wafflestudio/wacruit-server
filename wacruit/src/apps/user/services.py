@@ -1,15 +1,17 @@
 from fastapi import Depends
 from sqlalchemy.exc import IntegrityError
 
+from wacruit.src.apps.user.exceptions import EmailAlreadyExistsException
 from wacruit.src.apps.user.exceptions import UserAlreadyExistsException
 from wacruit.src.apps.user.exceptions import UserNotFoundException
 from wacruit.src.apps.user.models import User
 from wacruit.src.apps.user.repositories import UserRepository
 from wacruit.src.apps.user.schemas import SignupCheckResponse
-from wacruit.src.apps.user.schemas import UserCreateResponse
-from wacruit.src.apps.user.schemas import UserCreateUpdateRequest
+from wacruit.src.apps.user.schemas import UserCreateRequest
+from wacruit.src.apps.user.schemas import UserCreateUpdateResponse
 from wacruit.src.apps.user.schemas import UserDetailResponse
 from wacruit.src.apps.user.schemas import UserUpdateInvitationEmailsRequest
+from wacruit.src.apps.user.schemas import UserUpdateRequest
 
 
 class UserService:
@@ -25,8 +27,8 @@ class UserService:
         )
 
     def create_user(
-        self, sso_id: str, request: UserCreateUpdateRequest
-    ) -> UserCreateResponse:
+        self, sso_id: str, request: UserCreateRequest
+    ) -> UserCreateUpdateResponse:
         user = User(
             sso_id=sso_id,
             first_name=request.first_name,
@@ -44,7 +46,20 @@ class UserService:
             user = self.user_repository.create_user(user)
         except IntegrityError as exc:
             raise UserAlreadyExistsException from exc
-        return UserCreateResponse.from_orm(user)
+        return UserCreateUpdateResponse.from_orm(user)
+
+    def update_user(
+        self, user: User, request: UserUpdateRequest
+    ) -> UserCreateUpdateResponse:
+        for key, value in request.dict(exclude_none=True).items():
+            setattr(user, key, value)
+        try:
+            updated_user = self.user_repository.update_user(user)
+            if updated_user is None:
+                raise UserNotFoundException
+            return UserCreateUpdateResponse.from_orm(user)
+        except IntegrityError as exc:
+            raise EmailAlreadyExistsException from exc
 
     def list_users(self) -> list[UserDetailResponse]:
         users = self.user_repository.get_users()
