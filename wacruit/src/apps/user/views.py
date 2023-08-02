@@ -8,14 +8,21 @@ from fastapi import Header
 
 from wacruit.src.apps.user.dependencies import AdminUser
 from wacruit.src.apps.user.dependencies import CurrentUser
-from wacruit.src.apps.user.models import User
-from wacruit.src.apps.user.repositories import UserRepository
+from wacruit.src.apps.user.schemas import SignupCheckResponse
 from wacruit.src.apps.user.schemas import UserCreateUpdateRequest
 from wacruit.src.apps.user.schemas import UserDetailResponse
 from wacruit.src.apps.user.schemas import UserUpdateInvitationEmailsRequest
 from wacruit.src.apps.user.services import UserService
 
 v1_router = APIRouter(prefix="/v1/users", tags=["users"])
+
+
+@v1_router.get("")
+def check_signup(
+    waffle_user_id: Annotated[str, Header()],
+    user_service: Annotated[UserService, Depends()],
+) -> SignupCheckResponse:
+    return user_service.check_signup(waffle_user_id)
 
 
 @v1_router.post("")

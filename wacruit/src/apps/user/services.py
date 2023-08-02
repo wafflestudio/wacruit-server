@@ -1,11 +1,11 @@
 from fastapi import Depends
-from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 
 from wacruit.src.apps.user.exceptions import UserAlreadyExistsException
 from wacruit.src.apps.user.exceptions import UserNotFoundException
 from wacruit.src.apps.user.models import User
 from wacruit.src.apps.user.repositories import UserRepository
+from wacruit.src.apps.user.schemas import SignupCheckResponse
 from wacruit.src.apps.user.schemas import UserCreateResponse
 from wacruit.src.apps.user.schemas import UserCreateUpdateRequest
 from wacruit.src.apps.user.schemas import UserDetailResponse
@@ -18,6 +18,11 @@ class UserService:
         user_repository: UserRepository = Depends(),
     ) -> None:
         self.user_repository = user_repository
+
+    def check_signup(self, sso_id: str) -> SignupCheckResponse:
+        return SignupCheckResponse(
+            signup=self.user_repository.check_signup_by_sso_id(sso_id)
+        )
 
     def create_user(
         self, sso_id: str, request: UserCreateUpdateRequest
