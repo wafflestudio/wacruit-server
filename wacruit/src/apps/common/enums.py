@@ -42,3 +42,9 @@ class CodeSubmissionStatus(Enum):
     @property
     def NOT_SUBMITTED(cls):
         return 0
+
+
+class RecruitingType(Enum):
+    ROOKIE = 1
+    DESIGNER = 2
+    PROGRAMMER = 3

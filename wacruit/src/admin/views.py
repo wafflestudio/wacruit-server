@@ -45,6 +45,7 @@ class AnnouncementAdmin(ModelView, model=Announcement):
 class RecruitingAdmin(ModelView, model=Recruiting):
     column_list = [
         Recruiting.id,
+        Recruiting.type,
         Recruiting.name,
         Recruiting.is_active,
         Recruiting.from_date,

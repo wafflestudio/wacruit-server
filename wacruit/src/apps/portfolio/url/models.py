@@ -22,7 +22,7 @@ class PortfolioUrl(DeclarativeBase):
     url: Mapped[str255] = mapped_column(nullable=False)
 
     # user: Mapped["User"] = relationship(back_populates="portfolio_upload")
-    create_at: Mapped[datetime] = mapped_column(
+    created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=CURRENT_TIMESTAMP,
     )

@@ -2,12 +2,14 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime
+from sqlalchemy import text
 from sqlalchemy import Text
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
 from wacruit.src.apps.common.enums import CodeSubmissionStatus
+from wacruit.src.apps.common.enums import RecruitingType
 from wacruit.src.database.base import DeclarativeBase
 from wacruit.src.database.base import intpk
 from wacruit.src.database.base import str30
@@ -23,6 +25,7 @@ class Recruiting(DeclarativeBase):
 
     id: Mapped[intpk]
     name: Mapped[str30]
+    type: Mapped[RecruitingType] = mapped_column(server_default=text("'ROOKIE'"))
     is_active: Mapped[bool]
     from_date: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -51,13 +54,14 @@ class Recruiting(DeclarativeBase):
                     if submission.status == CodeSubmissionStatus.SOLVED:
                         status = CodeSubmissionStatus.SOLVED.value
                         break
-            problems.append({"num": problem.num, "status": status})
+            problems.append({"id": problem.id, "num": problem.num, "status": status})
         return problems
 
     def __str__(self):
         return (
             f"<Recruiting id={self.id}, "
             f"name={self.name}, "
+            f"type={self.type}, "
             f"is_active={self.is_active}, "
             f"from={self.from_date}, "
             f"to={self.to_date}>"
