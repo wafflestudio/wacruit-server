@@ -5,6 +5,10 @@ from pydantic import Field
 from wacruit.src.apps.common.schemas import OrmModel
 
 
+class SignupCheckResponse(BaseModel):
+    signup: bool
+
+
 class UserCreateRequest(BaseModel):
     first_name: str = Field(..., max_length=30)
     last_name: str = Field(..., max_length=30)
@@ -49,7 +53,7 @@ class UserUpdateInvitationEmailsRequest(BaseModel):
     notion_email: EmailStr | None = None
 
 
-class UserDetailResponse(BaseModel):
+class UserDetailResponse(OrmModel):
     id: int
     sso_id: str | None
 
@@ -66,6 +70,3 @@ class UserDetailResponse(BaseModel):
     github_email: str | None
     slack_email: str | None
     notion_email: str | None
-
-    class Config:
-        orm_mode = True

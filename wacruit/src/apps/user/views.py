@@ -13,6 +13,7 @@ from wacruit.src.apps.user.exceptions import EmailAlreadyExistsException
 from wacruit.src.apps.user.exceptions import UserAlreadyExistsException
 from wacruit.src.apps.user.exceptions import UserNotFoundException
 from wacruit.src.apps.user.exceptions import UserPermissionDeniedException
+from wacruit.src.apps.user.schemas import SignupCheckResponse
 from wacruit.src.apps.user.schemas import UserCreateRequest
 from wacruit.src.apps.user.schemas import UserCreateUpdateResponse
 from wacruit.src.apps.user.schemas import UserDetailResponse
@@ -21,6 +22,14 @@ from wacruit.src.apps.user.schemas import UserUpdateRequest
 from wacruit.src.apps.user.services import UserService
 
 v1_router = APIRouter(prefix="/v1/users", tags=["users"])
+
+
+@v1_router.get("")
+def check_signup(
+    waffle_user_id: Annotated[str, Header()],
+    user_service: Annotated[UserService, Depends()],
+) -> SignupCheckResponse:
+    return user_service.check_signup(waffle_user_id)
 
 
 @v1_router.patch(
