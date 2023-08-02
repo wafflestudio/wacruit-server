@@ -1,6 +1,7 @@
 from fastapi import Depends
 from sqlalchemy.exc import IntegrityError
 
+from wacruit.src.apps.user.exceptions import EmailAlreadyExistsException
 from wacruit.src.apps.user.exceptions import UserAlreadyExistsException
 from wacruit.src.apps.user.exceptions import UserNotFoundException
 from wacruit.src.apps.user.models import User
@@ -46,10 +47,13 @@ class UserService:
     ) -> UserCreateUpdateResponse:
         for key, value in request.dict(exclude_none=True).items():
             setattr(user, key, value)
-        updated_user = self.user_repository.update_user(user)
-        if updated_user is None:
-            raise UserNotFoundException
-        return UserCreateUpdateResponse.from_orm(user)
+        try:
+            updated_user = self.user_repository.update_user(user)
+            if updated_user is None:
+                raise UserNotFoundException
+            return UserCreateUpdateResponse.from_orm(user)
+        except IntegrityError as exc:
+            raise EmailAlreadyExistsException from exc
 
     def list_users(self) -> list[UserDetailResponse]:
         users = self.user_repository.get_users()

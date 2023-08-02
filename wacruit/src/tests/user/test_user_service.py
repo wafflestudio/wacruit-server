@@ -2,8 +2,8 @@ from typing import cast
 
 from pydantic import EmailStr
 import pytest
-from sqlalchemy.exc import IntegrityError
 
+from wacruit.src.apps.user.exceptions import EmailAlreadyExistsException
 from wacruit.src.apps.user.exceptions import UserAlreadyExistsException
 from wacruit.src.apps.user.exceptions import UserNotFoundException
 from wacruit.src.apps.user.models import User
@@ -105,7 +105,7 @@ def test_update_user_duplicate_email(created_user: User, user_service: UserServi
         email=EmailStr("test2@test.com"),
     )
     user_service.create_user(sso_id, create_request)
-    with pytest.raises(IntegrityError):
+    with pytest.raises(EmailAlreadyExistsException):
         update_request = UserUpdateRequest(  # type: ignore
             email=create_request.email,
         )
