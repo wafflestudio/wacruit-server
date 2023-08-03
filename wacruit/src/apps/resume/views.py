@@ -14,7 +14,7 @@ from wacruit.src.apps.resume.services import ResumeService
 from wacruit.src.apps.user.dependencies import CurrentUser
 from wacruit.src.apps.user.exceptions import UserPermissionDeniedException
 
-v1_router = APIRouter(prefix="/v1/recruiting", tags=["resume"])
+v1_router = APIRouter(prefix="/v1/recruitings", tags=["resume"])
 
 
 @v1_router.get(
