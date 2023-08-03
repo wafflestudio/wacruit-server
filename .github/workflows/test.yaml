@@ -1,0 +1,67 @@
+name: Run Test
+
+on:
+  pull_request:
+    paths:
+      - wacruit/**
+      - .github/workflows/test.yaml
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_USER: test-user
+          MYSQL_PASSWORD: password
+          MYSQL_ROOT_PASSWORD: root-password
+          MYSQL_DATABASE: testdb
+        ports:
+          - 3307:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    env:
+      env: test
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: change mysql charset
+        run: mysql -h 127.0.0.1 -P 3307 -u root -p'root-password' -e "ALTER DATABASE testdb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
+
+      - name: Install poetry
+        run: pipx install poetry
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+          cache: poetry
+
+      - name: Set poetry environment & install dependencies
+        run: |
+          poetry env use 3.11
+          poetry install --no-root
+
+      - name: Run tests
+        run: |
+          cd ${GITHUB_WORKSPACE}/wacruit/
+          poetry run pytest --junit-xml=${GITHUB_WORKSPACE}/wacruit/test.xml ./
+
+      - name: Test reports
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: backend tests
+          path: "./wacruit/test.xml"
+          reporter: java-junit
+
+      - name: Check Pylint
+        run: |
+          poetry run pylint -rn -sn --rcfile=${GITHUB_WORKSPACE}/.pylintrc ./wacruit
+
+      - name: Run alembic migration test
+        run: |
+          mkdir -p wacruit/src/database/migrations/versions
+          ls wacruit/src/database/migrations/versions/* || poetry run alembic revision --autogenerate
+          poetry run alembic upgrade head
