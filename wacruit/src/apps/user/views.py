@@ -24,7 +24,7 @@ from wacruit.src.apps.user.services import UserService
 v1_router = APIRouter(prefix="/v1/users", tags=["users"])
 
 
-@v1_router.get("")
+@v1_router.get("/check")
 def check_signup(
     waffle_user_id: Annotated[str, Header()],
     user_service: Annotated[UserService, Depends()],

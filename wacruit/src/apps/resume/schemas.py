@@ -10,7 +10,7 @@ from wacruit.src.database.base import intpk
 
 
 class ResumeQuestionDto(BaseModel):
-    recruiting_id: int
+    id: int
     question_num: int
     content: str
     content_limit: int
