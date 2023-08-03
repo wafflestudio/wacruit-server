@@ -22,6 +22,8 @@ from wacruit.src.apps.problem.schemas import CodeSubmissionResult
 from wacruit.src.apps.problem.schemas import CodeSubmitRequest
 from wacruit.src.apps.problem.schemas import ProblemResponse
 from wacruit.src.apps.problem.schemas import TokenStr
+from wacruit.src.apps.problem.utils import memory_handi
+from wacruit.src.apps.problem.utils import time_handi
 from wacruit.src.apps.user.models import User
 from wacruit.src.utils.mixins import LoggingMixin
 
@@ -69,7 +71,7 @@ class ProblemService(LoggingMixin):
                     cpu_time_limit=1.0,
                     cpu_extra_time=0.0,
                     wall_time_limit=20.0,
-                    memory_limit=128000,
+                    memory_limit=10000,
                     stack_limit=64000,
                 )
                 for testcase in testcases
@@ -81,10 +83,12 @@ class ProblemService(LoggingMixin):
                     language_id=request.language.value,
                     stdin=testcase.stdin,
                     expected_output=testcase.expected_output,
-                    cpu_time_limit=float(testcase.time_limit),
+                    cpu_time_limit=time_handi(
+                        float(testcase.time_limit), request.language
+                    ),
                     cpu_extra_time=float(testcase.extra_time),
                     wall_time_limit=20.0,
-                    memory_limit=testcase.memory_limit,
+                    memory_limit=memory_handi(testcase.memory_limit, request.language),
                     stack_limit=testcase.stack_limit,
                 )
                 for testcase in testcases
