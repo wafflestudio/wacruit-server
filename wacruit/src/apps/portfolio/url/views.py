@@ -16,7 +16,7 @@ v1_router = fastapi.APIRouter(prefix="/url", tags=["portfolio-url"])
 
 
 @v1_router.get(
-    path="/",
+    path="",
     status_code=HTTPStatus.OK,
 )
 def list_portfolio_urls(
