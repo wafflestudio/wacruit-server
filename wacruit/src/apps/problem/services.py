@@ -1,5 +1,6 @@
 import asyncio
 from decimal import Decimal
+import json
 from typing import Any, AsyncGenerator, Tuple
 
 from fastapi import Depends
@@ -182,11 +183,14 @@ class ProblemService(LoggingMixin):
                     event = "message"
 
             except HTTPStatusError as e:
-                data = {"detail": "채점 서버에 일시적인 문제가 생겼습니다. 잠시 후 다시 시도해주세요."}
+                data = json.dumps(
+                    {"detail": "채점 서버에 일시적인 문제가 생겼습니다. 잠시 후 다시 시도해주세요."},
+                    ensure_ascii=False,
+                )
                 event = "error"
                 token_map = {}
             except CodeSubmissionErrorException as e:
-                data = {"detail": e.detail}
+                data = json.dumps({"detail": e.detail}, ensure_ascii=False)
                 event = "error"
                 token_map = {}
             finally:
