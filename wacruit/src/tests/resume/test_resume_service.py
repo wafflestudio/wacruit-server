@@ -20,7 +20,7 @@ def test_get_questions(
     questions = resume_service.get_questions_by_recruiting_id(recruiting.id)
     assert len(questions) == len(resume_questions)
     for i, question in enumerate(questions):
-        assert question.recruiting_id == resume_questions[i].recruiting_id
+        assert question.id == resume_questions[i].id
         assert question.question_num == resume_questions[i].question_num
         assert question.content_limit == resume_questions[i].content_limit
         assert question.content == resume_questions[i].content
