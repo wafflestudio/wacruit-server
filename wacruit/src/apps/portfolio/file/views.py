@@ -28,7 +28,7 @@ def get_list_of_portfolios(
 
 
 @v1_router.get(
-    path="/url/download/?file_name={file_name}",
+    path="/url/download/",
     responses=responses_from(PortfolioNotFoundException),
     status_code=HTTPStatus.OK,
 )
@@ -44,7 +44,7 @@ def get_download_portfolio_url(
 
 
 @v1_router.get(
-    path="/url/upload/?file_name={file_name}",
+    path="/url/upload/",
     responses=responses_from(NumPortfolioLimitException),
     status_code=HTTPStatus.OK,
 )
