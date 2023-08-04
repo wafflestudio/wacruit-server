@@ -33,6 +33,6 @@ def downgrade() -> None:
         "code_submission",
         "status",
         existing_type=mysql.ENUM("RUNNING", "SOLVED", "WRONG"),
-        nullable=True,
+        nullable=False,
     )
     # ### end Alembic commands ###
