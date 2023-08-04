@@ -69,10 +69,10 @@ class ProblemService(LoggingMixin):
                     language_id=request.language.value,
                     stdin=testcase.stdin,
                     expected_output=testcase.expected_output,
-                    cpu_time_limit=1.0,
+                    cpu_time_limit=time_handi(1.0, request.language),
                     cpu_extra_time=0.0,
                     wall_time_limit=20.0,
-                    memory_limit=10000,
+                    memory_limit=memory_handi(10000, request.language),
                     stack_limit=64000,
                 )
                 for testcase in testcases
@@ -165,7 +165,7 @@ class ProblemService(LoggingMixin):
                             JudgeSubmissionStatus.INTERNAL_ERROR
                             | JudgeSubmissionStatus.EXEC_FORMAT_ERROR
                         ):
-                            raise CodeSubmissionErrorException()
+                            raise CodeSubmissionErrorException(testcase_result)
 
                     token_map.pop(i)
 
