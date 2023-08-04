@@ -1,7 +1,7 @@
 import asyncio
 from decimal import Decimal
 import json
-from typing import Any, AsyncGenerator, Tuple
+from typing import AsyncGenerator, Tuple
 
 from fastapi import Depends
 from fastapi import Request
@@ -194,7 +194,8 @@ class ProblemService(LoggingMixin):
                 event = "error"
                 token_map = {}
             finally:
-                yield ServerSentEvent(data=data, event=event)
+                if not await request.is_disconnected():
+                    yield ServerSentEvent(data=data, event=event)
                 await asyncio.sleep(1)
 
         if submission is not None:
