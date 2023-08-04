@@ -10,7 +10,6 @@ from wacruit.src.apps.router import api_router
 from wacruit.src.database.connection import DBSessionFactory
 from wacruit.src.settings import settings
 
-
 _DEV_ORIGINS = [
     "http://localhost:5173",
 ]
