@@ -30,8 +30,8 @@ class JudgeSubmissionStatusModel(BaseModel):
 
 class JudgeGetSubmissionResponse(BaseModel):
     stdout: str | None
-    stderr: str | None
-    compile_output: str | None
+    # stderr: str | None
+    # compile_output: str | None
     message: str | None
     status: JudgeSubmissionStatusModel
     time: str | None
