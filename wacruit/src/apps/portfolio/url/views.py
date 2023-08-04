@@ -27,7 +27,7 @@ def list_portfolio_urls(
 
 
 @v1_router.post(
-    path="/?url={url}",
+    path="",
     responses=responses_from(NumPortfolioUrlLimitException),
     status_code=HTTPStatus.CREATED,
 )
