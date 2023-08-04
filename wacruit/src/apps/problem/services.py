@@ -124,13 +124,11 @@ class ProblemService(LoggingMixin):
     ) -> AsyncGenerator[ServerSentEvent, None]:
         token_map = dict(enumerate(tokens, start=1))
         status = CodeSubmissionStatus.SOLVED
+        disconnected = False
 
         while len(token_map) > 0:
             data = ""
             event = "skip"
-
-            if await request.is_disconnected():
-                break
 
             try:
                 testcase_results = (
@@ -194,8 +192,9 @@ class ProblemService(LoggingMixin):
                 event = "error"
                 token_map = {}
             finally:
-                if not await request.is_disconnected():
+                if not disconnected:
                     yield ServerSentEvent(data=data, event=event)
+                    disconnected = await request.is_disconnected()
                 await asyncio.sleep(1)
 
         if submission is not None:
