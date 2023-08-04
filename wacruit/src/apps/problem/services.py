@@ -186,10 +186,12 @@ class ProblemService(LoggingMixin):
                     ensure_ascii=False,
                 )
                 event = "error"
+                self.logger.error(e)
                 token_map = {}
             except CodeSubmissionErrorException as e:
                 data = json.dumps({"detail": e.detail}, ensure_ascii=False)
                 event = "error"
+                self.logger.error(e)
                 token_map = {}
             finally:
                 if not disconnected:
