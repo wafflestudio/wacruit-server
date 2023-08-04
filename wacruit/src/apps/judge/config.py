@@ -6,6 +6,7 @@ from wacruit.src.settings import settings
 
 class JudgeAPIConfig(BaseSettings):
     url: str = ""
+    api_key: str = ""
 
     class Config:
         case_sensitive = False
@@ -17,6 +18,7 @@ class JudgeAPIConfig(BaseSettings):
         aws_secrets = AWSSecretManager()
         if aws_secrets.is_available():
             self.url = aws_secrets.get_secret("judge_api_url")
+            self.api_key = aws_secrets.get_secret("judge_api_key")
 
 
 judge_api_config = JudgeAPIConfig()
