@@ -44,7 +44,7 @@ class JudgeApiRepository:
     async def get_submission(self, token: str) -> JudgeGetSubmissionResponse:
         res = await self.client.get(
             url=f"/submissions/{token}",
-            params={**DEFAULT_PARAMS, "fields": ",".join(DEFAULT_FIELDS)},
+            params={**DEFAULT_PARAMS, "fields": DEFAULT_FIELDS},
             timeout=60,
         )
         res.raise_for_status()
