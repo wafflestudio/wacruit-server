@@ -123,7 +123,10 @@ class ProblemService(LoggingMixin):
         is_example: bool = True,
     ) -> AsyncGenerator[ServerSentEvent, None]:
         token_map = dict(enumerate(tokens, start=1))
-        status = CodeSubmissionStatus.SOLVED
+        total_count = len(token_map)
+        solve_count = 0
+        error_count = 0
+        wrong_count = 0
         disconnected = False
 
         while len(token_map) > 0:
@@ -145,7 +148,7 @@ class ProblemService(LoggingMixin):
                         ):
                             continue
                         case JudgeSubmissionStatus.ACCEPTED:
-                            ...
+                            solve_count += 1
                         case (
                             JudgeSubmissionStatus.WRONG_ANSWER
                             | JudgeSubmissionStatus.TIME_LIMIT_EXCEEDED
@@ -157,7 +160,7 @@ class ProblemService(LoggingMixin):
                             | JudgeSubmissionStatus.RUNTIME_ERROR_NZEC
                             | JudgeSubmissionStatus.RUNTIME_ERROR_OTHER
                         ):
-                            status = CodeSubmissionStatus.WRONG
+                            wrong_count += 1
                         case (
                             JudgeSubmissionStatus.INTERNAL_ERROR
                             | JudgeSubmissionStatus.EXEC_FORMAT_ERROR
@@ -186,18 +189,37 @@ class ProblemService(LoggingMixin):
                     ensure_ascii=False,
                 )
                 event = "error"
-                self.logger.error(e)
+                print(e)
                 token_map = {}
+                error_count += 1
             except CodeSubmissionErrorException as e:
                 data = json.dumps({"detail": e.detail}, ensure_ascii=False)
                 event = "error"
-                self.logger.error(e)
+                print(e)
                 token_map = {}
+                error_count += 1
             finally:
                 if not disconnected:
                     yield ServerSentEvent(data=data, event=event)
                     disconnected = await request.is_disconnected()
                 await asyncio.sleep(1)
 
+        status = self.check_submission_reuslt(
+            total_count, solve_count, wrong_count, error_count
+        )
+
         if submission is not None:
             self.problem_repository.update_submission_status(submission, status)
+
+    def check_submission_reuslt(
+        self, total_count, solve_count, wrong_count, error_count
+    ) -> CodeSubmissionStatus:
+        if total_count == solve_count:
+            status = CodeSubmissionStatus.SOLVED
+        elif error_count > 0:
+            status = CodeSubmissionStatus.ERROR
+        elif wrong_count > 0:
+            status = CodeSubmissionStatus.WRONG
+        else:
+            status = CodeSubmissionStatus.ERROR
+        return status

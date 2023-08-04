@@ -37,6 +37,7 @@ class CodeSubmissionStatus(Enum):
     RUNNING = 1
     SOLVED = 2
     WRONG = 3
+    ERROR = 4
 
     @classmethod
     @property
