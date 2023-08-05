@@ -16,7 +16,7 @@ class PortfolioUrl(DeclarativeBase):
     __tablename__ = "portfolio_url"
 
     id: Mapped[intpk]
-    user_id: Mapped[int | None] = mapped_column(
+    user_id: Mapped[intpk | None] = mapped_column(
         ForeignKey("user.id", ondelete="SET NULL")
     )
     url: Mapped[str255] = mapped_column(nullable=False)

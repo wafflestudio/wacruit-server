@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from wacruit.src.apps.portfolio.url.exceptions import PortfolioUrlNotFound
 from wacruit.src.apps.portfolio.url.models import PortfolioUrl
+from wacruit.src.database.base import intpk
 from wacruit.src.database.connection import get_db_session
 from wacruit.src.database.connection import Transaction
 
@@ -52,6 +53,6 @@ class PortfolioUrlRepository:
                 delete(PortfolioUrl).where(PortfolioUrl.user_id == user_id)
             )
 
-    def get_all_applicant_user_ids(self) -> Sequence[int]:
+    def get_all_applicant_user_ids(self) -> Sequence[intpk]:
         query = select(PortfolioUrl.user_id).distinct()
         return self.session.execute(query).scalars().all()
