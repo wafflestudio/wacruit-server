@@ -24,6 +24,12 @@ class AnnouncementService:
             AnnouncementDto.from_orm(announcement) for announcement in announcements
         ]
 
+    def list_pinned_announcements(self) -> list[AnnouncementDto]:
+        announcements = self.announcement_repository.get_pinned_announcements()
+        return [
+            AnnouncementDto.from_orm(announcement) for announcement in announcements
+        ]
+
     def update_announcement(
         self, id: int, request: AnnouncementCreateDto
     ) -> AnnouncementDto:

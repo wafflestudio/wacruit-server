@@ -21,6 +21,14 @@ async def list_announcements(
     return ListResponse(items=announcements)
 
 
+@v1_router.get("/pinned")
+async def get_pinned_announcements(
+    announcement_service: AnnouncementService = Depends(),
+) -> ListResponse[AnnouncementDto]:
+    pinned_announcements = announcement_service.list_pinned_announcements()
+    return ListResponse(items=pinned_announcements)
+
+
 @v1_router.post("/")
 async def create_announcement(
     user: AdminUser,
