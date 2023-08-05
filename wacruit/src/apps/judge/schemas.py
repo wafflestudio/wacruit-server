@@ -5,7 +5,7 @@ from wacruit.src.apps.common.enums import JudgeSubmissionStatus
 
 
 class JudgeCreateSubmissionRequest(BaseModel):
-    source_code: str = Field(..., max_length=10000)
+    source_code: str = Field(..., max_length=100000)
     language_id: int = Field(...)
     stdin: str
     expected_output: str | None
