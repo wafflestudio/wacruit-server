@@ -8,6 +8,7 @@ from sqlalchemy.orm import mapped_column
 from wacruit.src.apps.common.sql import CURRENT_TIMESTAMP
 from wacruit.src.apps.common.sql import CURRENT_TIMESTAMP_ON_UPDATE
 from wacruit.src.database.base import DeclarativeBase
+from wacruit.src.database.base import intpk
 from wacruit.src.database.base import str255
 
 
