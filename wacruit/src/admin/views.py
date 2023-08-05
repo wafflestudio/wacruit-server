@@ -35,6 +35,7 @@ class AnnouncementAdmin(ModelView, model=Announcement):
         Announcement.id,
         Announcement.title,
         Announcement.content,
+        Announcement.pinned,
         Announcement.created_at,
         Announcement.updated_at,
     ]
