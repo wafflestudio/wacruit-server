@@ -25,6 +25,9 @@ class UserRepository:
     def get_users(self) -> list[User]:
         return self.session.query(User).all()
 
+    def get_user_count(self) -> int:
+        return self.session.query(User).count()
+
     def get_user_by_id(self, user_id: int) -> User | None:
         return self.session.query(User).filter(User.id == user_id).first()
 

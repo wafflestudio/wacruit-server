@@ -65,6 +65,9 @@ class UserService:
         users = self.user_repository.get_users()
         return [UserDetailResponse.from_orm(user) for user in users]
 
+    def get_user_count(self) -> int:
+        return self.user_repository.get_user_count()
+
     def update_invitaion_emails(
         self, user: User, request: UserUpdateInvitationEmailsRequest
     ) -> UserDetailResponse:
