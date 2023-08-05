@@ -9,7 +9,8 @@ from .schemas import JudgeCreateSubmissionResponse
 from .schemas import JudgeGetSubmissionResponse
 
 DEFAULT_PARAMS = {"base64_encoded": False}
-DEFAULT_FIELDS = "stdout,stderr,compile_output,message,status,time,memory"
+# DEFAULT_FIELDS = "stdout,stderr,compile_output,message,status,time,memory"
+DEFAULT_FIELDS = "stdout,message,status,time,memory"
 
 
 class JudgeApiRepository:
@@ -25,6 +26,9 @@ class JudgeApiRepository:
             json=request.dict(),
             timeout=60,
         )
+        if res.status_code >= 400:
+            print(f"ERROR for sending {res.url} / status code: {res.status_code}.")
+            print(f"Details: {res.text}")
         res.raise_for_status()
         return JudgeCreateSubmissionResponse(**res.json())
 
@@ -38,15 +42,21 @@ class JudgeApiRepository:
             json=batch_request_data,
             timeout=60,
         )
+        if res.status_code >= 400:
+            print(f"ERROR for sending {res.url} / status code: {res.status_code}.")
+            print(f"Details: {res.text}")
         res.raise_for_status()
         return [JudgeCreateSubmissionResponse(**v) for v in res.json()]
 
     async def get_submission(self, token: str) -> JudgeGetSubmissionResponse:
         res = await self.client.get(
             url=f"/submissions/{token}",
-            params={**DEFAULT_PARAMS, "fields": ",".join(DEFAULT_FIELDS)},
+            params={**DEFAULT_PARAMS, "fields": DEFAULT_FIELDS},
             timeout=60,
         )
+        if res.status_code >= 400:
+            print(f"ERROR for sending {res.url} / status code: {res.status_code}.")
+            print(f"Details: {res.text}")
         res.raise_for_status()
         return JudgeGetSubmissionResponse(**res.json())
 
@@ -60,6 +70,9 @@ class JudgeApiRepository:
             params={"tokens": tokens, **DEFAULT_PARAMS, "fields": DEFAULT_FIELDS},
             timeout=60,
         )
+        if res.status_code >= 400:
+            print(f"ERROR for sending {res.url} / status code: {res.status_code}.")
+            print(f"Details: {res.text}")
         res.raise_for_status()
         submissions = res.json()["submissions"]
         return [JudgeGetSubmissionResponse(**v) for v in submissions]

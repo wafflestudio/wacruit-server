@@ -1,7 +1,7 @@
 import asyncio
 from decimal import Decimal
 import json
-from typing import Any, AsyncGenerator, Tuple
+from typing import AsyncGenerator, Tuple
 
 from fastapi import Depends
 from fastapi import Request
@@ -69,10 +69,10 @@ class ProblemService(LoggingMixin):
                     language_id=request.language.value,
                     stdin=testcase.stdin,
                     expected_output=testcase.expected_output,
-                    cpu_time_limit=1.0,
+                    cpu_time_limit=time_handi(1.0, request.language),
                     cpu_extra_time=0.0,
                     wall_time_limit=20.0,
-                    memory_limit=10000,
+                    memory_limit=memory_handi(10000, request.language),
                     stack_limit=64000,
                 )
                 for testcase in testcases
@@ -123,14 +123,15 @@ class ProblemService(LoggingMixin):
         is_example: bool = True,
     ) -> AsyncGenerator[ServerSentEvent, None]:
         token_map = dict(enumerate(tokens, start=1))
-        status = CodeSubmissionStatus.SOLVED
+        total_count = len(token_map)
+        solve_count = 0
+        error_count = 0
+        wrong_count = 0
+        disconnected = False
 
         while len(token_map) > 0:
             data = ""
             event = "skip"
-
-            if await request.is_disconnected():
-                break
 
             try:
                 testcase_results = (
@@ -147,7 +148,7 @@ class ProblemService(LoggingMixin):
                         ):
                             continue
                         case JudgeSubmissionStatus.ACCEPTED:
-                            ...
+                            solve_count += 1
                         case (
                             JudgeSubmissionStatus.WRONG_ANSWER
                             | JudgeSubmissionStatus.TIME_LIMIT_EXCEEDED
@@ -159,12 +160,12 @@ class ProblemService(LoggingMixin):
                             | JudgeSubmissionStatus.RUNTIME_ERROR_NZEC
                             | JudgeSubmissionStatus.RUNTIME_ERROR_OTHER
                         ):
-                            status = CodeSubmissionStatus.WRONG
+                            wrong_count += 1
                         case (
                             JudgeSubmissionStatus.INTERNAL_ERROR
                             | JudgeSubmissionStatus.EXEC_FORMAT_ERROR
                         ):
-                            raise CodeSubmissionErrorException()
+                            raise CodeSubmissionErrorException(testcase_result)
 
                     token_map.pop(i)
 
@@ -188,14 +189,37 @@ class ProblemService(LoggingMixin):
                     ensure_ascii=False,
                 )
                 event = "error"
+                print(e)
                 token_map = {}
+                error_count += 1
             except CodeSubmissionErrorException as e:
                 data = json.dumps({"detail": e.detail}, ensure_ascii=False)
                 event = "error"
+                print(e)
                 token_map = {}
+                error_count += 1
             finally:
-                yield ServerSentEvent(data=data, event=event)
+                if not disconnected:
+                    yield ServerSentEvent(data=data, event=event)
+                    disconnected = await request.is_disconnected()
                 await asyncio.sleep(1)
+
+        status = self.check_submission_reuslt(
+            total_count, solve_count, wrong_count, error_count
+        )
 
         if submission is not None:
             self.problem_repository.update_submission_status(submission, status)
+
+    def check_submission_reuslt(
+        self, total_count, solve_count, wrong_count, error_count
+    ) -> CodeSubmissionStatus:
+        if total_count == solve_count:
+            status = CodeSubmissionStatus.SOLVED
+        elif error_count > 0:
+            status = CodeSubmissionStatus.ERROR
+        elif wrong_count > 0:
+            status = CodeSubmissionStatus.WRONG
+        else:
+            status = CodeSubmissionStatus.ERROR
+        return status
