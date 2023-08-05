@@ -54,5 +54,7 @@ class PortfolioUrlRepository:
             )
 
     def get_all_applicant_user_ids(self) -> Sequence[intpk]:
-        query = select(PortfolioUrl.user_id).where(PortfolioUrl.user_id.isnot(None)).distinct()
+        query = select(PortfolioUrl.user_id).where(
+            PortfolioUrl.user_id.isnot(None)
+        ).distinct()
         return self.session.execute(query).scalars().all()
