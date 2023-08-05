@@ -8,7 +8,6 @@ from sqlalchemy.orm import mapped_column
 from wacruit.src.apps.common.sql import CURRENT_TIMESTAMP
 from wacruit.src.apps.common.sql import CURRENT_TIMESTAMP_ON_UPDATE
 from wacruit.src.database.base import DeclarativeBase
-from wacruit.src.database.base import intpk
 from wacruit.src.database.base import str255
 
 
@@ -16,7 +15,7 @@ class PortfolioUrl(DeclarativeBase):
     __tablename__ = "portfolio_url"
 
     id: Mapped[intpk]
-    user_id: Mapped[intpk | None] = mapped_column(
+    user_id: Mapped[int | None] = mapped_column(
         ForeignKey("user.id", ondelete="SET NULL")
     )
     url: Mapped[str255] = mapped_column(nullable=False)
