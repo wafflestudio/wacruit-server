@@ -49,3 +49,6 @@ class PortfolioUrlService:
 
     def delete_all_portfolio_urls(self, user_id: int) -> None:
         self._portfolio_url_repository.delete_all_portfolio_urls(user_id)
+
+    def get_all_applicant_user_ids(self) -> list[int]:
+        return list(self._portfolio_url_repository.get_all_applicant_user_ids())

@@ -60,7 +60,7 @@ def get_upload_portfolio_url(
 
 
 @v1_router.delete(
-    path="/delete/?file_name={file_name}",
+    path="/delete/",
     responses=responses_from(PortfolioNotFoundException),
     status_code=HTTPStatus.NO_CONTENT,
 )

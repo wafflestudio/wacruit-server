@@ -48,7 +48,7 @@ class PortfolioFileService(LoggingMixin):
         user_id: int,
     ) -> list[PortfolioNameResponse]:
         return [
-            PortfolioNameResponse(portfolio_name=obj[len(str(user_id)) + 1 :])
+            PortfolioNameResponse(portfolio_name=obj)
             for obj in self.get_portfolio_list(user_id)
         ]
 
@@ -115,3 +115,11 @@ class PortfolioFileService(LoggingMixin):
         )
         for obj in objects:
             delete_object(self._s3_client.client, self._s3_config.bucket_name, obj)
+
+    def get_all_applicant_user_ids(self) -> list[int]:
+        objects = get_list_of_objects(
+            s3_client=self._s3_client.client,
+            s3_bucket=self._s3_config.bucket_name,
+            s3_prefix="",
+        )
+        return list(set([int(obj.split("/")[0]) for obj in objects]))

@@ -51,3 +51,7 @@ class PortfolioUrlRepository:
             self.session.execute(
                 delete(PortfolioUrl).where(PortfolioUrl.user_id == user_id)
             )
+
+    def get_all_applicant_user_ids(self) -> Sequence[int]:
+        query = select(PortfolioUrl.user_id).distinct()
+        return self.session.execute(query).scalars().all()
