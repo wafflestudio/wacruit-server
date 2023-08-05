@@ -57,12 +57,25 @@ def announcement_service(announcement_repository: AnnouncementRepository):
 @pytest.fixture
 def announcement_create_dto():
     return AnnouncementCreateDto(
-        title="Test Announcement", content="This is a test announcement."
+        title="Test Announcement",
+        content="This is a test announcement that is not pinned.",
+        pinned=False,
+    )
+
+
+@pytest.fixture
+def pinned_announcement_create_dto():
+    return AnnouncementCreateDto(
+        title="Pinned Announcement",
+        content="This is a test announcement that is pinned.",
+        pinned=True,
     )
 
 
 @pytest.fixture
 def announcement_update_dto():
     return AnnouncementCreateDto(
-        title="Updated Announcement", content="This is an updated test announcement."
+        title="Updated Announcement",
+        content="This is an updated test announcement.",
+        pinned=True,
     )

@@ -14,12 +14,20 @@ class AnnouncementService:
         self.announcement_repository = announcement_repository
 
     def create_announcement(self, request: AnnouncementCreateDto) -> AnnouncementDto:
-        announcement = Announcement(title=request.title, content=request.content)
+        announcement = Announcement(
+            title=request.title, content=request.content, pinned=request.pinned
+        )
         announcement = self.announcement_repository.create_announcement(announcement)
         return AnnouncementDto.from_orm(announcement)
 
     def list_announcements(self) -> list[AnnouncementDto]:
         announcements = self.announcement_repository.get_announcements()
+        return [
+            AnnouncementDto.from_orm(announcement) for announcement in announcements
+        ]
+
+    def list_pinned_announcements(self) -> list[AnnouncementDto]:
+        announcements = self.announcement_repository.get_pinned_announcements()
         return [
             AnnouncementDto.from_orm(announcement) for announcement in announcements
         ]
@@ -32,6 +40,7 @@ class AnnouncementService:
             raise AnnouncementNotFound
         announcement.title = request.title
         announcement.content = request.content
+        announcement.pinned = request.pinned
         announcement = self.announcement_repository.update_announcement(announcement)
         return AnnouncementDto.from_orm(announcement)
 
