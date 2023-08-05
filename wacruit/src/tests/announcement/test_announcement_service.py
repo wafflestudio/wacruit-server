@@ -24,6 +24,19 @@ def test_list_announcements(
     assert len(announcements) == 2
 
 
+def test_list_pinned_announcements(
+    announcement_service: AnnouncementService,
+    announcement_create_dto,
+    pinned_announcement_create_dto,
+):
+    announcement_service.create_announcement(announcement_create_dto)
+    announcement_service.create_announcement(announcement_create_dto)
+    announcement_service.create_announcement(pinned_announcement_create_dto)
+    announcements = announcement_service.list_pinned_announcements()
+    assert len(announcements) == 1
+    assert announcements[0].pinned is True
+
+
 def test_update_announcement(
     announcement_service: AnnouncementService,
     announcement_create_dto,
@@ -36,6 +49,7 @@ def test_update_announcement(
     )
     assert updated_announcement.title == announcement_update_dto.title
     assert updated_announcement.content == announcement_update_dto.content
+    assert updated_announcement.pinned == announcement_update_dto.pinned
 
 
 def test_update_announcement_with_updated_at(
