@@ -2,6 +2,7 @@ from http import HTTPStatus
 from typing import Annotated
 
 import fastapi
+from fastapi import Response
 
 from wacruit.src.apps.common.exceptions import responses_from
 from wacruit.src.apps.common.schemas import ListResponse
@@ -32,10 +33,12 @@ def list_portfolio_urls(
     status_code=HTTPStatus.CREATED,
 )
 def register_portfolio_url(
+    response: Response,
     current_user: CurrentUser,
     url: str,
     service: Annotated[PortfolioUrlService, fastapi.Depends()],
 ) -> PortfolioUrlResponse:
+    response.headers["Access-Control-Allow-Origin"] = "*"
     return service.create_portfolio_url(current_user.id, url)
 
 
