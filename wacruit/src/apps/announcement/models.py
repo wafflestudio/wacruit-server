@@ -2,6 +2,7 @@ from datetime import datetime
 
 from sqlalchemy import DateTime
 from sqlalchemy import String
+from sqlalchemy import text
 from sqlalchemy import Text
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
@@ -17,6 +18,7 @@ class Announcement(DeclarativeBase):
     id: Mapped[intpk]
     title: Mapped[str | None] = mapped_column(String(50))
     content: Mapped[str | None] = mapped_column(Text)
+    pinned: Mapped[bool] = mapped_column(server_default=text("0"))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=CURRENT_TIMESTAMP,

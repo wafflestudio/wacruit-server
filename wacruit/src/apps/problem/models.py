@@ -37,6 +37,9 @@ class Problem(DeclarativeBase):
     recruiting: Mapped["Recruiting"] = relationship(back_populates="problems")
     submissions: Mapped[list["CodeSubmission"]] = relationship(back_populates="problem")
     testcases: Mapped[list["Testcase"]] = relationship(back_populates="problem")
+    code_submissions: Mapped[list["CodeSubmission"]] = relationship(
+        back_populates="problem"
+    )
 
     def __str__(self) -> str:
         return f"<Problem id={self.id}, num={self.num}, body={self.body[:10]}..>"

@@ -23,6 +23,10 @@ class AnnouncementRepository:
         query = select(Announcement)
         return self.session.execute(query).scalars().all()
 
+    def get_pinned_announcements(self) -> Sequence[Announcement]:
+        query = select(Announcement).where(Announcement.pinned)
+        return self.session.execute(query).scalars().all()
+
     def get_announcement(self, id: int) -> Announcement | None:
         query = select(Announcement).where(Announcement.id == id)
         return self.session.execute(query).scalars().first()

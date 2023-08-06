@@ -3,6 +3,9 @@ from datetime import timedelta
 
 import pytest
 
+from wacruit.src.apps.portfolio.file.services import PortfolioFileService
+from wacruit.src.apps.portfolio.url.repositories import PortfolioUrlRepository
+from wacruit.src.apps.portfolio.url.services import PortfolioUrlService
 from wacruit.src.apps.problem.models import Problem
 from wacruit.src.apps.problem.models import Testcase
 from wacruit.src.apps.recruiting.models import Recruiting
@@ -69,12 +72,35 @@ def user(db_session: Session) -> User:
 
 
 @pytest.fixture
+def portfolio_file_service():
+    return PortfolioFileService()
+
+
+@pytest.fixture
+def portfolio_url_repository(db_session: Session):
+    return PortfolioUrlRepository(
+        session=db_session, transaction=Transaction(db_session)
+    )
+
+
+@pytest.fixture
+def portfolio_url_service(portfolio_url_repository: PortfolioUrlRepository):
+    return PortfolioUrlService(portfolio_url_repository=portfolio_url_repository)
+
+
+@pytest.fixture
 def recruiting_repository(db_session: Session) -> RecruitingRepository:
     return RecruitingRepository(db_session, Transaction(db_session))
 
 
 @pytest.fixture
 def recruiting_service(
+    portfolio_file_service: PortfolioFileService,
+    portfolio_url_service: PortfolioUrlService,
     recruiting_repository: RecruitingRepository,
 ) -> RecruitingService:
-    return RecruitingService(recruiting_repository)
+    return RecruitingService(
+        portfolio_file_service,
+        portfolio_url_service,
+        recruiting_repository,
+    )
