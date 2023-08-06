@@ -4,11 +4,11 @@ from sqladmin import Admin
 from starlette.middleware import Middleware
 
 from wacruit.src.admin.auth import authentication_backend
-from wacruit.src.admin.middlewares import HTTPToHTTPSRequestMiddleware
 from wacruit.src.admin.views import admin_views
 from wacruit.src.apps.router import api_router
 from wacruit.src.database.connection import DBSessionFactory
 from wacruit.src.settings import settings
+from wacruit.src.utils.middlewares import HTTPToHTTPSRequestMiddleware
 
 _DEV_ORIGINS = [
     "http://localhost:5173",
@@ -24,6 +24,8 @@ def _add_middlewares(app: FastAPI):
             allow_methods=["*"],
             allow_headers=["*"],
         )
+    if not (settings.is_local or settings.is_test):
+        app.add_middleware(HTTPToHTTPSRequestMiddleware)
 
 
 def _add_routers(app: FastAPI):
