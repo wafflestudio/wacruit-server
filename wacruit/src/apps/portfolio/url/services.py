@@ -1,5 +1,3 @@
-from typing import Sequence
-
 from fastapi import Depends
 
 from wacruit.src.apps.portfolio.url.exceptions import NumPortfolioUrlLimitException
@@ -52,3 +50,20 @@ class PortfolioUrlService:
 
     def get_all_applicant_user_ids(self) -> list[int]:
         return list(self._portfolio_url_repository.get_all_applicant_user_ids())
+
+    def update_portfolio_url(
+        self, user_id: int, portfolio_url_id: int, url: str
+    ) -> PortfolioUrlResponse:
+        portfolio_url = self._portfolio_url_repository.get_portfolio_url_by_id(
+            portfolio_url_id
+        )
+
+        if not portfolio_url:
+            raise PortfolioUrlNotFound
+
+        if portfolio_url.user_id != user_id:
+            raise PortfolioUrlNotAuthorized
+
+        portfolio_url.url = url
+        self._portfolio_url_repository.update_portfolio_url(portfolio_url)
+        return PortfolioUrlResponse.from_orm(portfolio_url)

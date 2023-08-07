@@ -4,11 +4,11 @@ from sqladmin import Admin
 from starlette.middleware import Middleware
 
 from wacruit.src.admin.auth import authentication_backend
-from wacruit.src.admin.middlewares import HTTPToHTTPSRequestMiddleware
 from wacruit.src.admin.views import admin_views
 from wacruit.src.apps.router import api_router
 from wacruit.src.database.connection import DBSessionFactory
 from wacruit.src.settings import settings
+from wacruit.src.utils.middlewares import HTTPToHTTPSRequestMiddleware
 
 _DEV_ORIGINS = [
     "http://localhost:5173",

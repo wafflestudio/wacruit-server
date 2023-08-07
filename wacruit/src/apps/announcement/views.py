@@ -13,7 +13,7 @@ from wacruit.src.apps.user.dependencies import AdminUser
 v1_router = APIRouter(prefix="/v1/announcements", tags=["announcements"])
 
 
-@v1_router.get("/")
+@v1_router.get("")
 async def list_announcements(
     announcement_service: AnnouncementService = Depends(),
 ) -> ListResponse[AnnouncementDto]:
@@ -29,7 +29,7 @@ async def get_pinned_announcements(
     return ListResponse(items=pinned_announcements)
 
 
-@v1_router.post("/")
+@v1_router.post("")
 async def create_announcement(
     user: AdminUser,
     request: AnnouncementCreateDto,

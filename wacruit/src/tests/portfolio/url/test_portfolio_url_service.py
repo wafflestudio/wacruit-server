@@ -128,3 +128,44 @@ def test_delete_all_portfolio_urls(
     response = portfolio_url_service.list_portfolio_urls(user_id=created_user1.id)
     expected = []
     assert response == expected
+
+
+def test_update_portfolio_url(
+    created_user1: User,
+    created_user2: User,
+    portfolio_url_service: PortfolioUrlService,
+):
+    portfolio1 = portfolio_url_service.create_portfolio_url(
+        user_id=created_user1.id,
+        url="https://test1.com",
+    )
+    portfolio2 = portfolio_url_service.create_portfolio_url(
+        user_id=created_user2.id,
+        url="https://test2.com",
+    )
+    portfolio_url_service.update_portfolio_url(
+        user_id=created_user1.id,
+        portfolio_url_id=portfolio1.id,
+        url="https://test3.com",
+    )
+    response = portfolio_url_service.list_portfolio_urls(user_id=created_user1.id)
+    expected = [
+        PortfolioUrlResponse(
+            id=portfolio1.id,
+            url="https://test3.com",
+        ),
+    ]
+    assert response == expected
+
+    with pytest.raises(PortfolioUrlNotFound):
+        portfolio_url_service.update_portfolio_url(
+            user_id=created_user1.id,
+            portfolio_url_id=1000,
+            url="https://test3.com",
+        )
+    with pytest.raises(PortfolioUrlNotAuthorized):
+        portfolio_url_service.update_portfolio_url(
+            user_id=created_user1.id,
+            portfolio_url_id=portfolio2.id,
+            url="https://test3.com",
+        )
