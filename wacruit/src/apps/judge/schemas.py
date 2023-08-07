@@ -14,6 +14,7 @@ class JudgeCreateSubmissionRequest(BaseModel):
     cpu_extra_time: float = Field(0.0)
     memory_limit: int | None
     stack_limit: int | None
+    compiler_options: str | None
 
 
 class JudgeCreateSubmissionResponse(BaseModel):
