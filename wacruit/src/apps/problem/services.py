@@ -145,7 +145,6 @@ class ProblemService(LoggingMixin):
         disconnected = False
 
         while len(token_map) > 0:
-            print(token_map)
             data = ""
             event = "skip"
 
