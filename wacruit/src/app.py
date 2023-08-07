@@ -24,8 +24,6 @@ def _add_middlewares(app: FastAPI):
             allow_methods=["*"],
             allow_headers=["*"],
         )
-    if not (settings.is_local or settings.is_test):
-        app.add_middleware(HTTPToHTTPSRequestMiddleware)
 
 
 def _add_routers(app: FastAPI):
