@@ -63,7 +63,7 @@ class ProblemService(LoggingMixin):
         if len(testcases) == 0:
             raise TestcaseNotFoundException()
 
-        requests = (
+        batch_requests = (
             [
                 JudgeCreateSubmissionRequest(
                     source_code=request.source_code,
@@ -103,7 +103,15 @@ class ProblemService(LoggingMixin):
             ]
         )
 
-        response = await self.judge_api_repository.create_batch_submissions(requests)
+        if request.language == Language.KOTLIN:
+            response = [
+                await self.judge_api_repository.create_submission(r)
+                for r in batch_requests
+            ]
+        else:
+            response = await self.judge_api_repository.create_batch_submissions(
+                batch_requests
+            )
         tokens = [v.token for v in response]
         submission = None
 
