@@ -10,6 +10,7 @@ from sse_starlette import ServerSentEvent
 
 from wacruit.src.apps.common.enums import CodeSubmissionStatus
 from wacruit.src.apps.common.enums import JudgeSubmissionStatus
+from wacruit.src.apps.common.enums import Language
 from wacruit.src.apps.common.schemas import ListResponse
 from wacruit.src.apps.judge.repositories import JudgeApiRepository
 from wacruit.src.apps.judge.schemas import JudgeCreateSubmissionRequest
@@ -62,7 +63,7 @@ class ProblemService(LoggingMixin):
         if len(testcases) == 0:
             raise TestcaseNotFoundException()
 
-        requests = (
+        batch_requests = (
             [
                 JudgeCreateSubmissionRequest(
                     source_code=request.source_code,
@@ -74,6 +75,9 @@ class ProblemService(LoggingMixin):
                     wall_time_limit=20.0,
                     memory_limit=memory_handi(10000, request.language),
                     stack_limit=64000,
+                    compiler_options="-jvm-target 13"
+                    if request.language == Language.KOTLIN
+                    else None,
                 )
                 for testcase in testcases
             ]
@@ -91,12 +95,23 @@ class ProblemService(LoggingMixin):
                     wall_time_limit=20.0,
                     memory_limit=memory_handi(testcase.memory_limit, request.language),
                     stack_limit=testcase.stack_limit,
+                    compiler_options="-jvm-target 13"
+                    if request.language == Language.KOTLIN
+                    else None,
                 )
                 for testcase in testcases
             ]
         )
 
-        response = await self.judge_api_repository.create_batch_submissions(requests)
+        if request.language == Language.KOTLIN:
+            response = [
+                await self.judge_api_repository.create_submission(r)
+                for r in batch_requests
+            ]
+        else:
+            response = await self.judge_api_repository.create_batch_submissions(
+                batch_requests
+            )
         tokens = [v.token for v in response]
         submission = None
 
