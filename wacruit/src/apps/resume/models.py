@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
 from sqlalchemy import Text
+from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
@@ -54,6 +55,7 @@ class ResumeQuestion(DeclarativeBase):
 
 class ResumeSubmission(DeclarativeBase):
     __tablename__ = "resume_submission"
+    __table_args__ = (UniqueConstraint("user_id", "question_id", "recruiting_id"),)
 
     id: Mapped[intpk]
     user_id: Mapped[int | None] = mapped_column(
