@@ -103,15 +103,9 @@ class ProblemService(LoggingMixin):
             ]
         )
 
-        if request.language == Language.KOTLIN:
-            response = [
-                await self.judge_api_repository.create_submission(r)
-                for r in batch_requests
-            ]
-        else:
-            response = await self.judge_api_repository.create_batch_submissions(
-                batch_requests
-            )
+        response = await self.judge_api_repository.create_batch_submissions(
+            batch_requests
+        )
         tokens = [v.token for v in response]
         submission = None
 
