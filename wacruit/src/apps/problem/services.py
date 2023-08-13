@@ -1,4 +1,7 @@
 import asyncio
+from datetime import datetime
+from datetime import timedelta
+from datetime import timezone
 from decimal import Decimal
 import json
 from typing import AsyncGenerator, Tuple
@@ -17,6 +20,7 @@ from wacruit.src.apps.judge.schemas import JudgeCreateSubmissionRequest
 from wacruit.src.apps.problem.exceptions import CodeSubmissionErrorException
 from wacruit.src.apps.problem.exceptions import CodeSubmissionFailedException
 from wacruit.src.apps.problem.exceptions import ProblemNotFoundException
+from wacruit.src.apps.problem.exceptions import RecruitingClosedException
 from wacruit.src.apps.problem.exceptions import TestcaseNotFoundException
 from wacruit.src.apps.problem.models import CodeSubmission
 from wacruit.src.apps.problem.repositories import ProblemRepository
@@ -54,6 +58,14 @@ class ProblemService(LoggingMixin):
 
         if problem is None:
             raise ProblemNotFoundException()
+
+        recruiting_is_open = problem.recruiting.is_active and (
+            problem.recruiting.from_date
+            < datetime.utcnow() + timedelta(hours=9)
+            < problem.recruiting.to_date
+        )
+        if not recruiting_is_open:
+            raise RecruitingClosedException()
 
         testcases = problem.testcases
 

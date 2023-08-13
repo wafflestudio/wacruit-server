@@ -3,6 +3,7 @@ from typing import Iterable, Sequence
 from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.orm import contains_eager
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import Session
 
 from wacruit.src.apps.common.enums import CodeSubmissionStatus
@@ -34,6 +35,7 @@ class ProblemRepository:
             )
             .where(Problem.id == problem_id)
             .options(contains_eager(Problem.testcases))
+            .options(joinedload(Problem.recruiting))
         )
         return self.session.execute(query).scalar()
 
