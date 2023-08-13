@@ -1,4 +1,5 @@
 from datetime import datetime
+from datetime import timedelta
 from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime
@@ -42,6 +43,12 @@ class Recruiting(DeclarativeBase):
         back_populates="recruiting"
     )
     problems: Mapped[list["Problem"]] = relationship(back_populates="recruiting")
+
+    @property
+    def is_open(self):
+        return self.is_active and (
+            self.from_date < datetime.utcnow() + timedelta(hours=9) < self.to_date
+        )
 
     @property
     def problem_status(self):

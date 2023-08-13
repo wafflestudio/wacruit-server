@@ -59,12 +59,7 @@ class ProblemService(LoggingMixin):
         if problem is None:
             raise ProblemNotFoundException()
 
-        recruiting_is_open = problem.recruiting.is_active and (
-            problem.recruiting.from_date
-            < datetime.utcnow() + timedelta(hours=9)
-            < problem.recruiting.to_date
-        )
-        if not recruiting_is_open:
+        if not problem.recruiting.is_open:
             raise RecruitingClosedException()
 
         testcases = problem.testcases
