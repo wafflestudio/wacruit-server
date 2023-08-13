@@ -8,7 +8,6 @@ from .schemas import JudgeCreateSubmissionRequest
 from .schemas import JudgeCreateSubmissionResponse
 from .schemas import JudgeGetSubmissionResponse
 
-DEFAULT_PARAMS = {"base64_encoded": False}
 # DEFAULT_FIELDS = "stdout,stderr,compile_output,message,status,time,memory"
 DEFAULT_FIELDS = "stdout,message,status,time,memory"
 
@@ -22,7 +21,7 @@ class JudgeApiRepository:
     ) -> JudgeCreateSubmissionResponse:
         res = await self.client.post(
             url="/submissions",
-            params=DEFAULT_PARAMS,
+            params={"base64_encoded": False},
             json=request.dict(),
             timeout=60,
         )
@@ -38,7 +37,7 @@ class JudgeApiRepository:
         batch_request_data = {"submissions": [request.dict() for request in requests]}
         res = await self.client.post(
             url="/submissions/batch",
-            params=DEFAULT_PARAMS,
+            params={"base64_encoded": False},
             json=batch_request_data,
             timeout=60,
         )
@@ -51,7 +50,10 @@ class JudgeApiRepository:
     async def get_submission(self, token: str) -> JudgeGetSubmissionResponse:
         res = await self.client.get(
             url=f"/submissions/{token}",
-            params={**DEFAULT_PARAMS, "fields": DEFAULT_FIELDS},
+            params={
+                "base64_encoded": True,
+                "fields": DEFAULT_FIELDS,
+            },
             timeout=60,
         )
         if res.status_code >= 400:
@@ -67,7 +69,11 @@ class JudgeApiRepository:
             tokens = ",".join(tokens)
         res = await self.client.get(
             url="/submissions/batch",
-            params={"tokens": tokens, **DEFAULT_PARAMS, "fields": DEFAULT_FIELDS},
+            params={
+                "tokens": tokens,
+                "base64_encoded": True,
+                "fields": DEFAULT_FIELDS,
+            },
             timeout=60,
         )
         if res.status_code >= 400:
