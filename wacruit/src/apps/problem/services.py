@@ -26,6 +26,7 @@ from wacruit.src.apps.problem.schemas import ProblemResponse
 from wacruit.src.apps.problem.schemas import TokenStr
 from wacruit.src.apps.problem.utils import memory_handi
 from wacruit.src.apps.problem.utils import time_handi
+from wacruit.src.apps.recruiting.exceptions import RecruitingClosedException
 from wacruit.src.apps.user.models import User
 from wacruit.src.utils.mixins import LoggingMixin
 
@@ -54,6 +55,9 @@ class ProblemService(LoggingMixin):
 
         if problem is None:
             raise ProblemNotFoundException()
+
+        if not problem.recruiting.is_open:
+            raise RecruitingClosedException()
 
         testcases = problem.testcases
 

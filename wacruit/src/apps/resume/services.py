@@ -4,6 +4,9 @@ from fastapi import Depends
 
 from wacruit.src.apps.portfolio.file.services import PortfolioFileService
 from wacruit.src.apps.portfolio.url.services import PortfolioUrlService
+from wacruit.src.apps.recruiting.exceptions import RecruitingClosedException
+from wacruit.src.apps.recruiting.repositories import RecruitingRepository
+from wacruit.src.apps.recruiting.services import RecruitingService
 from wacruit.src.apps.resume.exceptions import ResumeNotFound
 from wacruit.src.apps.resume.models import ResumeSubmission
 from wacruit.src.apps.resume.repositories import ResumeRepository
@@ -17,11 +20,13 @@ class ResumeService:
     def __init__(
         self,
         resume_repository: Annotated[ResumeRepository, Depends()],
+        recruiting_repository: Annotated[RecruitingRepository, Depends()],
         portfolio_file_service: Annotated[PortfolioFileService, Depends()],
         portfolio_url_service: Annotated[PortfolioUrlService, Depends()],
         user_service: Annotated[UserService, Depends()],
     ) -> None:
         self.resume_repository = resume_repository
+        self.recruiting_repository = recruiting_repository
         self.portfolio_file_service = portfolio_file_service
         self.portfolio_url_service = portfolio_url_service
         self.user_service = user_service
@@ -38,6 +43,10 @@ class ResumeService:
         recruiting_id: int,
         resume_submissions: Sequence[ResumeSubmissionCreateDto],
     ) -> list[UserResumeSubmissionDto]:
+        recruiting = self.recruiting_repository.get_recruiting_by_id(recruiting_id)
+        if not recruiting.is_open:
+            raise RecruitingClosedException()
+
         result = []
         for resume_submission_dto in resume_submissions:
             resume_submission = ResumeSubmission()
@@ -72,6 +81,10 @@ class ResumeService:
         recruiting_id: int,
         resume_submissions: Sequence[ResumeSubmissionCreateDto],
     ) -> list[UserResumeSubmissionDto]:
+        recruiting = self.recruiting_repository.get_recruiting_by_id(recruiting_id)
+        if not recruiting.is_open:
+            raise RecruitingClosedException()
+
         resume_dtos = []
 
         for resume_info in resume_submissions:

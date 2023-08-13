@@ -1,4 +1,5 @@
 from datetime import datetime
+from datetime import timedelta
 
 import pytest
 from sqlalchemy.orm import Session
@@ -7,6 +8,7 @@ from wacruit.src.apps.portfolio.file.services import PortfolioFileService
 from wacruit.src.apps.portfolio.url.repositories import PortfolioUrlRepository
 from wacruit.src.apps.portfolio.url.services import PortfolioUrlService
 from wacruit.src.apps.recruiting.models import Recruiting
+from wacruit.src.apps.recruiting.repositories import RecruitingRepository
 from wacruit.src.apps.resume.models import ResumeQuestion
 from wacruit.src.apps.resume.repositories import ResumeRepository
 from wacruit.src.apps.resume.services import ResumeService
@@ -32,12 +34,12 @@ def user(db_session: Session) -> User:
 
 
 @pytest.fixture
-def recruiting(db_session: Session):
+def opened_recruiting(db_session: Session):
     recruiting = Recruiting(
         name="Example Recruiting",
         is_active=True,
-        from_date=datetime.utcnow(),
-        to_date=datetime.utcnow(),
+        from_date=datetime.utcnow() + timedelta(days=-1),
+        to_date=datetime.utcnow() + timedelta(days=1),
         description="This is an example recruiting instance.",
     )
     db_session.add(recruiting)
@@ -46,11 +48,25 @@ def recruiting(db_session: Session):
 
 
 @pytest.fixture
-def resume_questions(db_session: Session, recruiting: Recruiting):
+def closed_recruiting(db_session: Session):
+    recruiting = Recruiting(
+        name="Example Recruiting",
+        is_active=False,
+        from_date=datetime.utcnow() + timedelta(days=-3),
+        to_date=datetime.utcnow() + timedelta(days=-1),
+        description="This is an example recruiting instance.",
+    )
+    db_session.add(recruiting)
+    db_session.commit()
+    return recruiting
+
+
+@pytest.fixture
+def resume_questions(db_session: Session, opened_recruiting: Recruiting):
     resume_questions = []
     for i in range(1, 3):
         resume_question = ResumeQuestion(
-            recruiting_id=recruiting.id,
+            recruiting_id=opened_recruiting.id,
             question_num=i,
             content_limit=100,
             content=f"This is a test question {i}",
@@ -89,6 +105,11 @@ def user_service(user_repository: UserRepository):
 
 
 @pytest.fixture
+def recruiting_repository(db_session: Session) -> RecruitingRepository:
+    return RecruitingRepository(session=db_session, transaction=Transaction(db_session))
+
+
+@pytest.fixture
 def resume_repository(db_session: Session):
     return ResumeRepository(session=db_session, transaction=Transaction(db_session))
 
@@ -98,11 +119,13 @@ def resume_service(
     portfolio_file_service: PortfolioFileService,
     portfolio_url_service: PortfolioUrlService,
     resume_repository: ResumeRepository,
+    recruiting_repository: RecruitingRepository,
     user_service: UserService,
 ):
     return ResumeService(
         portfolio_file_service=portfolio_file_service,
         portfolio_url_service=portfolio_url_service,
         resume_repository=resume_repository,
+        recruiting_repository=recruiting_repository,
         user_service=user_service,
     )

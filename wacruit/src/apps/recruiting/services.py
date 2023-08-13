@@ -59,8 +59,10 @@ class RecruitingService:
     def get_recruiting_by_id(
         self, recruiting_id: int, user: User
     ) -> RecruitingResponse:
-        recruiting = self.recruiting_repository.get_recruiting_by_id(
-            recruiting_id, user.id
+        recruiting = (
+            self.recruiting_repository.get_recruiting_with_code_submission_status_by_id(
+                recruiting_id, user.id
+            )
         )
         if recruiting is None:
             raise RecruitingNotFoundException()
