@@ -1,5 +1,8 @@
+from base64 import b64decode
+
 from pydantic import BaseModel
 from pydantic import Field
+from pydantic import validator
 
 from wacruit.src.apps.common.enums import JudgeSubmissionStatus
 
@@ -37,3 +40,14 @@ class JudgeGetSubmissionResponse(BaseModel):
     status: JudgeSubmissionStatusModel
     time: str | None
     memory: int | None
+
+    class Config:
+        json_encoders = {
+            JudgeSubmissionStatusModel: lambda v: v.decode() if v is not None else None
+        }
+
+    @validator("stdout", pre=True)
+    def stdout_validator(cls, v):
+        if v is None:
+            return None
+        return b64decode(v).decode("utf-8")
