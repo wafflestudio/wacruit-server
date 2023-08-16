@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from wacruit.src.apps.problem.models import CodeSubmission
 from wacruit.src.apps.problem.models import Problem
 from wacruit.src.apps.recruiting.models import Recruiting
+from wacruit.src.apps.recruiting.models import RecruitingApplication
 from wacruit.src.database.connection import get_db_session
 from wacruit.src.database.connection import Transaction
 
@@ -60,3 +61,13 @@ class RecruitingRepository:
             )
         )
         return self.session.execute(query).scalars().first()
+
+    def get_recruiting_result_by_id(
+        self, recruiting_id: int, user_id: int
+    ) -> RecruitingApplication | None:
+        query = (
+            select(RecruitingApplication)
+            .where(RecruitingApplication.recruiting_id == recruiting_id)
+            .where(RecruitingApplication.user_id == user_id)
+        )
+        return self.session.execute(query).scalar()

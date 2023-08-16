@@ -56,3 +56,9 @@ class RecruitingType(Enum):
     ROOKIE = 1
     DESIGNER = 2
     PROGRAMMER = 3
+
+
+class RecruitingApplicationStatus(Enum):
+    IN_PROGRESS = 1
+    ACCEPTED = 2
+    REJECTED = 3

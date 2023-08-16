@@ -5,9 +5,11 @@ from fastapi import Depends
 
 from wacruit.src.apps.common.exceptions import responses_from
 from wacruit.src.apps.common.schemas import ListResponse
+from wacruit.src.apps.recruiting.exceptions import RecruitingNotAppliedException
 from wacruit.src.apps.recruiting.exceptions import RecruitingNotFoundException
 from wacruit.src.apps.recruiting.schemas import RecruitingApplicantDto
 from wacruit.src.apps.recruiting.schemas import RecruitingResponse
+from wacruit.src.apps.recruiting.schemas import RecruitingResultResponse
 from wacruit.src.apps.recruiting.services import RecruitingService
 from wacruit.src.apps.user.dependencies import CurrentUser
 
@@ -30,3 +32,14 @@ def get_recruiting(
     recruiting_service: Annotated[RecruitingService, Depends()],
 ) -> RecruitingResponse:
     return recruiting_service.get_recruiting_by_id(recruiting_id, user)
+
+
+@v1_router.get(
+    "/{recruiting_id}/result", responses=responses_from(RecruitingNotAppliedException)
+)
+def get_recruiting_result(
+    user: CurrentUser,
+    recruiting_id: int,
+    recruiting_service: Annotated[RecruitingService, Depends()],
+) -> RecruitingResultResponse:
+    return recruiting_service.get_recruiting_result_by_id(recruiting_id, user)
