@@ -13,6 +13,7 @@ from wacruit.src.database.base import str255
 
 if TYPE_CHECKING:
     from wacruit.src.apps.problem.models import CodeSubmission
+    from wacruit.src.apps.recruiting.models import RecruitingApplication
     from wacruit.src.apps.resume.models import ResumeSubmission
 
 
@@ -41,6 +42,10 @@ class User(DeclarativeBase):
     )
 
     resume_submissions: Mapped[list["ResumeSubmission"]] = relationship(
+        back_populates="user"
+    )
+
+    application: Mapped[list["RecruitingApplication"]] = relationship(
         back_populates="user"
     )
 

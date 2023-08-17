@@ -6,10 +6,12 @@ from wacruit.src.apps.common.enums import RecruitingType
 from wacruit.src.apps.common.schemas import ListResponse
 from wacruit.src.apps.portfolio.file.services import PortfolioFileService
 from wacruit.src.apps.portfolio.url.services import PortfolioUrlService
+from wacruit.src.apps.recruiting.exceptions import RecruitingNotAppliedException
 from wacruit.src.apps.recruiting.exceptions import RecruitingNotFoundException
 from wacruit.src.apps.recruiting.repositories import RecruitingRepository
 from wacruit.src.apps.recruiting.schemas import RecruitingApplicantDto
 from wacruit.src.apps.recruiting.schemas import RecruitingResponse
+from wacruit.src.apps.recruiting.schemas import RecruitingResultResponse
 from wacruit.src.apps.user.models import User
 
 
@@ -68,3 +70,14 @@ class RecruitingService:
             raise RecruitingNotFoundException()
 
         return RecruitingResponse.from_orm(recruiting)
+
+    def get_recruiting_result_by_id(
+        self, recruiting_id: int, user: User
+    ) -> RecruitingResultResponse:
+        recruiting_result = self.recruiting_repository.get_recruiting_result_by_id(
+            recruiting_id, user.id
+        )
+        if recruiting_result is None:
+            raise RecruitingNotAppliedException()
+
+        return RecruitingResultResponse(status=recruiting_result.status)

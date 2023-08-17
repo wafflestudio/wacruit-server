@@ -1,7 +1,10 @@
 from datetime import datetime
 from typing import Literal, TYPE_CHECKING
 
+from pydantic import BaseModel
+
 from wacruit.src.apps.common.enums import CodeSubmissionStatus
+from wacruit.src.apps.common.enums import RecruitingApplicationStatus
 from wacruit.src.apps.common.enums import RecruitingType
 from wacruit.src.apps.common.schemas import OrmModel
 
@@ -33,3 +36,7 @@ class RecruitingResponse(OrmModel):
     to_date: datetime
     description: str
     problem_status: list[ProblemStatusDto]
+
+
+class RecruitingResultResponse(BaseModel):
+    status: RecruitingApplicationStatus
