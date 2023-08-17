@@ -91,10 +91,10 @@ class RecruitingApplication(DeclarativeBase):
     )
 
     id: Mapped[intpk]
-    user_id: Mapped[intpk] = mapped_column(
+    user_id: Mapped[int] = mapped_column(
         ForeignKey("user.id", ondelete="CASCADE"), nullable=False
     )
-    recruiting_id: Mapped[intpk] = mapped_column(
+    recruiting_id: Mapped[int] = mapped_column(
         ForeignKey("recruiting.id", ondelete="CASCADE"), nullable=False
     )
     status: Mapped[RecruitingApplicationStatus] = mapped_column(

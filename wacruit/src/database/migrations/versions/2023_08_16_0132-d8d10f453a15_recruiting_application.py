@@ -49,7 +49,7 @@ def upgrade() -> None:
             ["recruiting_id"], ["recruiting.id"], ondelete="CASCADE"
         ),
         sa.ForeignKeyConstraint(["user_id"], ["user.id"], ondelete="CASCADE"),
-        sa.PrimaryKeyConstraint("id", "user_id", "recruiting_id"),
+        sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("user_id", "recruiting_id", name="ak_user_recruiting"),
     )
     # ### end Alembic commands ###
