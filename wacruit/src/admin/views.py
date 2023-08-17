@@ -29,6 +29,12 @@ class UserAdmin(ModelView, model=User):
         User.college,
     ]
 
+    form_excluded_columns = [
+        User.code_submissions,
+        User.resume_submissions,
+        User.application,
+    ]
+
 
 class AnnouncementAdmin(ModelView, model=Announcement):
     column_list = [
@@ -41,6 +47,11 @@ class AnnouncementAdmin(ModelView, model=Announcement):
     ]
 
     column_formatters = {Announcement.content: shorten_column(width=20)}
+
+    form_excluded_columns = [
+        Announcement.created_at,
+        Announcement.updated_at,
+    ]
 
 
 class RecruitingAdmin(ModelView, model=Recruiting):
@@ -56,6 +67,13 @@ class RecruitingAdmin(ModelView, model=Recruiting):
 
     column_formatters = {Recruiting.description: shorten_column(width=20)}
 
+    form_excluded_columns = [
+        Recruiting.resume_submissions,
+        Recruiting.resume_questions,
+        Recruiting.problems,
+        Recruiting.applicants,
+    ]
+
 
 class ProblemAdmin(ModelView, model=Problem):
     column_list = [
@@ -69,6 +87,12 @@ class ProblemAdmin(ModelView, model=Problem):
         Problem.recruiting: recruiting_formatter,
         Problem.body: shorten_column(width=20),
     }
+
+    form_excluded_columns = [
+        Problem.submissions,
+        Problem.code_submissions,
+        Problem.testcases,
+    ]
 
 
 class CodeSubmissionAdmin(ModelView, model=CodeSubmission):
@@ -84,6 +108,11 @@ class CodeSubmissionAdmin(ModelView, model=CodeSubmission):
     column_formatters = {
         CodeSubmission.user: user_formatter,
     }
+
+    form_excluded_columns = [
+        CodeSubmission.results,
+        CodeSubmission.created_at,
+    ]
 
 
 class TestcaseAdmin(ModelView, model=Testcase):
@@ -102,6 +131,10 @@ class TestcaseAdmin(ModelView, model=Testcase):
         Testcase.expected_output: shorten_column(),
     }
 
+    form_excluded_columns = [
+        Testcase.submission_results,
+    ]
+
 
 class ResumeQuestionAdmin(ModelView, model=ResumeQuestion):
     column_list = [
@@ -116,6 +149,12 @@ class ResumeQuestionAdmin(ModelView, model=ResumeQuestion):
         ResumeQuestion.recruiting: recruiting_formatter,
         ResumeQuestion.content: shorten_column(width=20),
     }
+
+    form_excluded_columns = [
+        ResumeQuestion.created_at,
+        ResumeQuestion.updated_at,
+        ResumeQuestion.resume_submissions,
+    ]
 
 
 class ResumeSubmissionAdmin(ModelView, model=ResumeSubmission):
@@ -136,6 +175,11 @@ class ResumeSubmissionAdmin(ModelView, model=ResumeSubmission):
         ResumeSubmission.recruiting: recruiting_formatter,
         ResumeSubmission.question: question_formatter,
     }
+
+    form_excluded_columns = [
+        ResumeSubmission.created_at,
+        ResumeSubmission.updated_at,
+    ]
 
 
 admin_views = [
