@@ -35,6 +35,16 @@ class UserAdmin(ModelView, model=User):
         User.application,
     ]
 
+    column_searchable_list = [
+        User.first_name,
+        User.last_name,
+        User.email,
+        User.phone_number,
+        User.department,
+        User.university,
+        User.college,
+    ]
+
 
 class AnnouncementAdmin(ModelView, model=Announcement):
     column_list = [
@@ -51,6 +61,11 @@ class AnnouncementAdmin(ModelView, model=Announcement):
     form_excluded_columns = [
         Announcement.created_at,
         Announcement.updated_at,
+    ]
+
+    column_searchable_list = [
+        Announcement.title,
+        Announcement.content,
     ]
 
 
@@ -74,6 +89,11 @@ class RecruitingAdmin(ModelView, model=Recruiting):
         Recruiting.applicants,
     ]
 
+    column_searchable_list = [
+        Recruiting.name,
+        Recruiting.description,
+    ]
+
 
 class ProblemAdmin(ModelView, model=Problem):
     column_list = [
@@ -94,6 +114,11 @@ class ProblemAdmin(ModelView, model=Problem):
         Problem.testcases,
     ]
 
+    column_searchable_list = [
+        Problem.num,
+        Problem.body,
+    ]
+
 
 class CodeSubmissionAdmin(ModelView, model=CodeSubmission):
     column_list = [
@@ -112,6 +137,12 @@ class CodeSubmissionAdmin(ModelView, model=CodeSubmission):
     form_excluded_columns = [
         CodeSubmission.results,
         CodeSubmission.created_at,
+    ]
+
+    column_searchable_list = [
+        CodeSubmission.user_id,
+        CodeSubmission.language,
+        CodeSubmission.status,
     ]
 
 
@@ -135,6 +166,12 @@ class TestcaseAdmin(ModelView, model=Testcase):
         Testcase.submission_results,
     ]
 
+    column_searchable_list = [
+        Testcase.problem_id,
+        Testcase.stdin,
+        Testcase.expected_output,
+    ]
+
 
 class ResumeQuestionAdmin(ModelView, model=ResumeQuestion):
     column_list = [
@@ -154,6 +191,11 @@ class ResumeQuestionAdmin(ModelView, model=ResumeQuestion):
         ResumeQuestion.created_at,
         ResumeQuestion.updated_at,
         ResumeQuestion.resume_submissions,
+    ]
+
+    column_searchable_list = [
+        ResumeQuestion.question_num,
+        ResumeQuestion.content,
     ]
 
 
@@ -179,6 +221,11 @@ class ResumeSubmissionAdmin(ModelView, model=ResumeSubmission):
     form_excluded_columns = [
         ResumeSubmission.created_at,
         ResumeSubmission.updated_at,
+    ]
+
+    column_searchable_list = [
+        ResumeSubmission.user_id,
+        ResumeSubmission.answer,
     ]
 
 
