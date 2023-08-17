@@ -11,6 +11,7 @@ from wacruit.src.apps.problem.models import CodeSubmission
 from wacruit.src.apps.problem.models import Problem
 from wacruit.src.apps.problem.models import Testcase
 from wacruit.src.apps.recruiting.models import Recruiting
+from wacruit.src.apps.recruiting.models import RecruitingApplication
 from wacruit.src.apps.resume.models import ResumeQuestion
 from wacruit.src.apps.resume.models import ResumeSubmission
 from wacruit.src.apps.user.models import User
@@ -229,6 +230,26 @@ class ResumeSubmissionAdmin(ModelView, model=ResumeSubmission):
     ]
 
 
+class RecruitingApplicationAdmin(ModelView, model=RecruitingApplication):
+    column_list = [
+        RecruitingApplication.id,
+        RecruitingApplication.recruiting,
+        RecruitingApplication.user,
+        RecruitingApplication.status,
+        RecruitingApplication.created_at,
+    ]
+
+    column_formatters = {
+        RecruitingApplication.recruiting: recruiting_formatter,
+        RecruitingApplication.user: user_formatter,
+    }
+
+    form_excluded_columns = [
+        RecruitingApplication.created_at,
+        RecruitingApplication.updated_at,
+    ]
+
+
 admin_views = [
     UserAdmin,
     RecruitingAdmin,
@@ -238,4 +259,5 @@ admin_views = [
     TestcaseAdmin,
     ResumeQuestionAdmin,
     ResumeSubmissionAdmin,
+    RecruitingApplicationAdmin,
 ]
