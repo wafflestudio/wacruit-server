@@ -26,8 +26,12 @@ class PortfolioUrlRepository:
         query = select(PortfolioUrl).where(PortfolioUrl.user_id == user_id)
         return self.session.execute(query).scalars().all()
 
-    def get_portfolio_urls_in_term(self, user_id: int, term: str) -> Sequence[PortfolioUrl]:
-        query = select(PortfolioUrl).where(PortfolioUrl.user_id == user_id and PortfolioUrl.term == term)
+    def get_portfolio_urls_in_term(
+        self, user_id: int, term: str
+    ) -> Sequence[PortfolioUrl]:
+        query = select(PortfolioUrl).where(
+            PortfolioUrl.user_id == user_id and PortfolioUrl.term == term
+        )
         return self.session.execute(query).scalars().all()
 
     def get_portfolio_url_by_id(self, portfolio_url_id: int) -> PortfolioUrl:
@@ -60,12 +64,18 @@ class PortfolioUrlRepository:
     def delete_all_portfolio_urls_in_term(self, user_id: int, term: str) -> None:
         with self.transaction:
             self.session.execute(
-                delete(PortfolioUrl).where(PortfolioUrl.user_id == user_id and PortfolioUrl.term == term)
+                delete(PortfolioUrl).where(
+                    PortfolioUrl.user_id == user_id and PortfolioUrl.term == term
+                )
             )
 
     def get_all_applicant_user_ids(self) -> Sequence[intpk]:
-        return self.session.execute(
-            select(PortfolioUrl.user_id)
-            .where(PortfolioUrl.user_id.isnot(None))
-            .distinct()
-        ).scalars().all()
+        return (
+            self.session.execute(
+                select(PortfolioUrl.user_id)
+                .where(PortfolioUrl.user_id.isnot(None))
+                .distinct()
+            )
+            .scalars()
+            .all()
+        )

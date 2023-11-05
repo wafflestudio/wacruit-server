@@ -29,12 +29,14 @@ class PortfolioFileService(LoggingMixin):
         self._num_portfolio_limit = 1
 
     @staticmethod
-    def get_portfolio_object_name(user_id: int, file_name: str, term: str | None = None) -> str:
+    def get_portfolio_object_name(
+        user_id: int, file_name: str, term: str | None = None
+    ) -> str:
         if term is None:
             return f"{user_id}/{file_name}"
         return f"{term}/{user_id}/{file_name}"
 
-    def get_portfolio_list(self, user_id: int,  term: str | None = None) -> list[str]:
+    def get_portfolio_list(self, user_id: int, term: str | None = None) -> list[str]:
         if term is not None:
             portfolios = self._portfolio_file_repository.get_portfolio_files(
                 user_id=user_id,
@@ -52,7 +54,9 @@ class PortfolioFileService(LoggingMixin):
         if len(self.get_portfolio_list(user_id, term)) > self._num_portfolio_limit - 1:
             raise NumPortfolioLimitException
 
-    def check_portfolio_object_exist(self, user_id: int, file_name: str, term: str | None = None) -> None:
+    def check_portfolio_object_exist(
+        self, user_id: int, file_name: str, term: str | None = None
+    ) -> None:
         if file_name not in self.get_portfolio_list(user_id, term):
             raise PortfolioNotFoundException
 
@@ -73,7 +77,9 @@ class PortfolioFileService(LoggingMixin):
         term: str | None = None,
     ) -> PresignedUrlResponse:
         self.check_portfolio_object_exist(user_id, file_name, term)
-        object_name = PortfolioFileService.get_portfolio_object_name(user_id, file_name, term)
+        object_name = PortfolioFileService.get_portfolio_object_name(
+            user_id, file_name, term
+        )
         url = generate_presigned_url(
             s3_client=self._s3_client.client,
             client_method=S3PresignedUrlMethod.GET,
@@ -91,8 +97,10 @@ class PortfolioFileService(LoggingMixin):
         file_name: str,
         term: str | None = None,
     ) -> PresignedUrlResponse:
-        self.check_portfolio_limit(user_id)
-        object_name = PortfolioFileService.get_portfolio_object_name(user_id, file_name, term)
+        self.check_portfolio_limit(user_id, term)
+        object_name = PortfolioFileService.get_portfolio_object_name(
+            user_id, file_name, term
+        )
         # Note: Check AWS Docs for more info
         # https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-HTTPPOSTConstructPolicy.html
         url, fields = generate_presigned_post_url(
@@ -120,7 +128,10 @@ class PortfolioFileService(LoggingMixin):
             user_id=user_id,
             term=term,
         )
-        return [PortfolioNameResponse.from_orm(portfolio_file) for portfolio_file in portfolio_files]
+        return [
+            PortfolioNameResponse.from_orm(portfolio_file)
+            for portfolio_file in portfolio_files
+        ]
 
     def register_portfolio_file_info_in_db(
         self,
@@ -159,7 +170,9 @@ class PortfolioFileService(LoggingMixin):
         term: str | None = None,
     ) -> None:
         self.check_portfolio_object_exist(user_id, file_name, term)
-        object_name = PortfolioFileService.get_portfolio_object_name(user_id, file_name, term)
+        object_name = PortfolioFileService.get_portfolio_object_name(
+            user_id, file_name, term
+        )
         delete_object(self._s3_client.client, self._s3_config.bucket_name, object_name)
 
     def delete_all_portfolios(
