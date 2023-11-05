@@ -52,10 +52,10 @@ def get_download_portfolio_url(
     status_code=HTTPStatus.OK,
 )
 def get_upload_portfolio_url(
-        current_user: CurrentUser,
-        term: str,
-        file_name: str,
-        service: Annotated[PortfolioFileService, fastapi.Depends()],
+    current_user: CurrentUser,
+    term: str,
+    file_name: str,
+    service: Annotated[PortfolioFileService, fastapi.Depends()],
 ) -> PresignedUrlResponse:
     return service.get_presigned_url_for_post_portfolio(
         user_id=current_user.id,

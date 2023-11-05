@@ -23,7 +23,9 @@ class PortfolioFileRepository:
         self.transaction = transaction
 
     def get_portfolio_files(self, user_id: int, term: str) -> Sequence[PortfolioFile]:
-        query = select(PortfolioFile).where(PortfolioFile.user_id == user_id and PortfolioFile.term == term)
+        query = select(PortfolioFile).where(
+            PortfolioFile.user_id == user_id and PortfolioFile.term == term
+        )
         return self.session.execute(query).scalars().all()
 
     def get_portfolio_file_by_id(self, portfolio_file_id: int) -> PortfolioFile:
@@ -54,8 +56,12 @@ class PortfolioFileRepository:
             )
 
     def get_all_applicant_user_ids(self) -> Sequence[intpk]:
-        return self.session.execute(
-            select(PortfolioFile.user_id)
-            .where(PortfolioFile.user_id.isnot(None))
-            .distinct()
-        ).scalars().all()
+        return (
+            self.session.execute(
+                select(PortfolioFile.user_id)
+                .where(PortfolioFile.user_id.isnot(None))
+                .distinct()
+            )
+            .scalars()
+            .all()
+        )
