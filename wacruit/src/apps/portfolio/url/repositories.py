@@ -30,8 +30,8 @@ class PortfolioUrlRepository:
         self, user_id: int, term: str
     ) -> Sequence[PortfolioUrl]:
         query = select(PortfolioUrl).where(
-            PortfolioUrl.user_id == user_id and PortfolioUrl.term == term
-        )
+            PortfolioUrl.user_id == user_id
+        ).where(PortfolioUrl.term == term)
         return self.session.execute(query).scalars().all()
 
     def get_portfolio_url_by_id(self, portfolio_url_id: int) -> PortfolioUrl:
@@ -65,8 +65,8 @@ class PortfolioUrlRepository:
         with self.transaction:
             self.session.execute(
                 delete(PortfolioUrl).where(
-                    PortfolioUrl.user_id == user_id and PortfolioUrl.term == term
-                )
+                    PortfolioUrl.user_id == user_id
+                ).where(PortfolioUrl.term == term)
             )
 
     def get_all_applicant_user_ids(self) -> Sequence[intpk]:

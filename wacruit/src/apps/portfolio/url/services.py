@@ -29,7 +29,7 @@ class PortfolioUrlService:
         if num_portfolios >= self._num_url_limit:
             raise NumPortfolioUrlLimitException
         portfolio_url = self._portfolio_url_repository.create_portfolio_url(
-            PortfolioUrl(user_id=user_id, url=url)
+            PortfolioUrl(user_id=user_id, url=url, term=term)
         )
         return PortfolioUrlResponse.from_orm(portfolio_url)
 
