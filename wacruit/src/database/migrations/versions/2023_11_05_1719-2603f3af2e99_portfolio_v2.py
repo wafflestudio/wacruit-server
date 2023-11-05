@@ -36,7 +36,9 @@ def upgrade() -> None:
             nullable=False,
         ),
     )
-    op.add_column("portfolio_url", sa.Column("term", sa.String(length=255), nullable=True))
+    op.add_column("portfolio_url", sa.Column(
+        "term", sa.String(length=255), nullable=True
+    ))
     # ### end Alembic commands ###
 
 
