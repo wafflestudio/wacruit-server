@@ -30,12 +30,10 @@ class PortfolioFileService(LoggingMixin):
         self._num_portfolio_limit = 1
 
     @staticmethod
-    def get_portfolio_object_name(
-        user_id: int, file_name: str, term: str
-    ) -> str:
+    def get_portfolio_object_name(user_id: int, file_name: str, term: str) -> str:
         return f"{term}/{user_id}/{file_name}"
 
-    def get_portfolio_list(self, user_id: int, term: str ) -> list[str]:
+    def get_portfolio_list(self, user_id: int, term: str) -> list[str]:
         portfolios = self._portfolio_file_repository.get_portfolio_files(
             user_id=user_id,
             term=term,
@@ -47,7 +45,11 @@ class PortfolioFileService(LoggingMixin):
             raise NumPortfolioLimitException
 
     def check_portfolio_object_exist(
-        self, user_id: int, file_name: str, term: str | None = None, portfolio_id: int | None = None
+        self,
+        user_id: int,
+        file_name: str,
+        term: str | None = None,
+        portfolio_id: int | None = None,
     ) -> None:
         if file_name not in self.get_portfolio_list(user_id, term):
             raise PortfolioNotFoundException
@@ -63,12 +65,14 @@ class PortfolioFileService(LoggingMixin):
         ]
 
     def get_presigned_url_for_get_portfolio(
-        self,
-        user_id: int,
-        portfolio_file_id: int
+        self, user_id: int, portfolio_file_id: int
     ) -> PresignedUrlResponse:
-        portfolio_file_info = self._portfolio_file_repository.get_portfolio_file_by_id(portfolio_file_id)
-        self.check_portfolio_object_exist(user_id, portfolio_file_info.file_name, portfolio_file_info.term)
+        portfolio_file_info = self._portfolio_file_repository.get_portfolio_file_by_id(
+            portfolio_file_id
+        )
+        self.check_portfolio_object_exist(
+            user_id, portfolio_file_info.file_name, portfolio_file_info.term
+        )
         object_name = PortfolioFileService.get_portfolio_object_name(
             user_id, portfolio_file_info.file_name, portfolio_file_info.term
         )
@@ -131,7 +135,10 @@ class PortfolioFileService(LoggingMixin):
         file_name: str,
         term: str,
     ) -> PortfolioFileResponse:
-        if len(self.list_portfolios_from_db(user_id, term)) >= self._num_portfolio_limit:
+        if (
+            len(self.list_portfolios_from_db(user_id, term))
+            >= self._num_portfolio_limit
+        ):
             raise NumPortfolioLimitException
         portfolio_file = self._portfolio_file_repository.create_portfolio_file(
             PortfolioFile(
@@ -149,7 +156,9 @@ class PortfolioFileService(LoggingMixin):
         new_file_name: str,
     ) -> PortfolioFileResponse:
         assert new_file_name is not None
-        portfolio_file = self._portfolio_file_repository.get_portfolio_file_by_id(portfolio_file_id)
+        portfolio_file = self._portfolio_file_repository.get_portfolio_file_by_id(
+            portfolio_file_id
+        )
         portfolio_file = self._portfolio_file_repository.update_portfolio_file(
             PortfolioFile(
                 id=portfolio_file_id,
@@ -165,8 +174,12 @@ class PortfolioFileService(LoggingMixin):
         user_id: int,
         portfolio_file_id: int | None = None,
     ) -> None:
-        portfolio_file = self._portfolio_file_repository.get_portfolio_file_by_id(portfolio_file_id)
-        self.check_portfolio_object_exist(user_id, portfolio_file.file_name, portfolio_file.term)
+        portfolio_file = self._portfolio_file_repository.get_portfolio_file_by_id(
+            portfolio_file_id
+        )
+        self.check_portfolio_object_exist(
+            user_id, portfolio_file.file_name, portfolio_file.term
+        )
         object_name = PortfolioFileService.get_portfolio_object_name(
             user_id, portfolio_file.file_name, portfolio_file.term
         )

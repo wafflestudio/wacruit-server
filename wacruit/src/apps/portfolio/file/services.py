@@ -44,8 +44,8 @@ class PortfolioFileService(LoggingMixin):
             raise PortfolioNotFoundException
 
     def get_portfolios(
-            self,
-            user_id: int,
+        self,
+        user_id: int,
     ) -> list[PortfolioNameResponse]:
         return [
             PortfolioNameResponse(portfolio_name=obj)
@@ -53,9 +53,9 @@ class PortfolioFileService(LoggingMixin):
         ]
 
     def get_presigned_url_for_get_portfolio(
-            self,
-            user_id: int,
-            file_name: str,
+        self,
+        user_id: int,
+        file_name: str,
     ) -> PresignedUrlResponse:
         self.check_portfolio_object_exist(user_id, file_name)
         object_name = PortfolioFileService.get_portfolio_object_name(user_id, file_name)
@@ -71,9 +71,9 @@ class PortfolioFileService(LoggingMixin):
         return PresignedUrlResponse(object_name=object_name, presigned_url=url)
 
     def get_presigned_url_for_post_portfolio(
-            self,
-            user_id: int,
-            file_name: str,
+        self,
+        user_id: int,
+        file_name: str,
     ) -> PresignedUrlResponse:
         self.check_portfolio_limit(user_id)
         object_name = PortfolioFileService.get_portfolio_object_name(user_id, file_name)
@@ -96,17 +96,17 @@ class PortfolioFileService(LoggingMixin):
         )
 
     def delete_portfolio(
-            self,
-            user_id: int,
-            file_name: str,
+        self,
+        user_id: int,
+        file_name: str,
     ) -> None:
         self.check_portfolio_object_exist(user_id, file_name)
         object_name = PortfolioFileService.get_portfolio_object_name(user_id, file_name)
         delete_object(self._s3_client.client, self._s3_config.bucket_name, object_name)
 
     def delete_all_portfolios(
-            self,
-            user_id: int,
+        self,
+        user_id: int,
     ) -> None:
         objects = get_list_of_objects(
             s3_client=self._s3_client.client,

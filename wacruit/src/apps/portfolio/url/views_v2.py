@@ -26,7 +26,9 @@ def list_portfolio_urls(
     request: PortfolioUrlRequest,
     service: Annotated[PortfolioUrlService, fastapi.Depends()],
 ) -> ListResponse[PortfolioUrlResponse]:
-    return ListResponse(items=service.list_portfolio_urls(current_user.id, request.term))
+    return ListResponse(
+        items=service.list_portfolio_urls(current_user.id, request.term)
+    )
 
 
 @v2_router.post(

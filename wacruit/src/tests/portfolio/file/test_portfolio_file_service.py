@@ -100,7 +100,9 @@ def test_get_download_portfolio_file_url_v2(
         portfolio_file_id=3,
     )
     url, _ = response.presigned_url.split("?")
-    assert url == f"https://test-bucket.s3.amazonaws.com/20.5/{created_user1.id}/test1.pdf"
+    assert (
+        url == f"https://test-bucket.s3.amazonaws.com/20.5/{created_user1.id}/test1.pdf"
+    )
 
 
 @moto.mock_s3
@@ -131,5 +133,3 @@ def test_delete_portfolio_file_v2(
     )
     expected = []
     assert response == expected
-
-
