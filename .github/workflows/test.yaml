@@ -60,8 +60,8 @@ jobs:
       # it contains pylint, black, isort, etc.
       - name: Run pre-commit
         run: |
-          git fetch origin ${{ github.base_ref }} ${{ github.head_ref }}
-          poetry run pre-commit run --from-ref ${{ github.base_ref }} --to-ref ${{ github.head_ref }}
+          git fetch origin ${{ github.base_ref }}
+          poetry run pre-commit run --from-ref origin/${{ github.base_ref }} --to-ref HEAD
 
       - name: Run alembic migration test
         run: |
