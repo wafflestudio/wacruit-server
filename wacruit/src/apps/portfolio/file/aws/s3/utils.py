@@ -85,6 +85,7 @@ def generate_presigned_post_url(
 
     # Generate a presigned S3 POST URL
     try:
+        # assert None, (s3_bucket, s3_object)
         response = s3_client.generate_presigned_post(
             s3_bucket,
             s3_object,

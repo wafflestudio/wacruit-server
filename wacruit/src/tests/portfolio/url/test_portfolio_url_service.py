@@ -77,9 +77,9 @@ def test_create_portfolio_url_v2(
 
 
 def test_list_portfolio_urls(
-        created_user1: User,
-        created_user2: User,
-        portfolio_url_service: PortfolioUrlService,
+    created_user1: User,
+    created_user2: User,
+    portfolio_url_service: PortfolioUrlService,
 ):
     portfolio1 = portfolio_url_service.create_portfolio_url(
         user_id=created_user1.id,
@@ -117,9 +117,9 @@ def test_list_portfolio_urls(
 
 
 def test_list_portfolio_urls_v2(
-        created_user1: User,
-        created_user2: User,
-        portfolio_url_service: PortfolioUrlService,
+    created_user1: User,
+    created_user2: User,
+    portfolio_url_service: PortfolioUrlService,
 ):
     portfolio1 = portfolio_url_service.create_portfolio_url(
         user_id=created_user1.id,
@@ -136,7 +136,9 @@ def test_list_portfolio_urls_v2(
         url="https://test3.com",
         term="21.5",
     )
-    response = portfolio_url_service.list_portfolio_urls(user_id=created_user1.id, term="20.5")
+    response = portfolio_url_service.list_portfolio_urls(
+        user_id=created_user1.id, term="20.5"
+    )
     expected = [
         PortfolioUrlResponse(
             id=portfolio1.id,
@@ -146,7 +148,9 @@ def test_list_portfolio_urls_v2(
     ]
     assert response == expected
 
-    response = portfolio_url_service.list_portfolio_urls(user_id=created_user2.id, term="21.5")
+    response = portfolio_url_service.list_portfolio_urls(
+        user_id=created_user2.id, term="21.5"
+    )
     expected = [
         PortfolioUrlResponse(
             id=portfolio3.id,
