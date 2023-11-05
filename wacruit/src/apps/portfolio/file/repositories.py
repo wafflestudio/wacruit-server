@@ -24,8 +24,8 @@ class PortfolioFileRepository:
 
     def get_portfolio_files(self, user_id: int, term: str) -> Sequence[PortfolioFile]:
         query = select(PortfolioFile).where(
-            PortfolioFile.user_id == user_id and PortfolioFile.term == term
-        )
+            PortfolioFile.user_id == user_id
+        ).where(PortfolioFile.term == term)
         return self.session.execute(query).scalars().all()
 
     def get_portfolio_file_by_id(self, portfolio_file_id: int) -> PortfolioFile:

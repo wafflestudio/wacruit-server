@@ -18,31 +18,30 @@ v2_router = fastapi.APIRouter(prefix="/url", tags=["portfolio-url"])
 
 
 @v2_router.get(
-    path="/{term}",
+    path="",
     status_code=HTTPStatus.OK,
 )
 def list_portfolio_urls(
     current_user: CurrentUser,
-    term: str,
+    request: PortfolioUrlRequest,
     service: Annotated[PortfolioUrlService, fastapi.Depends()],
 ) -> ListResponse[PortfolioUrlResponse]:
-    return ListResponse(items=service.list_portfolio_urls(current_user.id, term))
+    return ListResponse(items=service.list_portfolio_urls(current_user.id, request.term))
 
 
 @v2_router.post(
-    path="/{term}",
+    path="",
     responses=responses_from(NumPortfolioUrlLimitException),
     status_code=HTTPStatus.CREATED,
 )
 def register_portfolio_url(
     response: Response,
     current_user: CurrentUser,
-    term: str,
     request: PortfolioUrlRequest,
     service: Annotated[PortfolioUrlService, fastapi.Depends()],
 ) -> PortfolioUrlResponse:
     response.headers["Access-Control-Allow-Origin"] = "*"
-    return service.create_portfolio_url(current_user.id, request.url, term)
+    return service.create_portfolio_url(current_user.id, request.url, request.term)
 
 
 @v2_router.delete(
