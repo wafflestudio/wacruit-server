@@ -21,7 +21,7 @@ def test_get_upload_portfolio_file_v2(
     )
     expected = PresignedUrlResponse(
         object_name=f"20.5/{created_user1.id}/test1.pdf",
-        presigned_url="https://wacruit-portfolio-dev.s3.amazonaws.com/",
+        presigned_url="https://test-bucket.s3.amazonaws.com/",
         fields={
             "key": f"20.5/{created_user1.id}/test1.pdf",
             "x-amz-algorithm": "AWS4-HMAC-SHA256",
@@ -100,7 +100,7 @@ def test_get_download_portfolio_file_url_v2(
         portfolio_file_id=3,
     )
     url, _ = response.presigned_url.split("?")
-    assert url == f"https://wacruit-portfolio-dev.s3.amazonaws.com/20.5/{created_user1.id}/test1.pdf"
+    assert url == f"https://test-bucket.s3.amazonaws.com/20.5/{created_user1.id}/test1.pdf"
 
 
 @moto.mock_s3
@@ -113,11 +113,11 @@ def test_delete_portfolio_file_v2(
     )
     s3_client = portfolio_file_service._s3_client.client
     s3_client.create_bucket(
-        Bucket="wacruit-portfolio-dev",
+        Bucket="test-bucket",
         CreateBucketConfiguration={"LocationConstraint": "ap-northeast-2"},
     )
     s3_client.put_object(
-        Bucket="wacruit-portfolio-dev",
+        Bucket="test-bucket",
         Key=f"20.5/{created_user1.id}/test1.pdf",
     )
     portfolio_file_service.delete_portfolio(
