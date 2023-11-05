@@ -1,8 +1,17 @@
 from pydantic import BaseModel
 
+from wacruit.src.apps.common.schemas import OrmModel
+
 
 class PortfolioNameResponse(BaseModel):
     portfolio_name: str
+    term: str | None = None
+
+
+class PortfolioFileResponse(OrmModel):
+    id: int
+    file_name: str
+    term: str | None = None
 
 
 class PresignedUrlResponse(BaseModel):
@@ -14,6 +23,7 @@ class PresignedUrlResponse(BaseModel):
 class PortfolioRequest(BaseModel):
     term: str
 
+
 class PortfolioFileRequest(BaseModel):
-    term: str
-    file_name: str
+    term: str | None = None
+    file_name: str | None = None
