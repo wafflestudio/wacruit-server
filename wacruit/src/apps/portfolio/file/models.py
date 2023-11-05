@@ -12,17 +12,16 @@ from wacruit.src.database.base import intpk
 from wacruit.src.database.base import str255
 
 
-class PortfolioUrl(DeclarativeBase):
-    __tablename__ = "portfolio_url"
+class PortfolioFile(DeclarativeBase):
+    __tablename__ = "portfolio_file"
 
     id: Mapped[intpk]
     user_id: Mapped[int | None] = mapped_column(
         ForeignKey("user.id", ondelete="SET NULL")
     )
-    term: Mapped[str255] = mapped_column(nullable=True)
-    url: Mapped[str255] = mapped_column(nullable=False)
+    term: Mapped[str255] = mapped_column(nullable=False)
+    file_name: Mapped[str255] = mapped_column(nullable=False)
 
-    # user: Mapped["User"] = relationship(back_populates="portfolio_upload")
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=CURRENT_TIMESTAMP,
