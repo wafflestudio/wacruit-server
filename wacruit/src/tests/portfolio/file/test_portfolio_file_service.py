@@ -19,7 +19,6 @@ def test_get_upload_portfolio_file_v2(
         file_name="test1.pdf",
         term="20.5",
     )
-    # assert None, response.presigned_url
     expected = PresignedUrlResponse(
         object_name=f"20.5/{created_user1.id}/test1.pdf",
         presigned_url="https://wacruit-portfolio-dev.s3.amazonaws.com/",
