@@ -15,19 +15,23 @@ class PortfolioUrlService:
         self._portfolio_url_repository = portfolio_url_repository
         self._num_url_limit = 3
 
-    def create_portfolio_url(self, user_id: int, url: str) -> PortfolioUrlResponse:
-        if (
-            len(self._portfolio_url_repository.get_portfolio_urls(user_id))
-            >= self._num_url_limit
-        ):
+    def create_portfolio_url(self, user_id: int, url: str, term: str | None = None) -> PortfolioUrlResponse:
+        if term is not None:
+            num_portfolios = len(self._portfolio_url_repository.get_portfolio_urls_in_term(user_id, term))
+        else:
+            num_portfolios = len(self._portfolio_url_repository.get_portfolio_urls(user_id))
+        if num_portfolios >= self._num_url_limit:
             raise NumPortfolioUrlLimitException
         portfolio_url = self._portfolio_url_repository.create_portfolio_url(
             PortfolioUrl(user_id=user_id, url=url)
         )
         return PortfolioUrlResponse.from_orm(portfolio_url)
 
-    def list_portfolio_urls(self, user_id: int) -> list[PortfolioUrlResponse]:
-        portfolio_urls = self._portfolio_url_repository.get_portfolio_urls(user_id)
+    def list_portfolio_urls(self, user_id: int, term: str | None = None) -> list[PortfolioUrlResponse]:
+        if term is not None:
+            portfolio_urls = self._portfolio_url_repository.get_portfolio_urls_in_term(user_id, term)
+        else:
+            portfolio_urls = self._portfolio_url_repository.get_portfolio_urls(user_id)
         return [
             PortfolioUrlResponse.from_orm(portfolio_url)
             for portfolio_url in portfolio_urls
@@ -45,8 +49,11 @@ class PortfolioUrlService:
 
         self._portfolio_url_repository.delete_portfolio_url(portfolio_url_id)
 
-    def delete_all_portfolio_urls(self, user_id: int) -> None:
-        self._portfolio_url_repository.delete_all_portfolio_urls(user_id)
+    def delete_all_portfolio_urls(self, user_id: int, term: str | None = None) -> None:
+        if term is not None:
+            self._portfolio_url_repository.delete_all_portfolio_urls_in_term(user_id, term)
+        else:
+            self._portfolio_url_repository.delete_all_portfolio_urls(user_id)
 
     def get_all_applicant_user_ids(self) -> list[int]:
         return list(self._portfolio_url_repository.get_all_applicant_user_ids())
