@@ -36,10 +36,10 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: 3.11
-          cache: poetry
 
       - name: Set poetry environment & install dependencies
         run: |
+          poetry config virtualenvs.in-project true
           poetry env use 3.11
           poetry install --no-root
 
@@ -56,9 +56,12 @@ jobs:
           path: "./wacruit/test.xml"
           reporter: java-junit
 
-      - name: Check Pylint
+      # run pre-commit only different from base branch
+      # it contains pylint, black, isort, etc.
+      - name: Run pre-commit
         run: |
-          poetry run pylint -rn -sn --rcfile=${GITHUB_WORKSPACE}/.pylintrc ./wacruit
+          git fetch origin ${{ github.base_ref }}
+          poetry run pre-commit run --from-ref origin/${{ github.base_ref }} --to-ref HEAD
 
       - name: Run alembic migration test
         run: |
