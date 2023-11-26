@@ -7,6 +7,7 @@ Create Date: 2023-11-05 17:19:54.493755
 """
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.dialects import mysql
 
 # revision identifiers, used by Alembic.
 revision = "2603f3af2e99"
@@ -39,6 +40,12 @@ def upgrade() -> None:
     )
     op.add_column(
         "portfolio_url", sa.Column("generation", sa.String(length=255), nullable=True)
+    )
+    op.alter_column(
+        "portfolio_url",
+        "user_id",
+        existing_type=sa.Integer(),
+        nullable=False
     )
     # ### end Alembic commands ###
 
