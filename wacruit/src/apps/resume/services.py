@@ -110,7 +110,7 @@ class ResumeService:
     def withdraw_resume(self, user_id: int, recruiting_id: int) -> None:
         self.user_service.remove_sensitive_information(user_id)
         self.portfolio_file_service.delete_all_portfolios(user_id)
-        self.portfolio_url_service.delete_all_portfolio_urls(user_id)
+        self.portfolio_url_service.delete_all_portfolio_urls(user_id, recruiting_id)
         self.resume_repository.delete_resumes_by_user_recruiting_id(
             user_id, recruiting_id
         )
