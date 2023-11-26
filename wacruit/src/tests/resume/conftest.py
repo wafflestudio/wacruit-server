@@ -4,7 +4,7 @@ from datetime import timedelta
 import pytest
 from sqlalchemy.orm import Session
 
-from wacruit.src.apps.portfolio.file.services import PortfolioFileService
+from wacruit.src.apps.portfolio.file.services_v2 import PortfolioFileService
 from wacruit.src.apps.portfolio.url.repositories import PortfolioUrlRepository
 from wacruit.src.apps.portfolio.url.services import PortfolioUrlService
 from wacruit.src.apps.recruiting.models import Recruiting
