@@ -40,6 +40,7 @@ jobs:
 
       - name: Set poetry environment & install dependencies
         run: |
+          poetry config virtualenvs.in-project true
           poetry env use 3.11
           poetry install --no-root
 
