@@ -42,10 +42,7 @@ def upgrade() -> None:
         "portfolio_url", sa.Column("generation", sa.String(length=255), nullable=True)
     )
     op.alter_column(
-        "portfolio_url",
-        "user_id",
-        existing_type=sa.Integer(),
-        nullable=False
+        "portfolio_url", "user_id", existing_type=sa.Integer(), nullable=False
     )
     # ### end Alembic commands ###
 
