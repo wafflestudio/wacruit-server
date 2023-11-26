@@ -90,8 +90,14 @@ def portfolio_url_repository(db_session: Session):
 
 
 @pytest.fixture
-def portfolio_url_service(portfolio_url_repository: PortfolioUrlRepository, recruiting_repository: RecruitingRepository):
-    return PortfolioUrlService(portfolio_url_repository=portfolio_url_repository, recruiting_repository=recruiting_repository)
+def portfolio_url_service(
+    portfolio_url_repository: PortfolioUrlRepository,
+    recruiting_repository: RecruitingRepository,
+):
+    return PortfolioUrlService(
+        portfolio_url_repository=portfolio_url_repository,
+        recruiting_repository=recruiting_repository,
+    )
 
 
 @pytest.fixture
