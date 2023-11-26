@@ -41,9 +41,9 @@ def upgrade() -> None:
     op.add_column(
         "portfolio_url", sa.Column("generation", sa.String(length=255), nullable=True)
     )
-    op.drop_constraint("fk_portfolio_url_user_id", "portfolio_url", type_="foreignkey")
+    op.drop_constraint("portfolio_url_ibfk_2", "portfolio_url", type_="foreignkey")
     op.create_foreign_key(
-        op.f("fk_portfolio_url_user_id"),
+        op.f("portfolio_url_ibfk_2"),
         "portfolio_url",
         "user",
         ["user_id"],
