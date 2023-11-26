@@ -22,11 +22,13 @@ class PortfolioFileRepository:
         self.session = session
         self.transaction = transaction
 
-    def get_portfolio_files(self, user_id: int, term: str) -> Sequence[PortfolioFile]:
+    def get_portfolio_files(
+        self, user_id: int, generation: int
+    ) -> Sequence[PortfolioFile]:
         query = (
             select(PortfolioFile)
             .where(PortfolioFile.user_id == user_id)
-            .where(PortfolioFile.term == term)
+            .where(PortfolioFile.generation == generation)
         )
         return self.session.execute(query).scalars().all()
 
@@ -56,14 +58,3 @@ class PortfolioFileRepository:
             self.session.execute(
                 delete(PortfolioFile).where(PortfolioFile.user_id == user_id)
             )
-
-    def get_all_applicant_user_ids(self) -> Sequence[intpk]:
-        return (
-            self.session.execute(
-                select(PortfolioFile.user_id)
-                .where(PortfolioFile.user_id.isnot(None))
-                .distinct()
-            )
-            .scalars()
-            .all()
-        )

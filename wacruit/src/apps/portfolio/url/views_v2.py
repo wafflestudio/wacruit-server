@@ -27,7 +27,7 @@ def list_portfolio_urls(
     service: Annotated[PortfolioUrlService, fastapi.Depends()],
 ) -> ListResponse[PortfolioUrlResponse]:
     return ListResponse(
-        items=service.list_portfolio_urls(current_user.id, request.term)
+        items=service.list_portfolio_urls(current_user.id, request.generation)
     )
 
 
@@ -43,7 +43,9 @@ def register_portfolio_url(
     service: Annotated[PortfolioUrlService, fastapi.Depends()],
 ) -> PortfolioUrlResponse:
     response.headers["Access-Control-Allow-Origin"] = "*"
-    return service.create_portfolio_url(current_user.id, request.url, request.term)
+    return service.create_portfolio_url(
+        current_user.id, request.url, request.generation
+    )
 
 
 @v2_router.delete(

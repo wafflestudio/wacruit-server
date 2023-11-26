@@ -1,11 +1,12 @@
 from pydantic import BaseSettings
+from pydantic import Field
 
 from wacruit.src.secrets import AWSSecretManager
 from wacruit.src.settings import settings
 
 
 class S3PortfolioConfig(BaseSettings):
-    bucket_name: str = ""
+    bucket_name: str = Field(..., env="S3_PORTFOLIO_BUCKET_NAME")
 
     class Config:
         case_sensitive = False

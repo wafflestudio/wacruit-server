@@ -19,10 +19,11 @@ class PortfolioUrl(DeclarativeBase):
     user_id: Mapped[int | None] = mapped_column(
         ForeignKey("user.id", ondelete="SET NULL")
     )
-    term: Mapped[str255] = mapped_column(nullable=True)
+    generation: Mapped[int | None] = mapped_column(
+        ForeignKey("recruiting.id", ondelete="SET NULL")
+    )
     url: Mapped[str255] = mapped_column(nullable=False)
 
-    # user: Mapped["User"] = relationship(back_populates="portfolio_upload")
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=CURRENT_TIMESTAMP,

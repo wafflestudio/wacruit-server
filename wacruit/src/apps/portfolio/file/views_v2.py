@@ -9,7 +9,6 @@ from wacruit.src.apps.portfolio.file.exceptions import NumPortfolioLimitExceptio
 from wacruit.src.apps.portfolio.file.exceptions import PortfolioNotFoundException
 from wacruit.src.apps.portfolio.file.schemas import PortfolioFileRequest
 from wacruit.src.apps.portfolio.file.schemas import PortfolioFileResponse
-from wacruit.src.apps.portfolio.file.schemas import PortfolioNameResponse
 from wacruit.src.apps.portfolio.file.schemas import PortfolioRequest
 from wacruit.src.apps.portfolio.file.schemas import PresignedUrlResponse
 from wacruit.src.apps.portfolio.file.services_v2 import PortfolioFileService
@@ -27,7 +26,9 @@ def get_list_of_portfolios(
     request: PortfolioRequest,
     service: Annotated[PortfolioFileService, fastapi.Depends()],
 ) -> ListResponse[PortfolioFileResponse]:
-    portfolios = service.list_portfolios_from_db(current_user.id, term=request.term)
+    portfolios = service.list_portfolios_from_db(
+        current_user.id, generation=request.generation
+    )
     return ListResponse(items=portfolios)
 
 
@@ -59,24 +60,26 @@ def get_upload_portfolio_url(
     return service.get_presigned_url_for_post_portfolio(
         user_id=current_user.id,
         file_name=request.file_name,
-        term=request.term,
+        generation=request.generation,
     )
 
 
 @v2_router.get(
-    path="/url/check-upload-completed/",
+    path="/url/check-upload-completed/{portfolio_file_id}",
     responses=responses_from(NumPortfolioLimitException),
     status_code=HTTPStatus.OK,
 )
 def check_upload_portfolio_completed(
     current_user: CurrentUser,
+    portfolio_file_id: int,
     request: PortfolioFileRequest,
     service: Annotated[PortfolioFileService, fastapi.Depends()],
 ) -> PortfolioFileResponse:
     return service.register_portfolio_file_info_in_db(
         user_id=current_user.id,
+        portfolio_file_id=portfolio_file_id,
         file_name=request.file_name,
-        term=request.term,
+        generation=request.generation,
     )
 
 

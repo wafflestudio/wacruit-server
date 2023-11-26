@@ -1,26 +1,41 @@
+from typing import Annotated
+
 from fastapi import Depends
 
+from wacruit.src.apps.portfolio.url.exceptions import InValidGenerationException
 from wacruit.src.apps.portfolio.url.exceptions import NumPortfolioUrlLimitException
 from wacruit.src.apps.portfolio.url.exceptions import PortfolioUrlNotAuthorized
 from wacruit.src.apps.portfolio.url.exceptions import PortfolioUrlNotFound
 from wacruit.src.apps.portfolio.url.models import PortfolioUrl
 from wacruit.src.apps.portfolio.url.repositories import PortfolioUrlRepository
 from wacruit.src.apps.portfolio.url.schemas import PortfolioUrlResponse
+from wacruit.src.apps.recruiting.repositories import RecruitingRepository
 
 
 class PortfolioUrlService:
     def __init__(
-        self, portfolio_url_repository: PortfolioUrlRepository = Depends()
+        self,
+        portfolio_url_repository: Annotated[PortfolioUrlRepository, Depends()],
+        recruiting_repository: Annotated[RecruitingRepository, Depends()],
     ) -> None:
         self._portfolio_url_repository = portfolio_url_repository
+        self._recruiting_repository = recruiting_repository
         self._num_url_limit = 3
 
+    def _validate_generation(self, generation: int) -> None:
+        recruiting = self._recruiting_repository.get_recruiting_by_id(generation)
+        if (recruiting is None) or (not recruiting.is_active):
+            raise InValidGenerationException
+
     def create_portfolio_url(
-        self, user_id: int, url: str, term: str | None = None
+        self, user_id: int, url: str, generation: int | None = None
     ) -> PortfolioUrlResponse:
-        if term is not None:
+        if generation is not None:
+            self._validate_generation(generation)
             num_portfolios = len(
-                self._portfolio_url_repository.get_portfolio_urls_in_term(user_id, term)
+                self._portfolio_url_repository.get_portfolio_urls_in_generation(
+                    user_id, generation
+                )
             )
         else:
             num_portfolios = len(
@@ -29,16 +44,19 @@ class PortfolioUrlService:
         if num_portfolios >= self._num_url_limit:
             raise NumPortfolioUrlLimitException
         portfolio_url = self._portfolio_url_repository.create_portfolio_url(
-            PortfolioUrl(user_id=user_id, url=url, term=term)
+            PortfolioUrl(user_id=user_id, url=url, generation=generation)
         )
         return PortfolioUrlResponse.from_orm(portfolio_url)
 
     def list_portfolio_urls(
-        self, user_id: int, term: str | None = None
+        self, user_id: int, generation: int | None = None
     ) -> list[PortfolioUrlResponse]:
-        if term is not None:
-            portfolio_urls = self._portfolio_url_repository.get_portfolio_urls_in_term(
-                user_id, term
+        if generation is not None:
+            self._validate_generation(generation)
+            portfolio_urls = (
+                self._portfolio_url_repository.get_portfolio_urls_in_generation(
+                    user_id, generation
+                )
             )
         else:
             portfolio_urls = self._portfolio_url_repository.get_portfolio_urls(user_id)
@@ -59,10 +77,13 @@ class PortfolioUrlService:
 
         self._portfolio_url_repository.delete_portfolio_url(portfolio_url_id)
 
-    def delete_all_portfolio_urls(self, user_id: int, term: str | None = None) -> None:
-        if term is not None:
-            self._portfolio_url_repository.delete_all_portfolio_urls_in_term(
-                user_id, term
+    def delete_all_portfolio_urls(
+        self, user_id: int, generation: int | None = None
+    ) -> None:
+        if generation is not None:
+            self._validate_generation(generation)
+            self._portfolio_url_repository.delete_all_portfolio_urls_in_generation(
+                user_id, generation
             )
         else:
             self._portfolio_url_repository.delete_all_portfolio_urls(user_id)

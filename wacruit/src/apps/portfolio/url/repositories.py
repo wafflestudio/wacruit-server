@@ -26,13 +26,13 @@ class PortfolioUrlRepository:
         query = select(PortfolioUrl).where(PortfolioUrl.user_id == user_id)
         return self.session.execute(query).scalars().all()
 
-    def get_portfolio_urls_in_term(
-        self, user_id: int, term: str
+    def get_portfolio_urls_in_generation(
+        self, user_id: int, generation: int
     ) -> Sequence[PortfolioUrl]:
         query = (
             select(PortfolioUrl)
             .where(PortfolioUrl.user_id == user_id)
-            .where(PortfolioUrl.term == term)
+            .where(PortfolioUrl.generation == generation)
         )
         return self.session.execute(query).scalars().all()
 
@@ -63,12 +63,14 @@ class PortfolioUrlRepository:
                 delete(PortfolioUrl).where(PortfolioUrl.user_id == user_id)
             )
 
-    def delete_all_portfolio_urls_in_term(self, user_id: int, term: str) -> None:
+    def delete_all_portfolio_urls_in_generation(
+        self, user_id: int, generation: int
+    ) -> None:
         with self.transaction:
             self.session.execute(
                 delete(PortfolioUrl)
                 .where(PortfolioUrl.user_id == user_id)
-                .where(PortfolioUrl.term == term)
+                .where(PortfolioUrl.generation == generation)
             )
 
     def get_all_applicant_user_ids(self) -> Sequence[intpk]:
