@@ -21,8 +21,9 @@ def upgrade() -> None:
         "portfolio_file",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("user_id", sa.Integer(), nullable=False),
-        sa.Column("generation", sa.String(length=255), nullable=False),
+        sa.Column("generation", sa.Integer(), nullable=False),
         sa.Column("file_name", sa.String(length=255), nullable=False),
+        sa.Column("is_uploaded", sa.Boolean(), nullable=False),
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),
