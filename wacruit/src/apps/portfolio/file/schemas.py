@@ -5,13 +5,12 @@ from wacruit.src.apps.common.schemas import OrmModel
 
 class PortfolioNameResponse(BaseModel):
     portfolio_name: str
-    generation: str | None = None
 
 
 class PortfolioFileResponse(OrmModel):
     id: int
     file_name: str
-    generation: int | None = None
+    generation: int
     is_uploaded: bool = False
 
 
@@ -27,5 +26,5 @@ class PortfolioRequest(BaseModel):
 
 
 class PortfolioFileRequest(BaseModel):
-    generation: int | None = None
-    file_name: str | None = None
+    generation: int
+    file_name: str
