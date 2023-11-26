@@ -91,7 +91,9 @@ class PortfolioFileService(LoggingMixin):
             },
             expires_in=_10_MIN,
         )
-        return PresignedUrlResponse(object_name=object_name, presigned_url=url, fields={})
+        return PresignedUrlResponse(
+            object_name=object_name, presigned_url=url, fields={}
+        )
 
     def get_presigned_url_for_post_portfolio(
         self,
