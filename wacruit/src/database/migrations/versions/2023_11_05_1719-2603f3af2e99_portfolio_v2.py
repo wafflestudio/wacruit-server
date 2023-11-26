@@ -41,8 +41,14 @@ def upgrade() -> None:
     op.add_column(
         "portfolio_url", sa.Column("generation", sa.String(length=255), nullable=True)
     )
-    op.alter_column(
-        "portfolio_url", "user_id", existing_type=sa.Integer(), nullable=False
+    op.drop_constraint("fk_portfolio_url_user_id", "portfolio_url", type_="foreignkey")
+    op.create_foreign_key(
+        op.f("fk_portfolio_url_user_id"),
+        "portfolio_url",
+        "user",
+        ["user_id"],
+        ["id"],
+        ondelete="CASCADE",
     )
     # ### end Alembic commands ###
 
