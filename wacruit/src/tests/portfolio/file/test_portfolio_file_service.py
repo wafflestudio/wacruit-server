@@ -3,7 +3,7 @@ import pytest
 
 from wacruit.src.apps.portfolio.file.exceptions import NumPortfolioLimitException
 from wacruit.src.apps.portfolio.file.schemas import PortfolioFileResponse
-from wacruit.src.apps.portfolio.file.schemas import PresignedUrlResponse
+from wacruit.src.apps.portfolio.file.schemas import PresignedUrlWithIdResponse
 from wacruit.src.apps.portfolio.file.services_v2 import PortfolioFileService
 from wacruit.src.apps.recruiting.models import Recruiting
 from wacruit.src.apps.user.models import User
@@ -19,7 +19,7 @@ def test_get_upload_portfolio_file_v2(
         file_name="test1.pdf",
         generation=recruiting1.id,
     )
-    expected = PresignedUrlResponse(
+    expected = PresignedUrlWithIdResponse(
         object_name=f"{recruiting1.id}/{user1.id}/test1.pdf",
         presigned_url="https://wacruit-portfolio-test.s3.amazonaws.com/",
         fields={
