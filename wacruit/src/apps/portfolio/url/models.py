@@ -17,10 +17,10 @@ class PortfolioUrl(DeclarativeBase):
 
     id: Mapped[intpk]
     user_id: Mapped[int | None] = mapped_column(
-        ForeignKey("user.id", ondelete="SET NULL")
+        ForeignKey("user.id", ondelete="CASCADE")
     )
     generation: Mapped[int | None] = mapped_column(
-        ForeignKey("recruiting.id", ondelete="SET NULL")
+        ForeignKey("recruiting.id", ondelete="CASCADE")
     )
     url: Mapped[str255] = mapped_column(nullable=False)
 

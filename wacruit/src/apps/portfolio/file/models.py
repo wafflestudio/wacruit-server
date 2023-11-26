@@ -17,10 +17,10 @@ class PortfolioFile(DeclarativeBase):
 
     id: Mapped[intpk]
     user_id: Mapped[int | None] = mapped_column(
-        ForeignKey("user.id", ondelete="SET NULL")
+        ForeignKey("user.id", ondelete="CASCADE")
     )
     generation: Mapped[int | None] = mapped_column(
-        ForeignKey("recruiting.id", ondelete="SET NULL")
+        ForeignKey("recruiting.id", ondelete="CASCADE")
     )
     file_name: Mapped[str255] = mapped_column(nullable=False)
     is_uploaded: Mapped[bool] = mapped_column(nullable=False, default=False)

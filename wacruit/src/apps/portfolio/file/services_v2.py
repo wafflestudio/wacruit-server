@@ -64,7 +64,7 @@ class PortfolioFileService(LoggingMixin):
         self,
         user_id: int,
         file_name: str,
-        generation: int | None = None,
+        generation: int,
     ) -> None:
         if file_name not in self._get_portfolio_list(user_id, generation):
             raise PortfolioNotFoundException
@@ -96,7 +96,7 @@ class PortfolioFileService(LoggingMixin):
         self,
         user_id: int,
         file_name: str,
-        generation: int | None = None,
+        generation: int,
     ) -> PresignedUrlResponse:
         self._validate_generation(generation)
         self._check_portfolio_limit(user_id, generation)
@@ -189,7 +189,7 @@ class PortfolioFileService(LoggingMixin):
     def delete_portfolio(
         self,
         user_id: int,
-        portfolio_file_id: int | None = None,
+        portfolio_file_id: int,
     ) -> None:
         portfolio_file = self._portfolio_file_repository.get_portfolio_file_by_id(
             portfolio_file_id
