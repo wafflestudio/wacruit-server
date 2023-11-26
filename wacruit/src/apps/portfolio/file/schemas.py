@@ -17,13 +17,13 @@ class PortfolioFileResponse(OrmModel):
 class PresignedUrlResponse(BaseModel):
     object_name: str
     presigned_url: str
-    fields: dict[str, str] | None = None
+    fields: dict[str, str]
 
 
 class PresignedUrlWithIdResponse(BaseModel):
     object_name: str
     presigned_url: str
-    fields: dict[str, str] | None = None
+    fields: dict[str, str]
     portfolio_file_id: int
 
 
