@@ -15,6 +15,7 @@ from wacruit.src.apps.portfolio.file.exceptions import PortfolioNotFoundExceptio
 from wacruit.src.apps.portfolio.file.models import PortfolioFile
 from wacruit.src.apps.portfolio.file.repositories import PortfolioFileRepository
 from wacruit.src.apps.portfolio.file.schemas import PortfolioFileResponse
+from wacruit.src.apps.portfolio.file.schemas import PresignedUrlIdResponse
 from wacruit.src.apps.portfolio.file.schemas import PresignedUrlResponse
 from wacruit.src.apps.recruiting.repositories import RecruitingRepository
 from wacruit.src.utils.mixins import LoggingMixin
@@ -97,7 +98,7 @@ class PortfolioFileService(LoggingMixin):
         user_id: int,
         file_name: str,
         generation: int,
-    ) -> PresignedUrlResponse:
+    ) -> PresignedUrlIdResponse:
         self._validate_generation(generation)
         self._check_portfolio_limit(user_id, generation)
         object_name = PortfolioFileService.get_portfolio_object_name(
@@ -124,7 +125,7 @@ class PortfolioFileService(LoggingMixin):
                 generation=generation,
             )
         )
-        return PresignedUrlResponse(
+        return PresignedUrlIdResponse(
             object_name=object_name,
             presigned_url=url,
             fields=fields,

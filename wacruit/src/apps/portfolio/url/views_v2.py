@@ -58,7 +58,7 @@ def delete_portfolio_url(
     portfolio_url_id: int,
     service: Annotated[PortfolioUrlService, fastapi.Depends()],
 ) -> None:
-    return service.delete_portfolio_url(current_user.id, portfolio_url_id)
+    return service.delete_all_portfolio_urls(current_user.id, portfolio_url_id)
 
 
 @v2_router.put(

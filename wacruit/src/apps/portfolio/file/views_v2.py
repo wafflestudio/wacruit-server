@@ -11,6 +11,7 @@ from wacruit.src.apps.portfolio.file.schemas import PortfolioFileRequest
 from wacruit.src.apps.portfolio.file.schemas import PortfolioFileResponse
 from wacruit.src.apps.portfolio.file.schemas import PortfolioRequest
 from wacruit.src.apps.portfolio.file.schemas import PresignedUrlResponse
+from wacruit.src.apps.portfolio.file.schemas import PresignedUrlWithIdResponse
 from wacruit.src.apps.portfolio.file.services_v2 import PortfolioFileService
 from wacruit.src.apps.user.dependencies import CurrentUser
 
@@ -56,7 +57,7 @@ def get_upload_portfolio_url(
     current_user: CurrentUser,
     request: PortfolioFileRequest,
     service: Annotated[PortfolioFileService, fastapi.Depends()],
-) -> PresignedUrlResponse:
+) -> PresignedUrlWithIdResponse:
     return service.get_presigned_url_for_post_portfolio(
         user_id=current_user.id,
         file_name=request.file_name,

@@ -18,7 +18,13 @@ class PresignedUrlResponse(BaseModel):
     object_name: str
     presigned_url: str
     fields: dict[str, str] | None = None
-    portfolio_file_id: int | None = None
+
+
+class PresignedUrlWithIdResponse(BaseModel):
+    object_name: str
+    presigned_url: str
+    fields: dict[str, str] | None = None
+    portfolio_file_id: int
 
 
 class PortfolioRequest(BaseModel):
