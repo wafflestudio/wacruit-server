@@ -76,7 +76,7 @@ def test_withdraw_resume(
     resume_questions: list[ResumeQuestion],
 ):
     mock_file_delete = mocker.patch(
-        "wacruit.src.apps.portfolio.file.services"
+        "wacruit.src.apps.portfolio.file.services_v2"
         ".PortfolioFileService.delete_all_portfolios"
     )
     # user updated with university, github_email, slack_email
