@@ -22,8 +22,8 @@ class PortfolioUrlService:
         self._recruiting_repository = recruiting_repository
         self._num_url_limit = 3
 
-    def _validate_generation(self, generation: int) -> None:
-        recruiting = self._recruiting_repository.get_recruiting_by_id(generation)
+    def _validate_recruiting_id(self, recruiting_id: int) -> None:
+        recruiting = self._recruiting_repository.get_recruiting_by_id(recruiting_id)
         if (recruiting is None) or (not recruiting.is_active):
             raise InValidGenerationException
 
@@ -31,28 +31,28 @@ class PortfolioUrlService:
         self,
         user_id: int,
         url: str,
-        generation: int,
+        recruiting_id: int,
     ) -> PortfolioUrlResponse:
-        self._validate_generation(generation)
+        self._validate_recruiting_id(recruiting_id)
         num_portfolios = len(
-            self._portfolio_url_repository.get_portfolio_urls_in_generation(
-                user_id, generation
+            self._portfolio_url_repository.get_portfolio_urls_in_recruiting_id(
+                user_id, recruiting_id
             )
         )
         if num_portfolios >= self._num_url_limit:
             raise NumPortfolioUrlLimitException
         portfolio_url = self._portfolio_url_repository.create_portfolio_url(
-            PortfolioUrl(user_id=user_id, url=url, generation=generation)
+            PortfolioUrl(user_id=user_id, url=url, recruiting_id=recruiting_id)
         )
         return PortfolioUrlResponse.from_orm(portfolio_url)
 
     def list_portfolio_urls(
-        self, user_id: int, generation: int
+        self, user_id: int, recruiting_id: int
     ) -> list[PortfolioUrlResponse]:
-        self._validate_generation(generation)
+        self._validate_recruiting_id(recruiting_id)
         portfolio_urls = (
-            self._portfolio_url_repository.get_portfolio_urls_in_generation(
-                user_id, generation
+            self._portfolio_url_repository.get_portfolio_urls_in_recruiting_id(
+                user_id, recruiting_id
             )
         )
         return [
@@ -72,10 +72,10 @@ class PortfolioUrlService:
 
         self._portfolio_url_repository.delete_portfolio_url(portfolio_url_id)
 
-    def delete_all_portfolio_urls(self, user_id: int, generation: int) -> None:
-        self._validate_generation(generation)
-        self._portfolio_url_repository.delete_all_portfolio_urls_in_generation(
-            user_id, generation
+    def delete_all_portfolio_urls(self, user_id: int, recruiting_id: int) -> None:
+        self._validate_recruiting_id(recruiting_id)
+        self._portfolio_url_repository.delete_all_portfolio_urls_in_recruiting_id(
+            user_id, recruiting_id
         )
 
     def get_all_applicant_user_ids(self) -> list[int]:

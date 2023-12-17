@@ -7,13 +7,13 @@ from wacruit.src.database.base import str255
 class PortfolioUrlResponse(OrmModel):
     id: int
     url: str255
-    generation: int
+    recruiting_id: int
 
 
 class PortfolioUrlRequest(BaseModel):
     url: str255
-    generation: int
+    recruiting_id: int
 
 
 class PortfolioRequest(BaseModel):
-    generation: int
+    recruiting_id: int

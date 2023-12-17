@@ -23,12 +23,12 @@ class PortfolioFileRepository:
         self.transaction = transaction
 
     def get_portfolio_files(
-        self, user_id: int, generation: int
+        self, user_id: int, recruiting_id: int
     ) -> Sequence[PortfolioFile]:
         query = (
             select(PortfolioFile)
             .where(PortfolioFile.user_id == user_id)
-            .where(PortfolioFile.generation == generation)
+            .where(PortfolioFile.recruiting_id == recruiting_id)
         )
         return self.session.execute(query).scalars().all()
 

@@ -39,24 +39,24 @@ class PortfolioFileService(LoggingMixin):
         self._num_portfolio_limit = 1
 
     @staticmethod
-    def get_portfolio_object_name(user_id: int, file_name: str, generation: int) -> str:
-        return f"{generation}/{user_id}/{file_name}"
+    def get_portfolio_object_name(user_id: int, file_name: str, recruiting_id: int) -> str:
+        return f"{recruiting_id}/{user_id}/{file_name}"
 
-    def _validate_generation(self, generation: int) -> None:
-        recruiting = self._recruiting_repository.get_recruiting_by_id(generation)
+    def _validate_recruiting_id(self, recruiting_id: int) -> None:
+        recruiting = self._recruiting_repository.get_recruiting_by_id(recruiting_id)
         if (recruiting is None) or (not recruiting.is_active):
             raise InValidGenerationException
 
-    def _get_portfolio_list(self, user_id: int, generation: int) -> list[str]:
+    def _get_portfolio_list(self, user_id: int, recruiting_id: int) -> list[str]:
         portfolios = self._portfolio_file_repository.get_portfolio_files(
             user_id=user_id,
-            generation=generation,
+            recruiting_id=recruiting_id,
         )
         return [portfolio.file_name for portfolio in portfolios]
 
-    def _check_portfolio_limit(self, user_id: int, generation: int) -> None:
+    def _check_portfolio_limit(self, user_id: int, recruiting_id: int) -> None:
         if (
-            len(self._get_portfolio_list(user_id, generation))
+            len(self._get_portfolio_list(user_id, recruiting_id))
             > self._num_portfolio_limit - 1
         ):
             raise NumPortfolioLimitException
@@ -65,9 +65,9 @@ class PortfolioFileService(LoggingMixin):
         self,
         user_id: int,
         file_name: str,
-        generation: int,
+        recruiting_id: int,
     ) -> None:
-        if file_name not in self._get_portfolio_list(user_id, generation):
+        if file_name not in self._get_portfolio_list(user_id, recruiting_id):
             raise PortfolioNotFoundException
 
     def get_presigned_url_for_get_portfolio(
@@ -77,10 +77,10 @@ class PortfolioFileService(LoggingMixin):
             portfolio_file_id
         )
         self._check_portfolio_object_exist(
-            user_id, portfolio_file_info.file_name, portfolio_file_info.generation
+            user_id, portfolio_file_info.file_name, portfolio_file_info.recruiting_id
         )
         object_name = PortfolioFileService.get_portfolio_object_name(
-            user_id, portfolio_file_info.file_name, portfolio_file_info.generation
+            user_id, portfolio_file_info.file_name, portfolio_file_info.recruiting_id
         )
         url = generate_presigned_url(
             s3_client=self._s3_client.client,
@@ -99,12 +99,12 @@ class PortfolioFileService(LoggingMixin):
         self,
         user_id: int,
         file_name: str,
-        generation: int,
+        recruiting_id: int,
     ) -> PresignedUrlWithIdResponse:
-        self._validate_generation(generation)
-        self._check_portfolio_limit(user_id, generation)
+        self._validate_recruiting_id(recruiting_id)
+        self._check_portfolio_limit(user_id, recruiting_id)
         object_name = PortfolioFileService.get_portfolio_object_name(
-            user_id, file_name, generation
+            user_id, file_name, recruiting_id
         )
         # Note: Check AWS Docs for more info
         # https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-HTTPPOSTConstructPolicy.html
@@ -124,7 +124,7 @@ class PortfolioFileService(LoggingMixin):
             PortfolioFile(
                 user_id=user_id,
                 file_name=file_name,
-                generation=generation,
+                recruiting_id=recruiting_id,
             )
         )
         return PresignedUrlWithIdResponse(
@@ -137,12 +137,12 @@ class PortfolioFileService(LoggingMixin):
     def list_portfolios_from_db(
         self,
         user_id: int,
-        generation: int,
+        recruiting_id: int,
     ) -> list[PortfolioFileResponse]:
-        self._validate_generation(generation)
+        self._validate_recruiting_id(recruiting_id)
         portfolio_files = self._portfolio_file_repository.get_portfolio_files(
             user_id=user_id,
-            generation=generation,
+            recruiting_id=recruiting_id,
         )
         return [
             PortfolioFileResponse.from_orm(portfolio_file)
@@ -154,15 +154,15 @@ class PortfolioFileService(LoggingMixin):
         user_id: int,
         portfolio_file_id: int,
         file_name: str,
-        generation: int,
+        recruiting_id: int,
     ) -> PortfolioFileResponse:
-        self._validate_generation(generation)
+        self._validate_recruiting_id(recruiting_id)
         portfolio_file = self._portfolio_file_repository.update_portfolio_file(
             PortfolioFile(
                 id=portfolio_file_id,
                 user_id=user_id,
                 file_name=file_name,
-                generation=generation,
+                recruiting_id=recruiting_id,
                 is_uploaded=True,
             )
         )
@@ -183,7 +183,7 @@ class PortfolioFileService(LoggingMixin):
                 id=portfolio_file_id,
                 user_id=user_id,
                 file_name=new_file_name,
-                generation=portfolio_file.generation,
+                recruiting_id=portfolio_file.recruiting_id,
                 is_uploaded=True,
             )
         )
@@ -198,10 +198,10 @@ class PortfolioFileService(LoggingMixin):
             portfolio_file_id
         )
         self._check_portfolio_object_exist(
-            user_id, portfolio_file.file_name, portfolio_file.generation
+            user_id, portfolio_file.file_name, portfolio_file.recruiting_id
         )
         object_name = PortfolioFileService.get_portfolio_object_name(
-            user_id, portfolio_file.file_name, portfolio_file.generation
+            user_id, portfolio_file.file_name, portfolio_file.recruiting_id
         )
         delete_object(self._s3_client.client, self._s3_config.bucket_name, object_name)
         self._portfolio_file_repository.delete_portfolio_file(portfolio_file_id)

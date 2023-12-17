@@ -18,35 +18,35 @@ def test_create_portfolio_url(
     response = portfolio_url_service.create_portfolio_url(
         user_id=user1.id,
         url="https://test1.com",
-        generation=recruiting1.id,
+        recruiting_id=recruiting1.id,
     )
     expected = PortfolioUrlResponse(
         id=response.id,
         url="https://test1.com",
-        generation=recruiting1.id,
+        recruiting_id=recruiting1.id,
     )
     assert response == expected
 
     portfolio_url_service.create_portfolio_url(
         user_id=user1.id,
         url="https://test2.com",
-        generation=recruiting1.id,
+        recruiting_id=recruiting1.id,
     )
     portfolio_url_service.create_portfolio_url(
         user_id=user1.id,
         url="https://test3.com",
-        generation=recruiting1.id,
+        recruiting_id=recruiting1.id,
     )
     with pytest.raises(NumPortfolioUrlLimitException):
         portfolio_url_service.create_portfolio_url(
             user_id=user1.id,
             url="https://test4.com",
-            generation=recruiting1.id,
+            recruiting_id=recruiting1.id,
         )
     portfolio_url_service.create_portfolio_url(
         user_id=user1.id,
         url="https://test3.com",
-        generation=recruiting2.id,
+        recruiting_id=recruiting2.id,
     )
 
 
@@ -60,38 +60,38 @@ def test_list_portfolio_urls(
     portfolio1 = portfolio_url_service.create_portfolio_url(
         user_id=user1.id,
         url="https://test1.com",
-        generation=recruiting1.id,
+        recruiting_id=recruiting1.id,
     )
     portfolio2 = portfolio_url_service.create_portfolio_url(
         user_id=user1.id,
         url="https://test2.com",
-        generation=recruiting2.id,
+        recruiting_id=recruiting2.id,
     )
     portfolio3 = portfolio_url_service.create_portfolio_url(
         user_id=user2.id,
         url="https://test3.com",
-        generation=recruiting2.id,
+        recruiting_id=recruiting2.id,
     )
     response = portfolio_url_service.list_portfolio_urls(
-        user_id=user1.id, generation=recruiting1.id
+        user_id=user1.id, recruiting_id=recruiting1.id
     )
     expected = [
         PortfolioUrlResponse(
             id=portfolio1.id,
             url="https://test1.com",
-            generation=recruiting1.id,
+            recruiting_id=recruiting1.id,
         ),
     ]
     assert response == expected
 
     response = portfolio_url_service.list_portfolio_urls(
-        user_id=user2.id, generation=recruiting2.id
+        user_id=user2.id, recruiting_id=recruiting2.id
     )
     expected = [
         PortfolioUrlResponse(
             id=portfolio3.id,
             url="https://test3.com",
-            generation=recruiting2.id,
+            recruiting_id=recruiting2.id,
         ),
     ]
     assert response == expected
@@ -106,19 +106,19 @@ def test_delete_portfolio_url(
     portfolio1 = portfolio_url_service.create_portfolio_url(
         user_id=user1.id,
         url="https://test1.com",
-        generation=recruiting1.id,
+        recruiting_id=recruiting1.id,
     )
     portfolio2 = portfolio_url_service.create_portfolio_url(
         user_id=user2.id,
         url="https://test2.com",
-        generation=recruiting1.id,
+        recruiting_id=recruiting1.id,
     )
     portfolio_url_service.delete_portfolio_url(
         user_id=user1.id,
         portfolio_url_id=portfolio1.id,
     )
     response = portfolio_url_service.list_portfolio_urls(
-        user_id=user1.id, generation=recruiting1.id
+        user_id=user1.id, recruiting_id=recruiting1.id
     )
     expected = []
     assert response == expected
@@ -143,20 +143,20 @@ def test_delete_all_portfolio_urls(
     portfolio_url_service.create_portfolio_url(
         user_id=user1.id,
         url="https://test1.com",
-        generation=recruiting1.id,
+        recruiting_id=recruiting1.id,
     )
 
     portfolio_url_service.create_portfolio_url(
         user_id=user1.id,
         url="https://test2.com",
-        generation=recruiting1.id,
+        recruiting_id=recruiting1.id,
     )
 
     portfolio_url_service.delete_all_portfolio_urls(
-        user_id=user1.id, generation=recruiting1.id
+        user_id=user1.id, recruiting_id=recruiting1.id
     )
     response = portfolio_url_service.list_portfolio_urls(
-        user_id=user1.id, generation=recruiting1.id
+        user_id=user1.id, recruiting_id=recruiting1.id
     )
     expected = []
     assert response == expected
@@ -171,12 +171,12 @@ def test_update_portfolio_url(
     portfolio1 = portfolio_url_service.create_portfolio_url(
         user_id=user1.id,
         url="https://test1.com",
-        generation=recruiting1.id,
+        recruiting_id=recruiting1.id,
     )
     portfolio2 = portfolio_url_service.create_portfolio_url(
         user_id=user2.id,
         url="https://test2.com",
-        generation=recruiting1.id,
+        recruiting_id=recruiting1.id,
     )
     portfolio_url_service.update_portfolio_url(
         user_id=user1.id,
@@ -184,13 +184,13 @@ def test_update_portfolio_url(
         url="https://test3.com",
     )
     response = portfolio_url_service.list_portfolio_urls(
-        user_id=user1.id, generation=recruiting1.id
+        user_id=user1.id, recruiting_id=recruiting1.id
     )
     expected = [
         PortfolioUrlResponse(
             id=portfolio1.id,
             url="https://test3.com",
-            generation=recruiting1.id,
+            recruiting_id=recruiting1.id,
         ),
     ]
     assert response == expected

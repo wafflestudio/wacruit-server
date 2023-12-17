@@ -10,7 +10,7 @@ class PortfolioNameResponse(BaseModel):
 class PortfolioFileResponse(OrmModel):
     id: int
     file_name: str
-    generation: int
+    recruiting_id: int
     is_uploaded: bool = False
 
 
@@ -28,9 +28,9 @@ class PresignedUrlWithIdResponse(BaseModel):
 
 
 class PortfolioRequest(BaseModel):
-    generation: int
+    recruiting_id: int
 
 
 class PortfolioFileRequest(BaseModel):
-    generation: int
+    recruiting_id: int
     file_name: str

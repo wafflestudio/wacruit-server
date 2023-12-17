@@ -28,7 +28,7 @@ def get_list_of_portfolios(
     service: Annotated[PortfolioFileService, fastapi.Depends()],
 ) -> ListResponse[PortfolioFileResponse]:
     portfolios = service.list_portfolios_from_db(
-        current_user.id, generation=request.generation
+        current_user.id, recruiting_id=request.recruiting_id
     )
     return ListResponse(items=portfolios)
 
@@ -61,7 +61,7 @@ def get_upload_portfolio_url(
     return service.get_presigned_url_for_post_portfolio(
         user_id=current_user.id,
         file_name=request.file_name,
-        generation=request.generation,
+        recruiting_id=request.recruiting_id,
     )
 
 
@@ -80,7 +80,7 @@ def check_upload_portfolio_completed(
         user_id=current_user.id,
         portfolio_file_id=portfolio_file_id,
         file_name=request.file_name,
-        generation=request.generation,
+        recruiting_id=request.recruiting_id,
     )
 
 
