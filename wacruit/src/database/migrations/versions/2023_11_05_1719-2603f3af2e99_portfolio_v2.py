@@ -39,7 +39,8 @@ def upgrade() -> None:
         ),
     )
     op.add_column(
-        "portfolio_url", sa.Column("recruiting_id", sa.String(length=255), nullable=True)
+        "portfolio_url",
+        sa.Column("recruiting_id", sa.String(length=255), nullable=True),
     )
     op.drop_constraint("portfolio_url_ibfk_1", "portfolio_url", type_="foreignkey")
     op.create_foreign_key(

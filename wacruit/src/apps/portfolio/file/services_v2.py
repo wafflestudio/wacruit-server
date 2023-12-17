@@ -39,7 +39,9 @@ class PortfolioFileService(LoggingMixin):
         self._num_portfolio_limit = 1
 
     @staticmethod
-    def get_portfolio_object_name(user_id: int, file_name: str, recruiting_id: int) -> str:
+    def get_portfolio_object_name(
+        user_id: int, file_name: str, recruiting_id: int
+    ) -> str:
         return f"{recruiting_id}/{user_id}/{file_name}"
 
     def _validate_recruiting_id(self, recruiting_id: int) -> None:
