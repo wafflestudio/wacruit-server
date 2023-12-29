@@ -51,7 +51,12 @@ def upgrade() -> None:
     )
     op.drop_constraint("portfolio_url_ibfk_1", "portfolio_url", type_="foreignkey")
     op.create_foreign_key(
-        "portfolio_url_ibfk_1", "portfolio_url", "user", ["user_id"], ["id"], ondelete="CASCADE"
+        "portfolio_url_ibfk_1",
+        "portfolio_url",
+        "user",
+        ["user_id"],
+        ["id"],
+        ondelete="CASCADE",
     )
     op.create_foreign_key(
         "portfolio_url_ibfk_2",
