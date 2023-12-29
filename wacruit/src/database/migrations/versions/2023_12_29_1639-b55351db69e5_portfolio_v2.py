@@ -1,4 +1,4 @@
-"""empty message
+"""Portfolio v2
 
 Revision ID: b55351db69e5
 Revises: d8d10f453a15
@@ -46,6 +46,16 @@ def upgrade() -> None:
     op.add_column(
         "portfolio_url", sa.Column("recruiting_id", sa.Integer(), nullable=False)
     )
+    # 21.5기 디자이너 리크루팅 id
+    op.execute("UPDATE portfolio_url SET recruiting_id = 2")
+    op.create_foreign_key(
+        "portfolio_url_ibfk_2",
+        "portfolio_url",
+        "recruiting",
+        ["recruiting_id"],
+        ["id"],
+        ondelete="CASCADE",
+    )
     op.alter_column(
         "portfolio_url", "user_id", existing_type=mysql.INTEGER(), nullable=False
     )
@@ -55,14 +65,6 @@ def upgrade() -> None:
         "portfolio_url",
         "user",
         ["user_id"],
-        ["id"],
-        ondelete="CASCADE",
-    )
-    op.create_foreign_key(
-        "portfolio_url_ibfk_2",
-        "portfolio_url",
-        "recruiting",
-        ["recruiting_id"],
         ["id"],
         ondelete="CASCADE",
     )
