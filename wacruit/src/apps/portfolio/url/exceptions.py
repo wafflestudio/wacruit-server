@@ -14,3 +14,8 @@ class PortfolioUrlNotAuthorized(WacruitException):
 class PortfolioUrlNotFound(WacruitException):
     def __init__(self):
         super().__init__(status_code=404, detail="존재하지 않는 URL입니다.")
+
+
+class InValidGenerationException(WacruitException):
+    def __init__(self):
+        super().__init__(status_code=404, detail="유효하지 않은 기수입니다.")

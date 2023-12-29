@@ -1,11 +1,13 @@
 from datetime import datetime
 from datetime import timedelta
 
+import boto3
+import moto
 import pytest
 from sqlalchemy.orm import Session
 
-from wacruit.src.apps.portfolio.url.repositories import PortfolioUrlRepository
-from wacruit.src.apps.portfolio.url.services import PortfolioUrlService
+from wacruit.src.apps.portfolio.file.repositories import PortfolioFileRepository
+from wacruit.src.apps.portfolio.file.services_v2 import PortfolioFileService
 from wacruit.src.apps.recruiting.models import Recruiting
 from wacruit.src.apps.recruiting.repositories import RecruitingRepository
 from wacruit.src.apps.user.models import User
@@ -27,21 +29,6 @@ def user1(db_session: Session) -> User:
     db_session.add(user1)
     db_session.commit()
     return user1
-
-
-@pytest.fixture
-def user2(db_session: Session) -> User:
-    user2 = User(
-        sso_id="abcdef222",
-        first_name="Test2",
-        last_name="User2",
-        phone_number="020-2222-2222",
-        email="example2@email.com",
-        is_admin=False,
-    )
-    db_session.add(user2)
-    db_session.commit()
-    return user2
 
 
 @pytest.fixture
@@ -88,18 +75,24 @@ def recruiting_repository(db_session: Session) -> RecruitingRepository:
 
 
 @pytest.fixture
-def portfolio_url_repository(db_session: Session):
-    return PortfolioUrlRepository(
+def portfolio_file_repository(db_session: Session):
+    return PortfolioFileRepository(
         session=db_session, transaction=Transaction(db_session)
     )
 
 
 @pytest.fixture
-def portfolio_url_service(
-    portfolio_url_repository: PortfolioUrlRepository,
+@moto.mock_s3
+def portfolio_file_service(
+    portfolio_file_repository: PortfolioFileRepository,
     recruiting_repository: RecruitingRepository,
 ):
-    return PortfolioUrlService(
-        portfolio_url_repository=portfolio_url_repository,
+    s3_client = boto3.client("s3", region_name="ap-northeast-2")
+    s3_client.create_bucket(
+        Bucket="wacruit-portfolio-test",
+        CreateBucketConfiguration={"LocationConstraint": "ap-northeast-2"},
+    )
+    return PortfolioFileService(
+        portfolio_file_repository=portfolio_file_repository,
         recruiting_repository=recruiting_repository,
     )
