@@ -46,7 +46,7 @@ def upgrade() -> None:
     op.add_column(
         "portfolio_url", sa.Column("recruiting_id", sa.Integer(), nullable=False)
     )
-    # 21.5기 디자이너 리크루팅 id
+    # 21.5기 디자이너 리크루팅 id가 2번임 (dev, prod 둘 다)
     op.execute("UPDATE portfolio_url SET recruiting_id = 2")
     op.create_foreign_key(
         "portfolio_url_ibfk_2",
@@ -56,10 +56,10 @@ def upgrade() -> None:
         ["id"],
         ondelete="CASCADE",
     )
+    op.drop_constraint("portfolio_url_ibfk_1", "portfolio_url", type_="foreignkey")
     op.alter_column(
         "portfolio_url", "user_id", existing_type=mysql.INTEGER(), nullable=False
     )
-    op.drop_constraint("portfolio_url_ibfk_1", "portfolio_url", type_="foreignkey")
     op.create_foreign_key(
         "portfolio_url_ibfk_1",
         "portfolio_url",
