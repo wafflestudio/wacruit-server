@@ -19,8 +19,8 @@ class DBConfig(BaseSettings):
 
         env_file = settings.env_files
 
-    @property
-    def url(self) -> str:
+    def __init__(self):
+        super().__init__()
         aws_secrets = AWSSecretManager()
         if aws_secrets.is_available():
             self.username = aws_secrets.get_secret("server_db_username")
@@ -29,6 +29,8 @@ class DBConfig(BaseSettings):
             self.port = int(aws_secrets.get_secret("server_db_port"))
             self.name = aws_secrets.get_secret("server_db_name")
 
+    @property
+    def url(self) -> str:
         return (
             f"mysql+mysqldb://{self.username}:{self.password}"
             f"@{self.host}:{self.port}/{self.name}"

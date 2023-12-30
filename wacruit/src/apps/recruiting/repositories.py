@@ -39,7 +39,7 @@ class RecruitingRepository:
         print(query)
         return self.session.execute(query).scalar_one()
 
-    def get_recruiting_by_id(self, recruiting_id: int) -> Recruiting:
+    def get_recruiting_by_id(self, recruiting_id: int) -> Recruiting | None:
         query = select(Recruiting).where(Recruiting.id == recruiting_id)
         return self.session.execute(query).scalar_one()
 

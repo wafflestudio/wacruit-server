@@ -23,11 +23,11 @@ v2_router = fastapi.APIRouter(prefix="/url", tags=["portfolio-url"])
 )
 def list_portfolio_urls(
     current_user: CurrentUser,
-    request: PortfolioUrlRequest,
+    recruiting_id: int,
     service: Annotated[PortfolioUrlService, fastapi.Depends()],
 ) -> ListResponse[PortfolioUrlResponse]:
     return ListResponse(
-        items=service.list_portfolio_urls(current_user.id, request.recruiting_id)
+        items=service.list_portfolio_urls(current_user.id, recruiting_id)
     )
 
 

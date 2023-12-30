@@ -24,11 +24,11 @@ v2_router = fastapi.APIRouter(prefix="/file", tags=["portfolio-file"])
 )
 def get_list_of_portfolios(
     current_user: CurrentUser,
-    request: PortfolioRequest,
+    recruiting_id: int,
     service: Annotated[PortfolioFileService, fastapi.Depends()],
 ) -> ListResponse[PortfolioFileResponse]:
     portfolios = service.list_portfolios_from_db(
-        current_user.id, recruiting_id=request.recruiting_id
+        current_user.id, recruiting_id=recruiting_id
     )
     return ListResponse(items=portfolios)
 
