@@ -16,8 +16,8 @@ class RecruitingApplicantDto(OrmModel):
     id: int
     name: str
     is_active: bool
-    from_date: datetime
-    to_date: datetime
+    from_date: datetime | None
+    to_date: datetime | None
     applicant_count: int
 
 
@@ -32,8 +32,8 @@ class RecruitingResponse(OrmModel):
     name: str
     type: RecruitingType
     is_active: bool
-    from_date: datetime
-    to_date: datetime
+    from_date: datetime | None
+    to_date: datetime | None
     description: str
     problem_status: list[ProblemStatusDto]
 

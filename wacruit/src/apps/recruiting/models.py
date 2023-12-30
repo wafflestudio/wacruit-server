@@ -34,10 +34,10 @@ class Recruiting(DeclarativeBase):
     name: Mapped[str30]
     type: Mapped[RecruitingType] = mapped_column(server_default=text("'ROOKIE'"))
     is_active: Mapped[bool]
-    from_date: Mapped[datetime] = mapped_column(
+    from_date: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True),
     )
-    to_date: Mapped[datetime] = mapped_column(
+    to_date: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True),
     )
     description: Mapped[str] = mapped_column(Text)
@@ -55,8 +55,10 @@ class Recruiting(DeclarativeBase):
 
     @property
     def is_open(self):
+        from_date = self.from_date or datetime.min
+        to_date = self.to_date or datetime.max
         return self.is_active and (
-            self.from_date < datetime.utcnow() + timedelta(hours=9) < self.to_date
+            from_date < datetime.utcnow() + timedelta(hours=9) < to_date
         )
 
     @property
