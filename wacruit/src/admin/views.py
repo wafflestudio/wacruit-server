@@ -46,6 +46,8 @@ class UserAdmin(ModelView, model=User):
         User.college,
     ]
 
+    column_sortable_list = User.__table__.columns.keys()
+
 
 class AnnouncementAdmin(ModelView, model=Announcement):
     column_list = [
@@ -57,7 +59,7 @@ class AnnouncementAdmin(ModelView, model=Announcement):
         Announcement.updated_at,
     ]
 
-    column_formatters = {Announcement.content: shorten_column(width=20)}
+    column_formatters = {Announcement.content: shorten_column(width=20)}  # type: ignore
 
     form_excluded_columns = [
         Announcement.created_at,
@@ -68,6 +70,8 @@ class AnnouncementAdmin(ModelView, model=Announcement):
         Announcement.title,
         Announcement.content,
     ]
+
+    column_sortable_list = Announcement.__table__.columns.keys()
 
 
 class RecruitingAdmin(ModelView, model=Recruiting):
@@ -99,6 +103,8 @@ class RecruitingAdmin(ModelView, model=Recruiting):
         Recruiting.description,
     ]
 
+    column_sortable_list = Recruiting.__table__.columns.keys()
+
 
 class ProblemAdmin(ModelView, model=Problem):
     column_list = [
@@ -109,8 +115,8 @@ class ProblemAdmin(ModelView, model=Problem):
     ]
 
     column_formatters = {
-        Problem.recruiting: recruiting_formatter,
-        Problem.body: shorten_column(width=20),
+        Problem.recruiting: recruiting_formatter,  # type: ignore
+        Problem.body: shorten_column(width=20),  # type: ignore
     }
 
     form_excluded_columns = [
@@ -122,7 +128,10 @@ class ProblemAdmin(ModelView, model=Problem):
     column_searchable_list = [
         Problem.num,
         Problem.body,
+        "recruiting.name",
     ]
+
+    column_sortable_list = Problem.__table__.columns.keys()
 
 
 class CodeSubmissionAdmin(ModelView, model=CodeSubmission):
@@ -136,7 +145,7 @@ class CodeSubmissionAdmin(ModelView, model=CodeSubmission):
     ]
 
     column_formatters = {
-        CodeSubmission.user: user_formatter,
+        CodeSubmission.user: user_formatter,  # type: ignore
     }
 
     form_excluded_columns = [
@@ -148,7 +157,10 @@ class CodeSubmissionAdmin(ModelView, model=CodeSubmission):
         CodeSubmission.user_id,
         CodeSubmission.language,
         CodeSubmission.status,
+        "user.first_name",
     ]
+
+    column_sortable_list = CodeSubmission.__table__.columns.keys()
 
 
 class TestcaseAdmin(ModelView, model=Testcase):
@@ -163,8 +175,8 @@ class TestcaseAdmin(ModelView, model=Testcase):
     ]
 
     column_formatters = {
-        Testcase.stdin: shorten_column(),
-        Testcase.expected_output: shorten_column(),
+        Testcase.stdin: shorten_column(),  # type: ignore
+        Testcase.expected_output: shorten_column(),  # type: ignore
     }
 
     form_excluded_columns = [
@@ -177,6 +189,8 @@ class TestcaseAdmin(ModelView, model=Testcase):
         Testcase.expected_output,
     ]
 
+    column_sortable_list = Testcase.__table__.columns.keys()
+
 
 class ResumeQuestionAdmin(ModelView, model=ResumeQuestion):
     column_list = [
@@ -188,8 +202,8 @@ class ResumeQuestionAdmin(ModelView, model=ResumeQuestion):
     ]
 
     column_formatters = {
-        ResumeQuestion.recruiting: recruiting_formatter,
-        ResumeQuestion.content: shorten_column(width=20),
+        ResumeQuestion.recruiting: recruiting_formatter,  # type: ignore
+        ResumeQuestion.content: shorten_column(width=20),  # type: ignore
     }
 
     form_excluded_columns = [
@@ -201,7 +215,10 @@ class ResumeQuestionAdmin(ModelView, model=ResumeQuestion):
     column_searchable_list = [
         ResumeQuestion.question_num,
         ResumeQuestion.content,
+        "recruiting.name",
     ]
+
+    column_sortable_list = ResumeQuestion.__table__.columns.keys()
 
 
 class ResumeSubmissionAdmin(ModelView, model=ResumeSubmission):
@@ -219,8 +236,8 @@ class ResumeSubmissionAdmin(ModelView, model=ResumeSubmission):
     ]
 
     column_formatters = {
-        ResumeSubmission.recruiting: recruiting_formatter,
-        ResumeSubmission.question: question_formatter,
+        ResumeSubmission.recruiting: recruiting_formatter,  # type: ignore
+        ResumeSubmission.question: question_formatter,  # type: ignore
     }
 
     form_excluded_columns = [
@@ -231,7 +248,11 @@ class ResumeSubmissionAdmin(ModelView, model=ResumeSubmission):
     column_searchable_list = [
         ResumeSubmission.user_id,
         ResumeSubmission.answer,
+        "user.first_name",
+        "recruiting.name",
     ]
+
+    column_sortable_list = ResumeSubmission.__table__.columns.keys()
 
 
 class RecruitingApplicationAdmin(ModelView, model=RecruitingApplication):
@@ -244,14 +265,23 @@ class RecruitingApplicationAdmin(ModelView, model=RecruitingApplication):
     ]
 
     column_formatters = {
-        RecruitingApplication.recruiting: recruiting_formatter,
-        RecruitingApplication.user: user_formatter,
+        RecruitingApplication.recruiting: recruiting_formatter,  # type: ignore
+        RecruitingApplication.user: user_formatter,  # type: ignore
     }
 
     form_excluded_columns = [
         RecruitingApplication.created_at,
         RecruitingApplication.updated_at,
     ]
+
+    column_searchable_list = [
+        RecruitingApplication.user_id,
+        RecruitingApplication.status,
+        "user.first_name",
+        "recruiting.name",
+    ]
+
+    column_sortable_list = RecruitingApplication.__table__.columns.keys()
 
 
 admin_views = [

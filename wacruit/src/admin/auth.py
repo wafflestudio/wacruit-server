@@ -4,7 +4,6 @@ from datetime import timedelta
 import jwt
 from sqladmin.authentication import AuthenticationBackend
 from starlette.requests import Request
-from starlette.responses import RedirectResponse
 
 from wacruit.src.admin.config import admin_config
 
@@ -34,11 +33,9 @@ class AdminAuth(AuthenticationBackend):
         request.session.clear()
         return True
 
-    async def authenticate(self, request: Request) -> RedirectResponse | None:
+    async def authenticate(self, request: Request) -> bool:
         token = request.session.get("token")
-        if token and self.verify_jwt(token):
-            return None
-        return RedirectResponse(request.url_for("admin:login"), status_code=302)
+        return token is not None and self.verify_jwt(token)
 
     @staticmethod
     def generate_jwt(username: str) -> str:
