@@ -20,6 +20,7 @@ from wacruit.src.apps.user.models import User
 from wacruit.src.database.base import DeclarativeBase
 from wacruit.src.database.base import intpk
 from wacruit.src.database.base import str30
+from wacruit.src.database.base import str255
 
 if TYPE_CHECKING:
     from wacruit.src.apps.problem.models import Problem
@@ -40,6 +41,7 @@ class Recruiting(DeclarativeBase):
     to_date: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True),
     )
+    short_description: Mapped[str255]
     description: Mapped[str] = mapped_column(Text)
 
     resume_submissions: Mapped[list["ResumeSubmission"]] = relationship(

@@ -79,9 +79,13 @@ class RecruitingAdmin(ModelView, model=Recruiting):
         Recruiting.from_date,
         Recruiting.to_date,
         Recruiting.description,
+        Recruiting.short_description,
     ]
 
-    column_formatters = {Recruiting.description: shorten_column(width=20)}
+    column_formatters = {
+        Recruiting.description: shorten_column(width=20),  # type: ignore
+        Recruiting.short_description: shorten_column(width=20),  # type: ignore
+    }
 
     form_excluded_columns = [
         Recruiting.resume_submissions,

@@ -35,7 +35,6 @@ CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
 def get_admin_user(current_user: CurrentUser) -> User:
-    print(current_user.is_admin)
     if not current_user.is_admin:
         raise UserPermissionDeniedException
     return current_user

@@ -36,7 +36,6 @@ class RecruitingRepository:
             .outerjoin(CodeSubmission, CodeSubmission.problem_id == Problem.id)
             .where(Recruiting.id == recruiting_id)
         )
-        print(query)
         return self.session.execute(query).scalar_one()
 
     def get_recruiting_by_id(self, recruiting_id: int) -> Recruiting | None:
