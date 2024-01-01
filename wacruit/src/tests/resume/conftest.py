@@ -42,6 +42,7 @@ def opened_recruiting(db_session: Session):
         from_date=datetime.utcnow() + timedelta(days=-1),
         to_date=datetime.utcnow() + timedelta(days=1),
         description="This is an example recruiting instance.",
+        short_description="2023 루키 리크루팅",
     )
     db_session.add(recruiting)
     db_session.commit()
@@ -56,6 +57,7 @@ def closed_recruiting(db_session: Session):
         from_date=datetime.utcnow() + timedelta(days=-3),
         to_date=datetime.utcnow() + timedelta(days=-1),
         description="This is an example recruiting instance.",
+        short_description="2023 루키 리크루팅",
     )
     db_session.add(recruiting)
     db_session.commit()

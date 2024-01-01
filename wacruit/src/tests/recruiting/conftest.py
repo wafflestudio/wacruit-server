@@ -24,6 +24,7 @@ def recruiting(db_session: Session) -> Recruiting:
         from_date=datetime.today() - timedelta(days=7),
         to_date=datetime.today() + timedelta(days=7),
         description="2023 루키 리크루팅입니다.",
+        short_description="2023 루키 리크루팅",
     )
     db_session.add(recruiting)
     db_session.commit()
