@@ -8,7 +8,7 @@ class RecruitingNotFoundException(WacruitException):
 
 class RecruitingClosedException(WacruitException):
     def __init__(self):
-        super().__init__(status_code=404, detail="모집이 마감되었습니다.")
+        super().__init__(status_code=403, detail="모집이 마감되었습니다.")
 
 
 class RecruitingNotAppliedException(WacruitException):

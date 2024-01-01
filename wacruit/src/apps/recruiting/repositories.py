@@ -8,6 +8,8 @@ from sqlalchemy.orm import Session
 
 from wacruit.src.apps.problem.models import CodeSubmission
 from wacruit.src.apps.problem.models import Problem
+from wacruit.src.apps.recruiting.exceptions import RecruitingClosedException
+from wacruit.src.apps.recruiting.exceptions import RecruitingNotFoundException
 from wacruit.src.apps.recruiting.models import Recruiting
 from wacruit.src.apps.recruiting.models import RecruitingApplication
 from wacruit.src.database.connection import get_db_session
@@ -70,3 +72,10 @@ class RecruitingRepository:
             .where(RecruitingApplication.user_id == user_id)
         )
         return self.session.execute(query).scalar()
+
+    def validate_recruiting_id(self, recruiting_id: int) -> None:
+        recruiting = self.get_recruiting_by_id(recruiting_id)
+        if recruiting is None:
+            raise RecruitingNotFoundException
+        if not recruiting.is_open:
+            raise RecruitingClosedException

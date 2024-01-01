@@ -2,7 +2,6 @@ from typing import Annotated
 
 from fastapi import Depends
 
-from wacruit.src.apps.portfolio.url.exceptions import InValidGenerationException
 from wacruit.src.apps.portfolio.url.exceptions import NumPortfolioUrlLimitException
 from wacruit.src.apps.portfolio.url.exceptions import PortfolioUrlNotAuthorized
 from wacruit.src.apps.portfolio.url.exceptions import PortfolioUrlNotFound
@@ -22,18 +21,13 @@ class PortfolioUrlService:
         self._recruiting_repository = recruiting_repository
         self._num_url_limit = 3
 
-    def _validate_recruiting_id(self, recruiting_id: int) -> None:
-        recruiting = self._recruiting_repository.get_recruiting_by_id(recruiting_id)
-        if (recruiting is None) or (not recruiting.is_active):
-            raise InValidGenerationException
-
     def create_portfolio_url(
         self,
         user_id: int,
         url: str,
         recruiting_id: int,
     ) -> PortfolioUrlResponse:
-        self._validate_recruiting_id(recruiting_id)
+        self._recruiting_repository.validate_recruiting_id(recruiting_id)
         num_portfolios = len(
             self._portfolio_url_repository.get_portfolio_urls_in_recruiting_id(
                 user_id, recruiting_id
@@ -49,7 +43,6 @@ class PortfolioUrlService:
     def list_portfolio_urls(
         self, user_id: int, recruiting_id: int
     ) -> list[PortfolioUrlResponse]:
-        self._validate_recruiting_id(recruiting_id)
         portfolio_urls = (
             self._portfolio_url_repository.get_portfolio_urls_in_recruiting_id(
                 user_id, recruiting_id
@@ -73,7 +66,7 @@ class PortfolioUrlService:
         self._portfolio_url_repository.delete_portfolio_url(portfolio_url_id)
 
     def delete_all_portfolio_urls(self, user_id: int, recruiting_id: int) -> None:
-        self._validate_recruiting_id(recruiting_id)
+        self._recruiting_repository.validate_recruiting_id(recruiting_id)
         self._portfolio_url_repository.delete_all_portfolio_urls_in_recruiting_id(
             user_id, recruiting_id
         )
@@ -87,6 +80,7 @@ class PortfolioUrlService:
         portfolio_url = self._portfolio_url_repository.get_portfolio_url_by_id(
             portfolio_url_id
         )
+        self._recruiting_repository.validate_recruiting_id(portfolio_url.recruiting_id)
 
         if not portfolio_url:
             raise PortfolioUrlNotFound
