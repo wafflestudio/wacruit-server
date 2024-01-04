@@ -3,6 +3,7 @@ from typing import Sequence
 from fastapi import Depends
 from sqlalchemy import delete
 from sqlalchemy import select
+from sqlalchemy import update
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm import Session
 
@@ -25,10 +26,11 @@ class PortfolioFileRepository:
     def get_portfolio_files(
         self, user_id: int, recruiting_id: int
     ) -> Sequence[PortfolioFile]:
-        query = (
-            select(PortfolioFile)
-            .where(PortfolioFile.user_id == user_id)
-            .where(PortfolioFile.recruiting_id == recruiting_id)
+        # pylint: disable=singleton-comparison
+        query = select(PortfolioFile).where(
+            (PortfolioFile.user_id == user_id)
+            & (PortfolioFile.recruiting_id == recruiting_id)
+            & (PortfolioFile.is_uploaded == True)
         )
         return self.session.execute(query).scalars().all()
 
@@ -44,10 +46,17 @@ class PortfolioFileRepository:
             self.session.add(portfolio_file)
         return portfolio_file
 
-    def update_portfolio_file(self, portfolio_file: PortfolioFile) -> PortfolioFile:
+    def update_portfolio_file(self, portfolio_file_id: int, user_id: int) -> None:
         with self.transaction:
-            self.session.merge(portfolio_file)
-        return portfolio_file
+            query = (
+                update(PortfolioFile)
+                .where(
+                    (PortfolioFile.id == portfolio_file_id)
+                    & (PortfolioFile.user_id == user_id)
+                )
+                .values(is_uploaded=True)
+            )
+            self.session.execute(query)
 
     def delete_portfolio_file(self, id: int) -> None:
         with self.transaction:

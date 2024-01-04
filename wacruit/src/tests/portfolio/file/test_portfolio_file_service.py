@@ -55,7 +55,7 @@ def test_register_portfolio_file_v2(
         recruiting_id=recruiting1.id,
     )
     response = portfolio_file_service.register_portfolio_file_info_in_db(
-        user1.id, response.portfolio_file_id, "test1.pdf", recruiting1.id
+        user1.id, response.portfolio_file_id
     )
     first_id = response.id
     expected = PortfolioFileResponse(
@@ -73,7 +73,7 @@ def test_register_portfolio_file_v2(
             recruiting_id=recruiting1.id,
         )
         portfolio_file_service.register_portfolio_file_info_in_db(
-            user1.id, response.portfolio_file_id, "test2.pdf", recruiting1.id
+            user1.id, response.portfolio_file_id
         )
 
     response = portfolio_file_service.get_presigned_url_for_post_portfolio(
@@ -82,7 +82,7 @@ def test_register_portfolio_file_v2(
         recruiting_id=recruiting2.id,
     )
     portfolio_file_service.register_portfolio_file_info_in_db(
-        user1.id, response.portfolio_file_id, "test3.pdf", recruiting2.id
+        user1.id, response.portfolio_file_id
     )
 
     response = portfolio_file_service.list_portfolios_from_db(
@@ -98,16 +98,6 @@ def test_register_portfolio_file_v2(
         ),
     ]
     assert response == expected, response
-    response = portfolio_file_service.update_portfolio_file_info_in_db(
-        user_id=user1.id, portfolio_file_id=first_id, new_file_name="test2.pdf"
-    )
-    expected = PortfolioFileResponse(
-        id=first_id,
-        file_name="test2.pdf",
-        recruiting_id=recruiting1.id,
-        is_uploaded=True,
-    )
-    assert response == expected
 
 
 def test_get_download_portfolio_file_url_v2(
@@ -121,7 +111,7 @@ def test_get_download_portfolio_file_url_v2(
         recruiting_id=recruiting1.id,
     )
     portfolio_file_service.register_portfolio_file_info_in_db(
-        user1.id, response.portfolio_file_id, "test1.pdf", recruiting1.id
+        user1.id, response.portfolio_file_id
     )
     response = portfolio_file_service.get_presigned_url_for_get_portfolio(
         user_id=user1.id,
@@ -149,7 +139,7 @@ def test_delete_portfolio_file_v2(
     )
 
     portfolio_file_service.register_portfolio_file_info_in_db(
-        user1.id, response.portfolio_file_id, "test1.pdf", recruiting1.id
+        user1.id, response.portfolio_file_id
     )
     s3_client = portfolio_file_service._s3_client.client
     s3_client.create_bucket(

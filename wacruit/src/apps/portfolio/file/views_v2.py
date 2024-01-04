@@ -48,8 +48,8 @@ def get_download_portfolio_url(
     )
 
 
-@v2_router.get(
-    path="/url/upload/",
+@v2_router.post(
+    path="/url/upload",
     responses=responses_from(NumPortfolioLimitException),
     status_code=HTTPStatus.OK,
 )
@@ -73,32 +73,11 @@ def get_upload_portfolio_url(
 def check_upload_portfolio_completed(
     current_user: CurrentUser,
     portfolio_file_id: int,
-    request: PortfolioFileRequest,
     service: Annotated[PortfolioFileService, fastapi.Depends()],
 ) -> PortfolioFileResponse:
     return service.register_portfolio_file_info_in_db(
         user_id=current_user.id,
         portfolio_file_id=portfolio_file_id,
-        file_name=request.file_name,
-        recruiting_id=request.recruiting_id,
-    )
-
-
-@v2_router.get(
-    path="/url/check-upload-completed/update/{portfolio_file_id}",
-    responses=responses_from(NumPortfolioLimitException),
-    status_code=HTTPStatus.OK,
-)
-def check_updated_upload_portfolio_completed(
-    current_user: CurrentUser,
-    portfolio_file_id: int,
-    request: PortfolioFileRequest,
-    service: Annotated[PortfolioFileService, fastapi.Depends()],
-) -> PortfolioFileResponse:
-    return service.update_portfolio_file_info_in_db(
-        user_id=current_user.id,
-        portfolio_file_id=portfolio_file_id,
-        new_file_name=request.file_name,
     )
 
 
