@@ -14,21 +14,24 @@ from wacruit.src.apps.portfolio.url.schemas import PortfolioUrlResponse
 from wacruit.src.apps.portfolio.url.services import PortfolioUrlService
 from wacruit.src.apps.user.dependencies import CurrentUser
 
-v1_router = fastapi.APIRouter(prefix="/url", tags=["portfolio-url"])
+v2_router = fastapi.APIRouter(prefix="/url", tags=["portfolio-url"])
 
 
-@v1_router.get(
+@v2_router.get(
     path="",
     status_code=HTTPStatus.OK,
 )
 def list_portfolio_urls(
     current_user: CurrentUser,
+    recruiting_id: int,
     service: Annotated[PortfolioUrlService, fastapi.Depends()],
 ) -> ListResponse[PortfolioUrlResponse]:
-    return ListResponse(items=service.list_portfolio_urls(current_user.id))
+    return ListResponse(
+        items=service.list_portfolio_urls(current_user.id, recruiting_id)
+    )
 
 
-@v1_router.post(
+@v2_router.post(
     path="",
     responses=responses_from(NumPortfolioUrlLimitException),
     status_code=HTTPStatus.CREATED,
@@ -40,10 +43,12 @@ def register_portfolio_url(
     service: Annotated[PortfolioUrlService, fastapi.Depends()],
 ) -> PortfolioUrlResponse:
     response.headers["Access-Control-Allow-Origin"] = "*"
-    return service.create_portfolio_url(current_user.id, request.url)
+    return service.create_portfolio_url(
+        current_user.id, request.url, request.recruiting_id
+    )
 
 
-@v1_router.delete(
+@v2_router.delete(
     path="/{portfolio_url_id}",
     responses=responses_from(PortfolioUrlNotAuthorized, PortfolioUrlNotFound),
     status_code=HTTPStatus.NO_CONTENT,
@@ -56,7 +61,7 @@ def delete_portfolio_url(
     return service.delete_portfolio_url(current_user.id, portfolio_url_id)
 
 
-@v1_router.put(
+@v2_router.put(
     path="/{portfolio_url_id}",
     responses=responses_from(PortfolioUrlNotAuthorized, PortfolioUrlNotFound),
     status_code=HTTPStatus.OK,

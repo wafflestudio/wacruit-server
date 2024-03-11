@@ -1,4 +1,5 @@
 from pydantic import BaseSettings
+from pydantic import Field
 
 from wacruit.src.secrets import AWSSecretManager
 from wacruit.src.settings import settings

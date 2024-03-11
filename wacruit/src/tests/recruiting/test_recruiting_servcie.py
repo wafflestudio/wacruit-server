@@ -13,6 +13,7 @@ def test_get_all_recruiting(
     assert recruiting_applicant_dto.is_active == recruiting.is_active
     assert recruiting_applicant_dto.from_date == recruiting.from_date
     assert recruiting_applicant_dto.to_date == recruiting.to_date
+    assert recruiting_applicant_dto.short_description == recruiting.short_description
 
 
 def test_get_recruiting_by_id(

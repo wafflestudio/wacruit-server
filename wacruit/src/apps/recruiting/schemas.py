@@ -12,13 +12,15 @@ if TYPE_CHECKING:
     from wacruit.src.apps.problem.models import Problem
 
 
-class RecruitingApplicantDto(OrmModel):
+class RecruitingSummaryResponse(OrmModel):
     id: int
     name: str
+    type: RecruitingType
     is_active: bool
-    from_date: datetime
-    to_date: datetime
+    from_date: datetime | None
+    to_date: datetime | None
     applicant_count: int
+    short_description: str
 
 
 class ProblemStatusDto(OrmModel):
@@ -32,8 +34,8 @@ class RecruitingResponse(OrmModel):
     name: str
     type: RecruitingType
     is_active: bool
-    from_date: datetime
-    to_date: datetime
+    from_date: datetime | None
+    to_date: datetime | None
     description: str
     problem_status: list[ProblemStatusDto]
 

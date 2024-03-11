@@ -9,9 +9,9 @@ from wacruit.src.apps.portfolio.url.services import PortfolioUrlService
 from wacruit.src.apps.recruiting.exceptions import RecruitingNotAppliedException
 from wacruit.src.apps.recruiting.exceptions import RecruitingNotFoundException
 from wacruit.src.apps.recruiting.repositories import RecruitingRepository
-from wacruit.src.apps.recruiting.schemas import RecruitingApplicantDto
 from wacruit.src.apps.recruiting.schemas import RecruitingResponse
 from wacruit.src.apps.recruiting.schemas import RecruitingResultResponse
+from wacruit.src.apps.recruiting.schemas import RecruitingSummaryResponse
 from wacruit.src.apps.user.models import User
 
 
@@ -26,7 +26,7 @@ class RecruitingService:
         self.portfolio_url_service = portfolio_url_service
         self.recruiting_repository = recruiting_repository
 
-    def get_all_recruiting(self) -> ListResponse[RecruitingApplicantDto]:
+    def get_all_recruiting(self) -> ListResponse[RecruitingSummaryResponse]:
         recruitings = self.recruiting_repository.get_all_recruitings()
         items = []
         for recruiting in recruitings:
@@ -52,7 +52,7 @@ class RecruitingService:
                     # Not implemented
                     applicant_count = -1
             items.append(
-                RecruitingApplicantDto(
+                RecruitingSummaryResponse(
                     **recruiting.__dict__, applicant_count=applicant_count
                 )
             )

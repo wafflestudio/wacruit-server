@@ -2,11 +2,10 @@ from typing import Annotated, Sequence
 
 from fastapi import Depends
 
-from wacruit.src.apps.portfolio.file.services import PortfolioFileService
+from wacruit.src.apps.portfolio.file.services_v2 import PortfolioFileService
 from wacruit.src.apps.portfolio.url.services import PortfolioUrlService
 from wacruit.src.apps.recruiting.exceptions import RecruitingClosedException
 from wacruit.src.apps.recruiting.repositories import RecruitingRepository
-from wacruit.src.apps.recruiting.services import RecruitingService
 from wacruit.src.apps.resume.exceptions import ResumeNotFound
 from wacruit.src.apps.resume.models import ResumeSubmission
 from wacruit.src.apps.resume.repositories import ResumeRepository
@@ -44,7 +43,7 @@ class ResumeService:
         resume_submissions: Sequence[ResumeSubmissionCreateDto],
     ) -> list[UserResumeSubmissionDto]:
         recruiting = self.recruiting_repository.get_recruiting_by_id(recruiting_id)
-        if not recruiting.is_open:
+        if recruiting is None or not recruiting.is_open:
             raise RecruitingClosedException()
 
         result = []
@@ -82,7 +81,7 @@ class ResumeService:
         resume_submissions: Sequence[ResumeSubmissionCreateDto],
     ) -> list[UserResumeSubmissionDto]:
         recruiting = self.recruiting_repository.get_recruiting_by_id(recruiting_id)
-        if not recruiting.is_open:
+        if recruiting is None or not recruiting.is_open:
             raise RecruitingClosedException()
 
         resume_dtos = []
@@ -111,7 +110,7 @@ class ResumeService:
     def withdraw_resume(self, user_id: int, recruiting_id: int) -> None:
         self.user_service.remove_sensitive_information(user_id)
         self.portfolio_file_service.delete_all_portfolios(user_id)
-        self.portfolio_url_service.delete_all_portfolio_urls(user_id)
+        self.portfolio_url_service.delete_all_portfolio_urls(user_id, recruiting_id)
         self.resume_repository.delete_resumes_by_user_recruiting_id(
             user_id, recruiting_id
         )
