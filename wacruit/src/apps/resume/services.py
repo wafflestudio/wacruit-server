@@ -43,7 +43,7 @@ class ResumeService:
         resume_submissions: Sequence[ResumeSubmissionCreateDto],
     ) -> list[UserResumeSubmissionDto]:
         recruiting = self.recruiting_repository.get_recruiting_by_id(recruiting_id)
-        if not recruiting.is_open:
+        if recruiting is None or not recruiting.is_open:
             raise RecruitingClosedException()
 
         result = []
@@ -81,7 +81,7 @@ class ResumeService:
         resume_submissions: Sequence[ResumeSubmissionCreateDto],
     ) -> list[UserResumeSubmissionDto]:
         recruiting = self.recruiting_repository.get_recruiting_by_id(recruiting_id)
-        if not recruiting.is_open:
+        if recruiting is None or not recruiting.is_open:
             raise RecruitingClosedException()
 
         resume_dtos = []
