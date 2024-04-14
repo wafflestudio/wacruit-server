@@ -12,7 +12,9 @@ from wacruit.src.apps.recruiting.repositories import RecruitingRepository
 from wacruit.src.apps.recruiting.schemas import RecruitingResponse
 from wacruit.src.apps.recruiting.schemas import RecruitingResultResponse
 from wacruit.src.apps.recruiting.schemas import RecruitingSummaryResponse
+from wacruit.src.apps.resume.services import ResumeService
 from wacruit.src.apps.user.models import User
+from wacruit.src.apps.user.services import UserService
 
 
 class RecruitingService:
@@ -20,10 +22,14 @@ class RecruitingService:
         self,
         portfolio_file_service: Annotated[PortfolioFileService, Depends()],
         portfolio_url_service: Annotated[PortfolioUrlService, Depends()],
+        user_service: Annotated[UserService, Depends()],
+        resume_service: Annotated[ResumeService, Depends()],
         recruiting_repository: Annotated[RecruitingRepository, Depends()],
     ):
         self.portfolio_file_service = portfolio_file_service
         self.portfolio_url_service = portfolio_url_service
+        self.user_service = user_service
+        self.resume_service = resume_service
         self.recruiting_repository = recruiting_repository
 
     def get_all_recruiting(self) -> ListResponse[RecruitingSummaryResponse]:
@@ -81,3 +87,13 @@ class RecruitingService:
             raise RecruitingNotAppliedException()
 
         return RecruitingResultResponse(status=recruiting_result.status)
+
+    def apply_recruiting(self, recruiting_id: int, user: User) -> None:
+        self.recruiting_repository.create_recruiting_application(recruiting_id, user.id)
+
+    def cancel_recruiting(self, recruiting_id: int, user: User) -> None:
+        self.user_service.remove_sensitive_information(user.id)
+        self.portfolio_file_service.delete_all_portfolios(user.id)
+        self.portfolio_url_service.delete_all_portfolio_urls(user.id, recruiting_id)
+        self.resume_service.delete_all_resumes(user.id, recruiting_id)
+        self.recruiting_repository.delete_recruiting_application(recruiting_id, user.id)

@@ -1,14 +1,18 @@
 from typing import Sequence
 
+from alembic.util.messaging import status
 from fastapi import Depends
 from sqlalchemy import func
 from sqlalchemy import select
 from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm import Session
 
+from wacruit.src.apps.common.enums import RecruitingApplicationStatus
 from wacruit.src.apps.problem.models import CodeSubmission
 from wacruit.src.apps.problem.models import Problem
+from wacruit.src.apps.recruiting.exceptions import RecruitingAlreadyAppliedException
 from wacruit.src.apps.recruiting.exceptions import RecruitingClosedException
+from wacruit.src.apps.recruiting.exceptions import RecruitingNotAppliedException
 from wacruit.src.apps.recruiting.exceptions import RecruitingNotFoundException
 from wacruit.src.apps.recruiting.models import Recruiting
 from wacruit.src.apps.recruiting.models import RecruitingApplication
@@ -55,10 +59,16 @@ class RecruitingRepository:
                 (CodeSubmission.problem_id == Problem.id)
                 & (CodeSubmission.user_id == user_id),
             )
+            .outerjoin(
+                RecruitingApplication,
+                (RecruitingApplication.recruiting_id == recruiting_id)
+                & (RecruitingApplication.user_id == user_id),
+            )
             .where(Recruiting.id == recruiting_id)
             .order_by(CodeSubmission.created_at.desc())
             .options(
-                contains_eager(Recruiting.problems).contains_eager(Problem.submissions)
+                contains_eager(Recruiting.problems).contains_eager(Problem.submissions),
+                contains_eager(Recruiting.applicants),
             )
         )
         return self.session.execute(query).scalars().first()
@@ -66,10 +76,9 @@ class RecruitingRepository:
     def get_recruiting_result_by_id(
         self, recruiting_id: int, user_id: int
     ) -> RecruitingApplication | None:
-        query = (
-            select(RecruitingApplication)
-            .where(RecruitingApplication.recruiting_id == recruiting_id)
-            .where(RecruitingApplication.user_id == user_id)
+        query = select(RecruitingApplication).where(
+            RecruitingApplication.recruiting_id == recruiting_id,
+            RecruitingApplication.user_id == user_id,
         )
         return self.session.execute(query).scalar()
 
@@ -79,3 +88,30 @@ class RecruitingRepository:
             raise RecruitingNotFoundException
         if not recruiting.is_open:
             raise RecruitingClosedException
+
+    def create_recruiting_application(
+        self, recruiting_id: int, user_id: int
+    ) -> RecruitingApplication:
+        self.validate_recruiting_id(recruiting_id)
+        if self.get_recruiting_by_id(recruiting_id) is None:
+            raise RecruitingNotFoundException
+        if self.get_recruiting_result_by_id(recruiting_id, user_id) is not None:
+            raise RecruitingAlreadyAppliedException
+        application = RecruitingApplication(
+            user_id=user_id,
+            recruiting_id=recruiting_id,
+            status=RecruitingApplicationStatus.IN_PROGRESS,
+        )
+        with self.transaction:
+            self.session.add(application)
+        return application
+
+    def delete_recruiting_application(
+        self, recruiting_id: int, user_id: int
+    ) -> RecruitingApplication:
+        application = self.get_recruiting_result_by_id(recruiting_id, user_id)
+        if application is None:
+            raise RecruitingNotAppliedException
+        with self.transaction:
+            self.session.delete(application)
+        return application

@@ -24,6 +24,11 @@ class WacruitException(HTTPException):
         }
 
 
+class ApiDeprecatedException(WacruitException):
+    def __init__(self):
+        super().__init__(status_code=410, detail="API Deprecated")
+
+
 def responses_from(
     *exceptions: type[WacruitException],
 ) -> dict[int | str, dict[str, Any]]:
