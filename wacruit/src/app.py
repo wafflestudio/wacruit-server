@@ -8,15 +8,21 @@ from wacruit.src.admin.views import admin_views
 from wacruit.src.apps.router import api_router
 from wacruit.src.database.connection import DBSessionFactory
 from wacruit.src.settings import settings
-from wacruit.src.utils.middlewares import HTTPToHTTPSRequestMiddleware
+from wacruit.src.utils.middlewares import HttpToHttpsRequestMiddleware
 
 _DEV_ORIGINS = [
     "http://localhost:5173",
 ]
 
+if not settings.is_prod:
+    import logging
+
+    logging.basicConfig()
+    logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
+
 
 def _add_middlewares(app: FastAPI):
-    if settings.is_dev:
+    if not settings.is_prod:
         app.add_middleware(
             CORSMiddleware,
             allow_origins=_DEV_ORIGINS,
@@ -47,7 +53,7 @@ def _attach_admin(app: FastAPI):
         base_url="/api/admin",
         middlewares=None
         if settings.is_test or settings.is_local
-        else [Middleware(HTTPToHTTPSRequestMiddleware)],
+        else [Middleware(HttpToHttpsRequestMiddleware)],
         debug=not settings.is_prod,
     )
     for view in admin_views:

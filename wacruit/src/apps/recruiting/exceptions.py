@@ -14,3 +14,8 @@ class RecruitingClosedException(WacruitException):
 class RecruitingNotAppliedException(WacruitException):
     def __init__(self):
         super().__init__(status_code=404, detail="지원하지 않은 리크루팅입니다.")
+
+
+class RecruitingAlreadyAppliedException(WacruitException):
+    def __init__(self):
+        super().__init__(status_code=400, detail="이미 지원한 리크루팅입니다.")

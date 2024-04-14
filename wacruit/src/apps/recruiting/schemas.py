@@ -34,6 +34,7 @@ class RecruitingResponse(OrmModel):
     name: str
     type: RecruitingType
     is_active: bool
+    applied: bool
     from_date: datetime | None
     to_date: datetime | None
     description: str

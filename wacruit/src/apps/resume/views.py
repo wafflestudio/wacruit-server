@@ -4,6 +4,7 @@ from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import Response
 
+from wacruit.src.apps.common.exceptions import ApiDeprecatedException
 from wacruit.src.apps.common.exceptions import responses_from
 from wacruit.src.apps.common.schemas import ListResponse
 from wacruit.src.apps.resume.exceptions import ResumeNotFound
@@ -90,5 +91,6 @@ def withdraw_resume(
     유저가 제출한 모든 이력서를 삭제하고 관련 정보를 초기화합니다.
     이 작업은 되돌릴 수 없으므로 사전에 유저에게 확인을 받아야 합니다.
     """
-    resume_service.withdraw_resume(current_user.id, recruiting_id)
-    return Response(status_code=204)
+    # resume_service.withdraw_resume(current_user.id, recruiting_id)
+    # return Response(status_code=204)
+    raise ApiDeprecatedException

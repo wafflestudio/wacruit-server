@@ -77,6 +77,11 @@ class Recruiting(DeclarativeBase):
             problems.append({"id": problem.id, "num": problem.num, "status": status})
         return problems
 
+    @property
+    def applied(self):
+        print(self.applicants)
+        return len(self.applicants) > 0
+
     def __str__(self):
         return (
             f"<Recruiting id={self.id}, "
