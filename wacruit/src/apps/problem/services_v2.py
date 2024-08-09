@@ -110,7 +110,6 @@ class ProblemService(LoggingMixin):
                 request.problem_id,
                 request.language.to_language(),
                 testcases,
-                "",
             )
 
             if submission_and_results is None:

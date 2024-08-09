@@ -6,11 +6,12 @@ from httpx import AsyncClient
 from wacruit.src.apps.hodu.schemas import HoduSubmitErrorResponse
 from wacruit.src.apps.hodu.schemas import HoduSubmitRequest
 from wacruit.src.apps.hodu.schemas import HoduSubmitResponse
+from wacruit.src.utils.mixins import LoggingMixin
 
 from .connections import get_hodu_api_client
 
 
-class HoduApiRepository:
+class HoduApiRepository(LoggingMixin):
     def __init__(self, client: AsyncClient = Depends(get_hodu_api_client)):
         self.client = client
 
@@ -23,7 +24,13 @@ class HoduApiRepository:
             timeout=60,
         )
         if res.status_code >= 400:
-            print(f"ERROR for sending {res.url} / status code: {res.status_code}.")
-            print(f"Details: {res.json()}")
+            self.logger.error(
+                "HODU API ERROR for sending %s / status code: %d / "
+                "request: %s / response: %s",
+                res.url,
+                res.status_code,
+                request.json(),
+                res.json(),
+            )
             return HoduSubmitErrorResponse(**res.json())
         return HoduSubmitResponse(**res.json())

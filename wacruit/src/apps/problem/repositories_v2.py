@@ -46,7 +46,6 @@ class ProblemRepository:
         problem_id: int,
         language: Language,
         testcases: Iterable[Testcase],
-        tokens: Iterable[str],
     ) -> Tuple[CodeSubmission, list[CodeSubmissionResult]] | None:
         with self.transaction:
             submission = CodeSubmission(
@@ -56,9 +55,9 @@ class ProblemRepository:
             self.session.commit()
             results = [
                 CodeSubmissionResult(
-                    submission_id=submission.id, testcase_id=testcase.id, token=token
+                    submission_id=submission.id, testcase_id=testcase.id, token=""
                 )
-                for testcase, token in zip(testcases, tokens)
+                for testcase in testcases
             ]
             self.session.bulk_save_objects(results)
             return submission, results
@@ -74,8 +73,9 @@ class ProblemRepository:
             )
             .order_by(CodeSubmission.created_at.desc())
             .options(
-                joinedload(CodeSubmission.results),
-                joinedload(CodeSubmissionResult.testcase),
+                joinedload(CodeSubmission.results).joinedload(
+                    CodeSubmissionResult.testcase
+                ),
             )
         )
         return self.session.execute(query).scalar()
