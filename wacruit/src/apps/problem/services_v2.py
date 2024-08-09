@@ -212,8 +212,8 @@ class ProblemService(LoggingMixin):
                         )
                     )
 
+                data = ListResponse(items=partial_responses).json()
                 if len(partial_responses) > 0:
-                    data = ListResponse(items=partial_responses).json()
                     event = "message"
 
             except HTTPStatusError as e:
