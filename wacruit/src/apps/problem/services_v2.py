@@ -222,13 +222,22 @@ class ProblemService(LoggingMixin):
                     ensure_ascii=False,
                 )
                 event = "error"
-                print(e)
+                self.logger.error(e)
             except CodeSubmissionErrorException as e:
                 data = json.dumps({"detail": e.detail}, ensure_ascii=False)
                 event = "error"
-                print(e)
+                self.logger.error(e)
             finally:
                 if not disconnected:
                     yield ServerSentEvent(data=data, event=event)
+                    if return_count == total_count:
+                        break  # pylint: disable=lost-exception
                     disconnected = await request.is_disconnected()
                 await asyncio.sleep(1)
+                self.problem_repository.session.expire_all()
+                self.problem_repository.session.commit()
+                recent_submission = (
+                    self.problem_repository.get_recent_submission(user.id, problem_id)
+                    or recent_submission
+                )
+                results = recent_submission.results

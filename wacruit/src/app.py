@@ -18,7 +18,6 @@ if not settings.is_prod:
     import logging
 
     logging.basicConfig()
-    logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
 
 
 def _add_middlewares(app: FastAPI):

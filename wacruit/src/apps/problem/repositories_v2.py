@@ -60,6 +60,7 @@ class ProblemRepository:
                 for testcase in testcases
             ]
             self.session.bulk_save_objects(results)
+            self.session.commit()
             return submission, results
 
     def get_recent_submission(
@@ -72,11 +73,7 @@ class ProblemRepository:
                 & (CodeSubmission.problem_id == problem_id)
             )
             .order_by(CodeSubmission.created_at.desc())
-            .options(
-                joinedload(CodeSubmission.results).joinedload(
-                    CodeSubmissionResult.testcase
-                ),
-            )
+            .options(joinedload(CodeSubmission.results))
         )
         return self.session.execute(query).scalar()
 
@@ -108,3 +105,4 @@ class ProblemRepository:
             submission_result.time = time
             submission_result.memory = memory
             self.session.merge(submission_result)
+            self.session.commit()
