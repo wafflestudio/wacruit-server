@@ -52,6 +52,17 @@ class CodeSubmissionStatus(Enum):
         return 0
 
 
+class CodeSubmissionResultStatus(Enum):
+    RUNNING = 1
+    CORRECT = 2
+    WRONG = 3
+    COMPILE_ERROR = 4
+    RUNTIME_ERROR = 5
+    TIME_LIMIT_EXCEEDED = 6
+    MEMORY_LIMIT_EXCEEDED = 7
+    INTERNAL_SERVER_ERROR = 8
+
+
 class RecruitingType(Enum):
     ROOKIE = 1
     DESIGNER = 2

@@ -3,9 +3,9 @@ from decimal import Decimal
 from pydantic import BaseModel
 from pydantic import Field
 
-from wacruit.src.apps.common.enums import Language
 from wacruit.src.apps.common.schemas import OrmModel
-from wacruit.src.apps.judge.schemas import JudgeSubmissionStatusModel
+from wacruit.src.apps.hodu.schemas import HoduLanguage
+from wacruit.src.apps.hodu.schemas import HoduSubmitStatus
 
 
 class TestcaseDto(OrmModel):
@@ -22,7 +22,7 @@ class ProblemResponse(OrmModel):
 
 class CodeSubmitRequest(BaseModel):
     problem_id: int
-    language: Language = Field(...)
+    language: HoduLanguage = Field(...)
     source_code: str = Field(..., max_length=100000)
     is_example: bool = Field(False)
     extra_testcases: list[TestcaseDto] = Field([], max_items=10)
@@ -30,10 +30,10 @@ class CodeSubmitRequest(BaseModel):
 
 class CodeSubmissionResultResponse(BaseModel):
     num: int
-    status: JudgeSubmissionStatusModel
-    stdout: str | None
-    time: Decimal | None
-    memory: Decimal | None
+    status: HoduSubmitStatus
+    stdout: str | None = None
+    time: float | None = None
+    memory: float | None = None
 
 
 TokenStr = str

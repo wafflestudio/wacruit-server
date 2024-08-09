@@ -20,7 +20,7 @@ from wacruit.src.apps.problem.exceptions import ProblemNotFoundException
 from wacruit.src.apps.problem.exceptions import TestcaseNotFoundException
 from wacruit.src.apps.problem.models import CodeSubmission
 from wacruit.src.apps.problem.repositories import ProblemRepository
-from wacruit.src.apps.problem.schemas import CodeSubmissionResult
+from wacruit.src.apps.problem.schemas import CodeSubmissionResultResponse
 from wacruit.src.apps.problem.schemas import CodeSubmitRequest
 from wacruit.src.apps.problem.schemas import ProblemResponse
 from wacruit.src.apps.problem.schemas import TokenStr
@@ -183,7 +183,7 @@ class ProblemService(LoggingMixin):
                     token_map.pop(i)
 
                     responses.append(
-                        CodeSubmissionResult(
+                        CodeSubmissionResultResponse(
                             num=i,
                             status=testcase_result.status,
                             stdout=testcase_result.stdout if is_example else None,
