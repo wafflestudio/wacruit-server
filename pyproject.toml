@@ -15,7 +15,7 @@ python-dotenv = "^1.0.0"
 uvicorn = "^0.22.0"
 bcrypt = "^4.0.1"
 alembic = "^1.11.1"
-mysqlclient = "^2.1.1"
+mysqlclient = "2.2.4"
 aws-secretsmanager-caching = "^1.1.1.5"
 sse-starlette = "^1.6.1"
 httpx = "^0.24.1"
@@ -56,7 +56,13 @@ venv = ".venv"
 reportShadowedImports = false
 
 [tool.isort]
-profile = "black"
+profile="google"
+src_paths="wacruit"
+use_parentheses=true
+float_to_top=true
+line_length=88
+ensure_newline_before_comments=true
+sections=["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
 
 [tool.pycln]
 all = true

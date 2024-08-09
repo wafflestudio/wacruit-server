@@ -5,7 +5,7 @@ from httpx import AsyncClient
 import pytest
 from sqlalchemy.orm import Session
 
-from wacruit.src.apps.judge import get_judge_api_client
+from wacruit.src.apps.judge.connections import get_judge_api_client
 from wacruit.src.apps.judge.repositories import JudgeApiRepository
 from wacruit.src.apps.problem.models import Problem
 from wacruit.src.apps.problem.models import Testcase

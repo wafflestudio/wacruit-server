@@ -12,6 +12,7 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
+from wacruit.src.apps.common.enums import CodeSubmissionResultStatus
 from wacruit.src.apps.common.enums import CodeSubmissionStatus
 from wacruit.src.apps.common.enums import Language
 from wacruit.src.apps.common.sql import CURRENT_TIMESTAMP
@@ -88,6 +89,11 @@ class CodeSubmissionResult(DeclarativeBase):
         ForeignKey("testcase.id", ondelete="CASCADE"), primary_key=True
     )
     token: Mapped[str255]
+    status: Mapped[CodeSubmissionResultStatus] = mapped_column(
+        default=CodeSubmissionResultStatus.RUNNING
+    )
+    time: Mapped[float | None] = mapped_column()
+    memory: Mapped[int | None] = mapped_column()
 
     submission: Mapped["CodeSubmission"] = relationship(back_populates="results")
     testcase: Mapped["Testcase"] = relationship(back_populates="submission_results")

@@ -34,3 +34,8 @@ class TestcaseNotFoundException(WacruitException):
             status_code=404,
             detail="테스트케이스를 찾을 수 없습니다.\n지속적으로 문제가 발생하면 관리자에게 문의 부탁드립니다.",
         )
+
+
+class NoRecentSubmissionException(WacruitException):
+    def __init__(self):
+        super().__init__(status_code=404, detail="최근 제출한 코드가 없습니다.")
