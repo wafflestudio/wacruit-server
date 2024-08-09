@@ -20,7 +20,23 @@ class HoduLanguage(StrEnum):
     # SWIFT = "swift"
 
     def to_language(self) -> Language:
-        return Language[self.value.upper()]
+        match self:
+            case HoduLanguage.C:
+                return Language.C
+            case HoduLanguage.CPP:
+                return Language.CPP
+            case HoduLanguage.JAVA:
+                return Language.JAVA
+            case HoduLanguage.JAVASCRIPT:
+                return Language.JAVASCRIPT
+            case HoduLanguage.PYTHON:
+                return Language.PYTHON
+            # case HoduLanguage.KOTLIN:
+            #     return Language.KOTLIN
+            # case HoduLanguage.SWIFT:
+            #     return Language.SWIFT
+            case _:
+                raise ValueError(f"Invalid HoduLanguage: {self}")
 
 
 class HoduField(StrEnum):
