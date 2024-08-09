@@ -56,7 +56,13 @@ venv = ".venv"
 reportShadowedImports = false
 
 [tool.isort]
-profile = "black"
+profile="google"
+src_paths="wacruit"
+use_parentheses=true
+float_to_top=true
+line_length=88
+ensure_newline_before_comments=true
+sections=["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
 
 [tool.pycln]
 all = true
