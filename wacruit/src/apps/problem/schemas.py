@@ -28,7 +28,7 @@ class CodeSubmitRequest(BaseModel):
     extra_testcases: list[TestcaseDto] = Field([], max_items=10)
 
 
-class CodeSubmissionResult(BaseModel):
+class CodeSubmissionResultResponse(BaseModel):
     num: int
     status: JudgeSubmissionStatusModel
     stdout: str | None

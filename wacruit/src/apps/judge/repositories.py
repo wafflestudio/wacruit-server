@@ -3,7 +3,7 @@ from typing import Iterable
 from fastapi import Depends
 from httpx import AsyncClient
 
-from . import get_judge_api_client
+from .connections import get_judge_api_client
 from .schemas import JudgeCreateSubmissionRequest
 from .schemas import JudgeCreateSubmissionResponse
 from .schemas import JudgeGetSubmissionResponse
