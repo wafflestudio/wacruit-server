@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from pydantic.fields import Field
 
 from wacruit.src.apps.common.schemas import OrmModel
 
@@ -17,7 +18,7 @@ class PortfolioFileResponse(OrmModel):
 class PresignedUrlResponse(BaseModel):
     object_name: str
     presigned_url: str
-    fields: dict[str, str]
+    fields: dict[str, str] = Field(default={})
 
 
 class PresignedUrlWithIdResponse(BaseModel):

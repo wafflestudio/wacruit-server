@@ -11,7 +11,11 @@ from wacruit.src.apps.problem.models import Testcase
 from wacruit.src.apps.recruiting.models import Recruiting
 from wacruit.src.apps.recruiting.repositories import RecruitingRepository
 from wacruit.src.apps.recruiting.services import RecruitingService
+from wacruit.src.apps.resume.repositories import ResumeRepository
+from wacruit.src.apps.resume.services import ResumeService
 from wacruit.src.apps.user.models import User
+from wacruit.src.apps.user.repositories import UserRepository
+from wacruit.src.apps.user.services import UserService
 from wacruit.src.database.connection import Session
 from wacruit.src.database.connection import Transaction
 
@@ -101,13 +105,45 @@ def recruiting_repository(db_session: Session) -> RecruitingRepository:
 
 
 @pytest.fixture
+def user_repository(db_session: Session):
+    return UserRepository(db_session, Transaction(db_session))
+
+
+@pytest.fixture
+def user_service(user_repository: UserRepository):
+    return UserService(user_repository)
+
+
+@pytest.fixture
+def resume_repository(db_session: Session):
+    return ResumeRepository(db_session, Transaction(db_session))
+
+
+@pytest.fixture
+def resume_service(
+    resume_repository: ResumeRepository,
+    recruiting_repository: RecruitingRepository,
+    user_service: UserService,
+):
+    return ResumeService(
+        resume_repository,
+        recruiting_repository,
+        user_service,
+    )
+
+
+@pytest.fixture
 def recruiting_service(
     portfolio_file_service: PortfolioFileService,
     portfolio_url_service: PortfolioUrlService,
+    user_service: UserService,
+    resume_service: ResumeService,
     recruiting_repository: RecruitingRepository,
 ) -> RecruitingService:
     return RecruitingService(
         portfolio_file_service,
         portfolio_url_service,
+        user_service,
+        resume_service,
         recruiting_repository,
     )

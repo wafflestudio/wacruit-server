@@ -67,57 +67,58 @@ def test_create_resume(
         assert submission.answer == answers[i]
 
 
-def test_withdraw_resume(
-    mocker: pytest_mock.MockerFixture,
-    user: User,
-    resume_service: ResumeService,
-    user_service: UserService,
-    opened_recruiting: Recruiting,
-    resume_questions: list[ResumeQuestion],
-):
-    mock_file_delete = mocker.patch(
-        "wacruit.src.apps.portfolio.file.services_v2"
-        ".PortfolioFileService.delete_all_portfolios"
-    )
-    # user updated with university, github_email, slack_email
-    user_service.update_invitaion_emails(
-        user,
-        UserUpdateInvitationEmailsRequest(
-            github_email=EmailStr("github@email.com"),
-        ),
-    )
+# This test is removed because `withdraw_resume` is deprecated.
+# def test_withdraw_resume(
+#     mocker: pytest_mock.MockerFixture,
+#     user: User,
+#     resume_service: ResumeService,
+#     user_service: UserService,
+#     opened_recruiting: Recruiting,
+#     resume_questions: list[ResumeQuestion],
+# ):
+#     mock_file_delete = mocker.patch(
+#         "wacruit.src.apps.portfolio.file.services_v2"
+#         ".PortfolioFileService.delete_all_portfolios"
+#     )
+#     # user updated with university, github_email, slack_email
+#     user_service.update_invitaion_emails(
+#         user,
+#         UserUpdateInvitationEmailsRequest(
+#             github_email=EmailStr("github@email.com"),
+#         ),
+#     )
 
-    # user submitted resume
-    answers = list(f"Answer for question {i}" for i in range(len(resume_questions)))
-    resume_submissions = list(
-        ResumeSubmissionCreateDto(
-            question_id=question.id,
-            answer=answer,
-        )
-        for question, answer in zip(resume_questions, answers)
-    )
-    submissions = resume_service.create_resume(
-        user_id=user.id,
-        recruiting_id=opened_recruiting.id,
-        resume_submissions=resume_submissions,
-    )
-    assert len(submissions) == len(answers)
+#     # user submitted resume
+#     answers = list(f"Answer for question {i}" for i in range(len(resume_questions)))
+#     resume_submissions = list(
+#         ResumeSubmissionCreateDto(
+#             question_id=question.id,
+#             answer=answer,
+#         )
+#         for question, answer in zip(resume_questions, answers)
+#     )
+#     submissions = resume_service.create_resume(
+#         user_id=user.id,
+#         recruiting_id=opened_recruiting.id,
+#         resume_submissions=resume_submissions,
+#     )
+#     assert len(submissions) == len(answers)
 
-    # user withdraws resume
-    resume_service.withdraw_resume(user.id, opened_recruiting.id)
-    mock_file_delete.assert_called_once_with(user.id)
-    submissions_by_user_and_recruiting = (
-        resume_service.get_resumes_by_user_and_recruiting_id(
-            user.id, opened_recruiting.id
-        )
-    )
-    assert len(submissions_by_user_and_recruiting) == 0
+#     # user withdraws resume
+#     resume_service.withdraw_resume(user.id, opened_recruiting.id)
+#     mock_file_delete.assert_called_once_with(user.id)
+#     submissions_by_user_and_recruiting = (
+#         resume_service.get_resumes_by_user_and_recruiting_id(
+#             user.id, opened_recruiting.id
+#         )
+#     )
+#     assert len(submissions_by_user_and_recruiting) == 0
 
-    user_from_db = user_service.user_repository.get_user_by_id(user.id)
-    assert user_from_db is not None
-    assert user_from_db.university is None
-    assert user_from_db.github_email is None
-    assert user_from_db.slack_email is None
+#     user_from_db = user_service.user_repository.get_user_by_id(user.id)
+#     assert user_from_db is not None
+#     assert user_from_db.university is None
+#     assert user_from_db.github_email is None
+#     assert user_from_db.slack_email is None
 
 
 def test_update_resumes(

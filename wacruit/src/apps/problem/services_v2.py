@@ -109,6 +109,7 @@ class ProblemService(LoggingMixin):
                 user.id,
                 request.problem_id,
                 request.language.to_language(),
+                request.source_code,
                 testcases,
             )
 

@@ -64,6 +64,7 @@ class CodeSubmission(DeclarativeBase):
         DateTime(timezone=True),
         server_default=CURRENT_TIMESTAMP,
     )
+    source_code: Mapped[str] = mapped_column(Text, nullable=True)
 
     user: Mapped["User"] = relationship(back_populates="code_submissions")
     problem: Mapped["Problem"] = relationship(back_populates="submissions")
