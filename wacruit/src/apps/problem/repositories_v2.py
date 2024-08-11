@@ -1,3 +1,4 @@
+from datetime import timedelta
 from typing import Iterable, Sequence, Tuple
 
 from fastapi import Depends
@@ -5,6 +6,9 @@ from sqlalchemy import select
 from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import Session
+from tenacity import retry
+from tenacity.stop import stop_after_attempt
+from tenacity.wait import wait_fixed
 
 from wacruit.src.apps.common.enums import CodeSubmissionResultStatus
 from wacruit.src.apps.common.enums import CodeSubmissionStatus
@@ -15,9 +19,10 @@ from wacruit.src.apps.problem.models import Problem
 from wacruit.src.apps.problem.models import Testcase
 from wacruit.src.database.connection import get_db_session
 from wacruit.src.database.connection import Transaction
+from wacruit.src.utils.mixins import LoggingMixin
 
 
-class ProblemRepository:
+class ProblemRepository(LoggingMixin):
     def __init__(
         self,
         session: Session = Depends(get_db_session),
@@ -86,6 +91,7 @@ class ProblemRepository:
         )
         return self.session.execute(query).scalar()
 
+    @retry(stop=stop_after_attempt(5), wait=wait_fixed(timedelta(seconds=1)))
     def update_submission_status(
         self, submission: CodeSubmission, status: CodeSubmissionStatus
     ):
@@ -93,6 +99,7 @@ class ProblemRepository:
             submission.status = status
             self.session.merge(submission)
 
+    @retry(stop=stop_after_attempt(5), wait=wait_fixed(timedelta(seconds=1)))
     def update_submission_result(
         self,
         submission_result: CodeSubmissionResult,
