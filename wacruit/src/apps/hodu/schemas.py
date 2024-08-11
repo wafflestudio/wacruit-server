@@ -67,7 +67,7 @@ class HoduSubmitStatus(StrEnum):
     MEMORY_LIMIT_EXCEEDED = "MEMORY_LIMIT_EXCEEDED"
     INTERNAL_ERROR = "INTERNAL_ERROR"
 
-    def to_submission_result_status(self):
+    def to_submission_result_status(self) -> CodeSubmissionResultStatus:
         match self:
             case HoduSubmitStatus.CORRECT:
                 return CodeSubmissionResultStatus.CORRECT
@@ -101,6 +101,8 @@ class HoduSubmitStatus(StrEnum):
                 return HoduSubmitStatus.TIME_LIMIT_EXCEEDED
             case CodeSubmissionResultStatus.MEMORY_LIMIT_EXCEEDED:
                 return HoduSubmitStatus.MEMORY_LIMIT_EXCEEDED
+            case CodeSubmissionResultStatus.INTERNAL_SERVER_ERROR:
+                return HoduSubmitStatus.INTERNAL_ERROR
             case _:
                 raise ValueError(f"Invalid CodeSubmissionResultStatus: {status}")
 
