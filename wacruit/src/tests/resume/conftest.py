@@ -145,8 +145,8 @@ def resume_service(
     user_service: UserService,
 ):
     return ResumeService(
-        portfolio_file_service=portfolio_file_service,
-        portfolio_url_service=portfolio_url_service,
+        # portfolio_file_service=portfolio_file_service,
+        # portfolio_url_service=portfolio_url_service,
         resume_repository=resume_repository,
         recruiting_repository=recruiting_repository,
         user_service=user_service,

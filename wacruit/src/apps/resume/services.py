@@ -20,14 +20,14 @@ class ResumeService:
         self,
         resume_repository: Annotated[ResumeRepository, Depends()],
         recruiting_repository: Annotated[RecruitingRepository, Depends()],
-        portfolio_file_service: Annotated[PortfolioFileService, Depends()],
-        portfolio_url_service: Annotated[PortfolioUrlService, Depends()],
+        # portfolio_file_service: Annotated[PortfolioFileService, Depends()],
+        # portfolio_url_service: Annotated[PortfolioUrlService, Depends()],
         user_service: Annotated[UserService, Depends()],
     ) -> None:
         self.resume_repository = resume_repository
         self.recruiting_repository = recruiting_repository
-        self.portfolio_file_service = portfolio_file_service
-        self.portfolio_url_service = portfolio_url_service
+        # self.portfolio_file_service = portfolio_file_service
+        # self.portfolio_url_service = portfolio_url_service
         self.user_service = user_service
 
     def get_questions_by_recruiting_id(
