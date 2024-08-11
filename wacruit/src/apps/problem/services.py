@@ -118,6 +118,7 @@ class ProblemService(LoggingMixin):
                 user.id,
                 request.problem_id,
                 request.language,
+                request.source_code,
                 testcases,
                 tokens,
             )

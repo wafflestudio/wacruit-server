@@ -44,12 +44,16 @@ class ProblemRepository:
         user_id: int,
         problem_id: int,
         language: Language,
+        source_code: str,
         testcases: Iterable[Testcase],
         tokens: Iterable[str],
     ) -> CodeSubmission | None:
         with self.transaction:
             submission = CodeSubmission(
-                user_id=user_id, problem_id=problem_id, language=language
+                user_id=user_id,
+                problem_id=problem_id,
+                language=language,
+                source_code=source_code,
             )
             self.session.add(submission)
             self.session.commit()

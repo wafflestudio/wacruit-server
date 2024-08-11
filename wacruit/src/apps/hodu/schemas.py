@@ -81,6 +81,8 @@ class HoduSubmitStatus(StrEnum):
                 return CodeSubmissionResultStatus.TIME_LIMIT_EXCEEDED
             case HoduSubmitStatus.MEMORY_LIMIT_EXCEEDED:
                 return CodeSubmissionResultStatus.MEMORY_LIMIT_EXCEEDED
+            case HoduSubmitStatus.INTERNAL_ERROR:
+                return CodeSubmissionResultStatus.INTERNAL_SERVER_ERROR
 
     @staticmethod
     def from_submission_result_status(
