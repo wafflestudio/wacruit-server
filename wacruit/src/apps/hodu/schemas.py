@@ -1,6 +1,7 @@
 from enum import StrEnum
 from subprocess import STDOUT
 from typing import Self
+from xmlrpc.client import INTERNAL_ERROR
 
 from MySQLdb import TIME
 from pydantic import BaseModel
@@ -64,6 +65,7 @@ class HoduSubmitStatus(StrEnum):
     RUNTIME_ERROR = "RUNTIME_ERROR"
     TIME_LIMIT_EXCEEDED = "TIME_LIMIT_EXCEEDED"
     MEMORY_LIMIT_EXCEEDED = "MEMORY_LIMIT_EXCEEDED"
+    INTERNAL_ERROR = "INTERNAL_ERROR"
 
     def to_submission_result_status(self):
         match self:
