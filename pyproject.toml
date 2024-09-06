@@ -9,7 +9,7 @@ packages = [{include = "wacruit"}]
 [tool.poetry.dependencies]
 python = "^3.11"
 fastapi = "^0.95.1"
-sqlalchemy = "^2.0.13"
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.34"}
 loguru = "^0.7.0"
 python-dotenv = "^1.0.0"
 uvicorn = "^0.22.0"
@@ -27,6 +27,7 @@ pyjwt = "^2.8.0"
 pytest-mock = "3.8.2"
 moto = {version = "4.2.7", extras = ["all", "ec2", "s3"]}
 tenacity = "^9.0.0"
+aiomysql = "^0.2.0"
 
 
 [tool.poetry.group.dev.dependencies]

@@ -30,9 +30,13 @@ class DBConfig(BaseSettings):
             self.name = aws_secrets.get_secret("server_db_name")
 
     @property
+    def backend(self) -> str:
+        return "mysqldb"
+
+    @property
     def url(self) -> str:
         return (
-            f"mysql+mysqldb://{self.username}:{self.password}"
+            f"mysql+{self.backend}://{self.username}:{self.password}"
             f"@{self.host}:{self.port}/{self.name}"
             "?charset=utf8mb4"
         )

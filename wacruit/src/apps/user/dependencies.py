@@ -9,7 +9,7 @@ from wacruit.src.apps.user.models import User
 from wacruit.src.apps.user.repositories import UserRepository
 
 
-def get_current_user(
+async def get_current_user(
     waffle_user_id: Annotated[
         str,
         Security(
@@ -25,7 +25,7 @@ def get_current_user(
     ],
     user_repository: Annotated[UserRepository, Depends()],
 ) -> User:
-    user = user_repository.get_user_by_sso_id(waffle_user_id)
+    user = await user_repository.get_user_by_sso_id(waffle_user_id)
     if user is None:
         raise UserPermissionDeniedException
     return user

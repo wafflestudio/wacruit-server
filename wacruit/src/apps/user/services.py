@@ -21,9 +21,9 @@ class UserService:
     ) -> None:
         self.user_repository = user_repository
 
-    def check_signup(self, sso_id: str) -> SignupCheckResponse:
+    async def check_signup(self, sso_id: str) -> SignupCheckResponse:
         return SignupCheckResponse(
-            signup=self.user_repository.check_signup_by_sso_id(sso_id)
+            signup=await self.user_repository.check_signup_by_sso_id(sso_id)
         )
 
     def create_user(
@@ -61,8 +61,8 @@ class UserService:
         except IntegrityError as exc:
             raise EmailAlreadyExistsException from exc
 
-    def list_users(self) -> list[UserDetailResponse]:
-        users = self.user_repository.get_users()
+    async def list_users(self) -> list[UserDetailResponse]:
+        users = await self.user_repository.get_users()
         return [UserDetailResponse.from_orm(user) for user in users]
 
     def update_invitaion_emails(
@@ -79,8 +79,8 @@ class UserService:
             raise UserNotFoundException
         return UserDetailResponse.from_orm(user)
 
-    def remove_sensitive_information(self, user_id: int) -> UserDetailResponse:
-        user = self.user_repository.get_user_by_id(user_id)
+    async def remove_sensitive_information(self, user_id: int) -> UserDetailResponse:
+        user = await self.user_repository.get_user_by_id(user_id)
         if user is None:
             raise UserNotFoundException
         user.department = None

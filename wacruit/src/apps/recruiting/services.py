@@ -91,8 +91,8 @@ class RecruitingService:
     def apply_recruiting(self, recruiting_id: int, user: User) -> None:
         self.recruiting_repository.create_recruiting_application(recruiting_id, user.id)
 
-    def cancel_recruiting(self, recruiting_id: int, user: User) -> None:
-        self.user_service.remove_sensitive_information(user.id)
+    async def cancel_recruiting(self, recruiting_id: int, user: User) -> None:
+        await self.user_service.remove_sensitive_information(user.id)
         self.portfolio_file_service.delete_all_portfolios(user.id)
         self.portfolio_url_service.delete_all_portfolio_urls(user.id, recruiting_id)
         self.resume_service.delete_all_resumes(user.id, recruiting_id)

@@ -68,10 +68,10 @@ def apply_recruiting(
         RecruitingNotFoundException, RecruitingNotAppliedException
     ),
 )
-def cancel_recruiting(
+async def cancel_recruiting(
     user: CurrentUser,
     recruiting_id: int,
     recruiting_service: Annotated[RecruitingService, Depends()],
 ) -> Response:
-    recruiting_service.cancel_recruiting(recruiting_id, user)
+    await recruiting_service.cancel_recruiting(recruiting_id, user)
     return Response(status_code=204)

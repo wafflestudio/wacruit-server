@@ -25,11 +25,11 @@ v1_router = APIRouter(prefix="/v1/users", tags=["users"])
 
 
 @v1_router.get("/check")
-def check_signup(
+async def check_signup(
     waffle_user_id: Annotated[str, Header()],
     user_service: Annotated[UserService, Depends()],
 ) -> SignupCheckResponse:
-    return user_service.check_signup(waffle_user_id)
+    return await user_service.check_signup(waffle_user_id)
 
 
 @v1_router.patch(
@@ -53,11 +53,11 @@ def create_user(
 
 
 @v1_router.get("", responses=responses_from(UserPermissionDeniedException))
-def list_users(
+async def list_users(
     admin_user: AdminUser,
     user_service: Annotated[UserService, Depends()],
 ) -> list[UserDetailResponse]:
-    return user_service.list_users()
+    return await user_service.list_users()
 
 
 @v1_router.patch(
