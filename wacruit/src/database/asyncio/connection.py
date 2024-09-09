@@ -58,7 +58,6 @@ class AsyncTransaction:
         self.session = session
 
     async def __aenter__(self):
-        self.session.begin_nested()
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb) -> bool:
@@ -67,5 +66,5 @@ class AsyncTransaction:
             await self.session.rollback()
             return False
 
-        await self.session.flush()
+        await self.session.commit()
         return True

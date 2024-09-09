@@ -1,10 +1,6 @@
 import asyncio
-from decimal import Decimal
-from heapq import merge
 import json
-from math import e
-import re
-from typing import AsyncGenerator, Literal, Tuple
+from typing import AsyncGenerator, Literal
 
 from fastapi import BackgroundTasks
 from fastapi import Depends
@@ -32,7 +28,6 @@ from wacruit.src.apps.problem.repositories_v2 import ProblemRepository
 from wacruit.src.apps.problem.schemas_v2 import CodeSubmissionResultResponse
 from wacruit.src.apps.problem.schemas_v2 import CodeSubmitRequest
 from wacruit.src.apps.problem.schemas_v2 import ProblemResponse
-from wacruit.src.apps.problem.schemas_v2 import TokenStr
 from wacruit.src.apps.problem.utils_v2 import memory_handi
 from wacruit.src.apps.problem.utils_v2 import time_handi
 from wacruit.src.apps.recruiting.exceptions import RecruitingClosedException
@@ -58,7 +53,7 @@ class ProblemService(LoggingMixin):
         return ProblemResponse.from_orm(problem)
 
     async def submit_code(self, request: CodeSubmitRequest, user: User) -> None:
-        problem = self.problem_repository.get_problem_by_id(
+        problem = await self.problem_repository.get_problem_by_id(
             request.problem_id, request.is_example
         )
 
@@ -105,7 +100,7 @@ class ProblemService(LoggingMixin):
         )
 
         if not request.is_example:
-            submission_and_results = self.problem_repository.create_submission(
+            submission_and_results = await self.problem_repository.create_submission(
                 user.id,
                 request.problem_id,
                 request.language.to_language(),
@@ -117,6 +112,7 @@ class ProblemService(LoggingMixin):
                 raise CodeSubmissionFailedException()
 
             submission, results = submission_and_results
+            print(f"submission.id: {submission.id}")
 
             self.background_tasks.add_task(
                 self.record_submission_results,
@@ -148,24 +144,17 @@ class ProblemService(LoggingMixin):
             response = await self.hodu_api_repository.submit(hodu_request)
             if isinstance(response, HoduSubmitResponse):
                 submission_result_status = response.status.to_submission_result_status()
-                if (
-                    submission_result_status != CodeSubmissionResultStatus.CORRECT
-                    and submission_result_status
-                    != CodeSubmissionResultStatus.INTERNAL_SERVER_ERROR
+                if submission_result_status not in (
+                    CodeSubmissionResultStatus.CORRECT,
+                    CodeSubmissionResultStatus.INTERNAL_SERVER_ERROR,
                 ):
-                    print(f"############################################")
-                    print(f"hodu_request: {hodu_request.json()}")
-                    print(f"status: {response.status}")
-                    print(f"stdout: {response.fields.stdout}")
-                    print(f"stderr: {response.fields.stderr}")
-                    print("\n\n")
                     merge_status(CodeSubmissionStatus.WRONG)
                 elif (
                     submission_result_status
                     == CodeSubmissionResultStatus.INTERNAL_SERVER_ERROR
                 ):
                     merge_status(CodeSubmissionStatus.ERROR)
-                self.problem_repository.update_submission_result(
+                await self.problem_repository.update_submission_result(
                     submission_result,
                     submission_result_status,
                     response.fields.time,
@@ -173,7 +162,7 @@ class ProblemService(LoggingMixin):
                 )
             elif isinstance(response, HoduSubmitErrorResponse):
                 merge_status(CodeSubmissionStatus.ERROR)
-                self.problem_repository.update_submission_result(
+                await self.problem_repository.update_submission_result(
                     submission_result,
                     CodeSubmissionResultStatus.INTERNAL_SERVER_ERROR,
                     None,
@@ -181,7 +170,7 @@ class ProblemService(LoggingMixin):
                 )
                 break
 
-        self.problem_repository.update_submission_status(submission, total_status)
+        await self.problem_repository.update_submission_status(submission, total_status)
 
     async def get_recent_submission_result(
         self,
@@ -189,12 +178,15 @@ class ProblemService(LoggingMixin):
         user: User,
         problem_id: int,
     ) -> AsyncGenerator[ServerSentEvent, None]:
-        problem = self.problem_repository.get_problem_by_id(problem_id, is_example=True)
+        user_id = user.id
+        problem = await self.problem_repository.get_problem_by_id(
+            problem_id, is_example=True
+        )
 
         if problem is None:
             raise ProblemNotFoundException()
 
-        recent_submission = self.problem_repository.get_recent_submission(
+        recent_submission = await self.problem_repository.get_recent_submission(
             user.id, problem_id
         )
 
@@ -251,9 +243,11 @@ class ProblemService(LoggingMixin):
                     disconnected = await request.is_disconnected()
                 await asyncio.sleep(1)
                 self.problem_repository.session.expire_all()
-                self.problem_repository.session.commit()
+                await self.problem_repository.session.commit()
                 recent_submission = (
-                    self.problem_repository.get_recent_submission(user.id, problem_id)
+                    await self.problem_repository.get_recent_submission(
+                        user_id, problem_id
+                    )
                     or recent_submission
                 )
                 results = recent_submission.results
