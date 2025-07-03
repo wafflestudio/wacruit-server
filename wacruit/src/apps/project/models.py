@@ -20,7 +20,7 @@ project_member_association = Table(
     "project_member_association",
     DeclarativeBase.metadata,
     Column("member_id", ForeignKey("member.id")),
-    Column("project_id", ForeignKey("projects.id")),
+    Column("project_id", ForeignKey("project.id")),
 )
 
 
@@ -46,7 +46,7 @@ class ProjectURL(DeclarativeBase):
     __tablename__ = "project_url"
 
     id: Mapped[intpk]
-    project_id: Mapped[int] = mapped_column(ForeignKey("projects.id"))
+    project_id: Mapped[int] = mapped_column(ForeignKey("project.id"))
     url: Mapped[str255]
 
     source_project: Mapped["Project"] = relationship(back_populates="urls")
