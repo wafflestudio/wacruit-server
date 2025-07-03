@@ -4,3 +4,12 @@ import wacruit.src.apps.announcement.models  # isort: skip
 import wacruit.src.apps.portfolio.url.models  # isort: skip
 import wacruit.src.apps.problem.models  # isort: skip
 import wacruit.src.apps.resume.models  # isort: skip
+import wacruit.src.apps.recruiting_info.models  # isort: skip
+import wacruit.src.apps.seminar.models  # isort: skip
+import wacruit.src.apps.sponsor.models  # isort: skip
+import wacruit.src.apps.member.models  # isort: skip
+import wacruit.src.apps.review.models  # isort: skip
+import wacruit.src.apps.project.models  # isort: skip
+import wacruit.src.apps.faq.models  # isort: skip
+import wacruit.src.apps.history.models  # isort: skip
+import wacruit.src.apps.timeline.models  # isort: skip
