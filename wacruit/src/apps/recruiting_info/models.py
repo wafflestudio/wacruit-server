@@ -24,4 +24,4 @@ class RecruitingInfo(DeclarativeBase):
     date_info: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     recruiting_id: Mapped[int] = mapped_column(ForeignKey("recruiting.id"))
 
-    recruting: Mapped["Recruiting"] = relationship(back_populates="recruiting_info")
+    recruiting: Mapped["Recruiting"] = relationship(back_populates="recruiting_info")
