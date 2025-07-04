@@ -40,6 +40,9 @@ class Project(DeclarativeBase):
         secondary=project_member_association, back_populates="projects"
     )
     urls: Mapped[list["ProjectURL"]] = relationship(back_populates="source_project")
+    image_urls: Mapped[list["ProjectImageURL"]] = relationship(
+        back_populates="source_project"
+    )
 
 
 class ProjectURL(DeclarativeBase):
@@ -50,3 +53,13 @@ class ProjectURL(DeclarativeBase):
     url: Mapped[str255]
 
     source_project: Mapped["Project"] = relationship(back_populates="urls")
+
+
+class ProjectImageURL(DeclarativeBase):
+    __tablename__ = "project_image_url"
+
+    id: Mapped[intpk]
+    project_id: Mapped[int] = mapped_column(ForeignKey("project.id"))
+    url: Mapped[str255]
+
+    source_project: Mapped["Project"] = relationship(back_populates="image_urls")
