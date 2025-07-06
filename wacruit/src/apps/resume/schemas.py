@@ -20,6 +20,13 @@ class ResumeQuestionDto(BaseModel):
     class Config:
         orm_mode = True
 
+class ResumeQuestionCreateDto(BaseModel):
+    question_num: int
+    content_limit: int
+    content: str
+
+    class Config:
+        orm_mode = True
 
 class ResumeSubmissionDto(BaseModel):
     id: int

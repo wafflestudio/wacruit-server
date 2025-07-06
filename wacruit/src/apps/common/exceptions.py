@@ -36,3 +36,7 @@ def responses_from(
     for exc in exceptions:
         responses.update(exc().to_response())
     return responses
+
+class InvalidRecruitTypeException(WacruitException):
+    def __init__(self, type: str):
+        super().__init__(status_code=400, detail=f"Invalid recruiting type: {type}")

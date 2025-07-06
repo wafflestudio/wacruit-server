@@ -73,3 +73,7 @@ class RecruitingApplicationStatus(Enum):
     IN_PROGRESS = 1
     ACCEPTED = 2
     REJECTED = 3
+
+class ProjectType(Enum):
+    SERVICE = 1
+    STUDY = 2

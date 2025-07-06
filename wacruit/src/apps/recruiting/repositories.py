@@ -15,7 +15,9 @@ from wacruit.src.apps.recruiting.exceptions import RecruitingClosedException
 from wacruit.src.apps.recruiting.exceptions import RecruitingNotAppliedException
 from wacruit.src.apps.recruiting.exceptions import RecruitingNotFoundException
 from wacruit.src.apps.recruiting.models import Recruiting
+from wacruit.src.apps.recruiting_info.models import RecruitingInfo
 from wacruit.src.apps.recruiting.models import RecruitingApplication
+from wacruit.src.apps.common.enums import RecruitingType
 from wacruit.src.database.connection import get_db_session
 from wacruit.src.database.connection import Transaction
 
@@ -46,7 +48,7 @@ class RecruitingRepository:
 
     def get_recruiting_by_id(self, recruiting_id: int) -> Recruiting | None:
         query = select(Recruiting).where(Recruiting.id == recruiting_id)
-        return self.session.execute(query).scalar_one()
+        return self.session.execute(query).scalar()
 
     def get_recruiting_with_code_submission_status_by_id(
         self, recruiting_id: int, user_id: int
@@ -115,3 +117,39 @@ class RecruitingRepository:
         with self.transaction:
             self.session.delete(application)
         return application
+    
+    def get_active_recruitings(self) -> Sequence[Recruiting]:
+        query = (
+            select(Recruiting)
+            .where(Recruiting.is_active.is_(True))
+            .order_by(Recruiting.from_date.desc())
+        )
+        return self.session.execute(query).scalars().all()
+    
+    def get_recruiting_info_by_type(
+        self, recruiting_type: RecruitingType
+    ) -> RecruitingInfo | None:
+        query = (
+            select(RecruitingInfo)
+            .join(Recruiting, RecruitingInfo.recruiting_id == Recruiting.id)
+            .where(Recruiting.type == recruiting_type)
+            .order_by(RecruitingInfo.info_num.desc())
+            .limit(1)
+        )
+        return self.session.execute(query).scalar_one_or_none()
+    
+    def create_recruiting(
+        self, recruiting: Recruiting
+    ) -> Recruiting:
+        with self.transaction:
+            self.session.add(recruiting)
+            self.session.flush()
+        return recruiting
+    
+    def update_recruiting(
+        self, recruiting: Recruiting
+    ) -> Recruiting:
+        with self.transaction:
+            self.session.merge(recruiting)
+            self.session.flush()
+        return recruiting

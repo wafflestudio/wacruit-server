@@ -7,6 +7,7 @@ from wacruit.src.apps import problem
 from wacruit.src.apps import recruiting
 from wacruit.src.apps import resume
 from wacruit.src.apps import user
+from wacruit.src.apps import project
 
 api_router = APIRouter(prefix="/api")
 api_router.include_router(dummy.router)
@@ -18,3 +19,4 @@ api_router.include_router(resume.router)
 api_router.include_router(recruiting.router)
 api_router.include_router(portfolio.v1_router)
 api_router.include_router(portfolio.v2_router)
+api_router.include_router(project.router)
