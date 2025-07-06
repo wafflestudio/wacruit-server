@@ -27,7 +27,7 @@ class Project(DeclarativeBase):
     introduction: Mapped[str255 | None]
     thumbnail_url: Mapped[str255 | None]
     leader_id: Mapped[int] = mapped_column(ForeignKey("member.id"))
-    service_type: Mapped[ProjectType]
+    project_type: Mapped[ProjectType]
     is_active: Mapped[bool] = mapped_column(default=True)
     leader: Mapped["Member"] = relationship(back_populates="leading_projects")
     members: Mapped[list["ProjectMember"]] = relationship(back_populates="project", cascade="all, delete-orphan")

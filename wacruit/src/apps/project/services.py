@@ -6,6 +6,7 @@ from wacruit.src.apps.project.models import Project
 from wacruit.src.apps.project.models import ProjectMember
 from wacruit.src.apps.project.models import ProjectImageURL
 from wacruit.src.apps.project.models import ProjectURL
+from wacruit.src.apps.common.enums import ProjectType
 
 from wacruit.src.apps.common.schemas import ListResponse
 
@@ -22,6 +23,7 @@ from wacruit.src.apps.project.exceptions import ProjectAlreadyExistsException
 from wacruit.src.apps.project.exceptions import ProjectNotFoundException
 from wacruit.src.apps.member.exceptions import MemberNotFoundException
 from wacruit.src.apps.member.exceptions import MemberAlreadyExistsException
+from wacruit.src.apps.common.exceptions import InvalidProjectTypeException
 
 
 class ProjectService:
@@ -41,13 +43,16 @@ class ProjectService:
         if not leader:
             raise MemberNotFoundException
         
+        if request.project_type not in ProjectType.__members__:
+            raise InvalidProjectTypeException(request.project_type)
+
         project = Project(
             name=request.name,
             summary=request.summary,
             introduction=request.introduction,
             thumbnail_url=request.thumbnail_url,
             leader_id=request.leader_id,
-            service_type=request.service_type,
+            project_type=request.project_type,
             is_active=request.is_active,
         )
 

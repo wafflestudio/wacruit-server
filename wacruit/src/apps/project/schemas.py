@@ -15,7 +15,7 @@ class ProjectCreateRequest(BaseModel):
     introduction:str | None = Field(None, max_length=255)
     thumbnail_url:str | None = Field(None, max_length=255)
     leader_id:int
-    service_type:ProjectType
+    project_type:str
     is_active:bool
     images:list[str] | None
     urls: list[ProjectLinkDto] | None
@@ -25,7 +25,7 @@ class ProjectUpdateRequest(BaseModel):
     summary:str | None = Field(None, max_length=50)
     introduction:str | None = Field(None, max_length=255)
     thumbnail_url:str | None = Field(None, max_length=255)
-    service_type:ProjectType | None
+    project_type:str | None
     is_active:bool | None
     images:list[str] | None
     urls: list[ProjectLinkDto] | None
@@ -37,7 +37,7 @@ class ProjectDetailResponse(OrmModel):
     introduction:str | None
     thumbnail_url:str | None
     leader_id:int
-    service_type:str  # enum 문자열로 변경
+    project_type:str  # enum 문자열로 변경
     is_active:bool
     images:list[str] | None
     urls:list[ProjectLinkDto] | None
@@ -59,7 +59,7 @@ class ProjectDetailResponse(OrmModel):
             introduction=obj.introduction,
             thumbnail_url=obj.thumbnail_url,
             leader_id=obj.leader_id,
-            service_type=obj.service_type.name,  # enum의 name 속성 사용
+            project_type=obj.project_type.name,
             is_active=obj.is_active,
             images=images,
             urls=urls
@@ -70,7 +70,7 @@ class ProjectBriefResponse(OrmModel):
     name:str
     summary:str | None
     thumbnail_url:str | None
-    service_type:str  # enum 문자열로 변경
+    project_type:str
     is_active:bool
 
     @classmethod
@@ -80,7 +80,7 @@ class ProjectBriefResponse(OrmModel):
             name=obj.name,
             summary=obj.summary,
             thumbnail_url=obj.thumbnail_url,
-            service_type=obj.service_type.name,  # enum의 name 속성 사용
+            project_type=obj.project_type.name,
             is_active=obj.is_active
         )
 
@@ -94,7 +94,7 @@ class ProjectMemberCreateRequest(BaseModel):
 
 class ProjectMemberResponse(OrmModel):
     member_id: int
-    name: str
+    member_name: str
     position: str
 
 class ProjectMemberListResponse(OrmModel):
