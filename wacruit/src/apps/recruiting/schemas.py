@@ -113,4 +113,4 @@ class RecruitingInfoResponse(OrmModel):
     type: str
     info_num: int
     title: str
-    date_info: str
+    date_info: datetime

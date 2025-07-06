@@ -145,7 +145,10 @@ class RecruitingService:
         info = self.recruiting_repository.get_recruiting_info_by_type(recruiting_type)
         if not info:
             return None
-        return RecruitingInfoResponse.from_orm(info)
+        return RecruitingInfoResponse(
+            **info.__dict__,
+            type=recruiting_type.name
+        )
     
     def create_recruiting(
         self, request: RecruitingCreateRequest
