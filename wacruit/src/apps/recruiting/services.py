@@ -73,7 +73,7 @@ class RecruitingService:
             )
         return ListResponse(items=items)
 
-    def get_recruiting_by_id(
+    def get_user_recruiting_by_id(
         self, recruiting_id: int, user: User
     ) -> UserRecruitingResponse:
         recruiting = (
@@ -217,7 +217,7 @@ class RecruitingService:
 
         return RecruitingResponse.from_orm(updated_recruiting)
 
-    def get_recruitings_by_id(self, recruiting_id: int) -> RecruitingResponse:
+    def get_recruiting_by_id(self, recruiting_id: int) -> RecruitingResponse:
         recruiting = self.recruiting_repository.get_recruiting_by_id(recruiting_id)
         if recruiting is None:
             raise RecruitingNotFoundException()

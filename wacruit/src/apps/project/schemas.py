@@ -17,7 +17,6 @@ class ProjectCreateRequest(BaseModel):
     summary: str | None = Field(None, max_length=50)
     introduction: str | None = Field(None, max_length=255)
     thumbnail_url: str | None = Field(None, max_length=255)
-    leader_id: int
     project_type: str
     is_active: bool
     images: list[str] | None
@@ -41,8 +40,7 @@ class ProjectDetailResponse(OrmModel):
     summary: str | None
     introduction: str | None
     thumbnail_url: str | None
-    leader_id: int
-    project_type: str  # enum 문자열로 변경
+    project_type: str
     is_active: bool
     images: list[str] | None
     urls: list[ProjectLinkDto] | None
@@ -63,7 +61,6 @@ class ProjectDetailResponse(OrmModel):
             summary=obj.summary,
             introduction=obj.introduction,
             thumbnail_url=obj.thumbnail_url,
-            leader_id=obj.leader_id,
             project_type=obj.project_type.name,
             is_active=obj.is_active,
             images=images,
@@ -93,24 +90,3 @@ class ProjectBriefResponse(OrmModel):
 
 class ProjectListResponse(OrmModel):
     projects: list[ProjectBriefResponse]
-
-
-class ProjectMemberCreateRequest(BaseModel):
-    member_id: int
-    name: str
-    position: str
-
-
-class ProjectMemberResponse(OrmModel):
-    member_id: int
-    member_name: str
-    position: str
-
-
-class ProjectMemberListResponse(OrmModel):
-    members: list[ProjectMemberResponse]
-
-
-class ProjectMemberUpdateRequest(BaseModel):
-    name: str | None
-    position: str | None

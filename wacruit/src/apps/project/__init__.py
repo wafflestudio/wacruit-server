@@ -1,1 +1,1 @@
-from .views import v1_router as router
+from .views import v3_router as router

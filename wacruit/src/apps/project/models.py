@@ -26,13 +26,8 @@ class Project(DeclarativeBase):
     summary: Mapped[str50 | None]
     introduction: Mapped[str255 | None]
     thumbnail_url: Mapped[str255 | None]
-    leader_id: Mapped[int] = mapped_column(ForeignKey("member.id"))
     project_type: Mapped[ProjectType]
     is_active: Mapped[bool] = mapped_column(default=True)
-    leader: Mapped["Member"] = relationship(back_populates="leading_projects")
-    members: Mapped[list["ProjectMember"]] = relationship(
-        back_populates="project", cascade="all, delete-orphan"
-    )
     urls: Mapped[list["ProjectURL"] | None] = relationship(
         back_populates="source_project"
     )
@@ -60,16 +55,3 @@ class ProjectImageURL(DeclarativeBase):
     url: Mapped[str255]
 
     source_project: Mapped["Project"] = relationship(back_populates="image_urls")
-
-
-class ProjectMember(DeclarativeBase):
-    __tablename__ = "project_member"
-
-    id: Mapped[intpk]
-    project_id: Mapped[int] = mapped_column(ForeignKey("project.id"))
-    member_id: Mapped[int] = mapped_column(ForeignKey("member.id"))
-    member_name: Mapped[str30]
-    position: Mapped[str50 | None]
-
-    project: Mapped["Project"] = relationship(back_populates="members")
-    member: Mapped["Member"] = relationship(back_populates="projects")

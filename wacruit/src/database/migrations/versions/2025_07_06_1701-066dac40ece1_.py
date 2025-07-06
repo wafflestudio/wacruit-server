@@ -1,4 +1,4 @@
-"""add field service_type & is_active in project table, add field generation in recruiting table
+"""add field service_type & is_active in project table
 
 Revision ID: 066dac40ece1
 Revises: f1b48402a49c

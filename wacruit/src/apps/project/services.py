@@ -12,16 +12,12 @@ from wacruit.src.apps.project.exceptions import ProjectAlreadyExistsException
 from wacruit.src.apps.project.exceptions import ProjectNotFoundException
 from wacruit.src.apps.project.models import Project
 from wacruit.src.apps.project.models import ProjectImageURL
-from wacruit.src.apps.project.models import ProjectMember
 from wacruit.src.apps.project.models import ProjectURL
 from wacruit.src.apps.project.repositories import ProjectRepository
 from wacruit.src.apps.project.schemas import ProjectBriefResponse
 from wacruit.src.apps.project.schemas import ProjectCreateRequest
 from wacruit.src.apps.project.schemas import ProjectDetailResponse
 from wacruit.src.apps.project.schemas import ProjectLinkDto
-from wacruit.src.apps.project.schemas import ProjectMemberCreateRequest
-from wacruit.src.apps.project.schemas import ProjectMemberResponse
-from wacruit.src.apps.project.schemas import ProjectMemberUpdateRequest
 from wacruit.src.apps.project.schemas import ProjectUpdateRequest
 
 
@@ -38,10 +34,6 @@ class ProjectService:
         if self.project_repository.get_project_by_name(request.name):
             raise ProjectAlreadyExistsException
 
-        leader = self.member_repository.get_member_by_id(request.leader_id)
-        if not leader:
-            raise MemberNotFoundException
-
         if request.project_type not in ProjectType.__members__:
             raise InvalidProjectTypeException(request.project_type)
 
@@ -50,7 +42,6 @@ class ProjectService:
             summary=request.summary,
             introduction=request.introduction,
             thumbnail_url=request.thumbnail_url,
-            leader_id=request.leader_id,
             project_type=request.project_type,
             is_active=request.is_active,
         )
@@ -106,52 +97,3 @@ class ProjectService:
         if not updated_project:
             raise ProjectNotFoundException
         return ProjectDetailResponse.from_orm(updated_project)
-
-    def add_project_member(self, project_id: int, request: ProjectMemberCreateRequest):
-        project = self.project_repository.get_project_by_id(project_id)
-        if not project:
-            raise ProjectNotFoundException
-        member = self.member_repository.get_member_by_id(request.member_id)
-        if not member:
-            raise MemberNotFoundException
-        if self.project_repository.get_member_by_id(project_id, request.member_id):
-            raise MemberAlreadyExistsException
-        project_member = ProjectMember(
-            project_id=project.id,
-            member_id=member.id,
-            member_name=request.name,
-            position=request.position,
-        )
-        self.project_repository.add_member_to_project(project, project_member)
-
-    def list_project_members(self, project_id: int):
-        project = self.project_repository.get_project_by_id(project_id)
-        if not project:
-            raise ProjectNotFoundException
-        return ListResponse(
-            items=[ProjectMemberResponse.from_orm(member) for member in project.members]
-        )
-
-    def update_project_member(
-        self, project_id: int, member_id: int, request: ProjectMemberUpdateRequest
-    ):
-        project = self.project_repository.get_project_by_id(project_id)
-        if not project:
-            raise ProjectNotFoundException
-        member = self.project_repository.get_member_by_id(project_id, member_id)
-        if not member:
-            raise MemberNotFoundException
-        for key, value in request.dict(exclude_none=True).items():
-            setattr(member, key, value)
-        self.project_repository.update_project(project)
-        return self.list_project_members(project_id)
-
-    def delete_project_member(self, project_id: int, member_id: int):
-        project = self.project_repository.get_project_by_id(project_id)
-        if not project:
-            raise ProjectNotFoundException
-        member = self.project_repository.get_member_by_id(project_id, member_id)
-        if not member:
-            raise MemberNotFoundException
-        self.project_repository.delete_member_from_project(project, member)
-        return self.list_project_members(project_id)
