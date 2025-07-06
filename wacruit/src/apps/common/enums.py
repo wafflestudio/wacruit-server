@@ -74,6 +74,7 @@ class RecruitingApplicationStatus(Enum):
     ACCEPTED = 2
     REJECTED = 3
 
+
 class ProjectType(Enum):
     SERVICE = 1
     STUDY = 2

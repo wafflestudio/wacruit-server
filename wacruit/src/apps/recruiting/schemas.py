@@ -30,7 +30,9 @@ class ProblemStatusDto(OrmModel):
     num: int
     status: CodeSubmissionStatus | Literal[0]  # 0 means NOT_SUBMITTED
 
+
 # 기존에 존재하던 RecruitingResponse을 UserRecruitingResponse로 변경
+
 
 class UserRecruitingResponse(OrmModel):
     id: int
@@ -42,6 +44,7 @@ class UserRecruitingResponse(OrmModel):
     to_date: datetime | None
     description: str
     problem_status: list[ProblemStatusDto]
+
 
 class RecruitingResponse(OrmModel):
     id: int
@@ -59,7 +62,8 @@ class RecruitingResponse(OrmModel):
     @classmethod
     def from_orm(cls, obj):
         resume_questions = [
-            ResumeQuestionCreateDto.from_orm(question) for question in obj.resume_questions
+            ResumeQuestionCreateDto.from_orm(question)
+            for question in obj.resume_questions
         ]
         problems = (
             [ProblemCreateDto.from_orm(problem) for problem in obj.problems]
@@ -84,6 +88,7 @@ class RecruitingResponse(OrmModel):
 class RecruitingResultResponse(BaseModel):
     status: RecruitingApplicationStatus
 
+
 class RecruitingCreateRequest(BaseModel):
     name: str
     type: str
@@ -96,6 +101,7 @@ class RecruitingCreateRequest(BaseModel):
     resume_questions: list[ResumeQuestionCreateDto]
     problems: list[ProblemCreateDto] | None = None
 
+
 class RecruitingUpdateRequest(BaseModel):
     name: str | None = None
     type: RecruitingType | None = None
@@ -107,6 +113,7 @@ class RecruitingUpdateRequest(BaseModel):
     description: str | None = None
     resume_questions: list[ResumeQuestionCreateDto] | None = None
     problems: list[ProblemCreateDto] | None = None
+
 
 class RecruitingInfoResponse(OrmModel):
     id: int

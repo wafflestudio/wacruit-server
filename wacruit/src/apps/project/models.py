@@ -7,16 +7,16 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
+from wacruit.src.apps.common.enums import ProjectType
 from wacruit.src.database.base import DeclarativeBase
 from wacruit.src.database.base import intpk
 from wacruit.src.database.base import str30
 from wacruit.src.database.base import str50
 from wacruit.src.database.base import str255
 
-from wacruit.src.apps.common.enums import ProjectType
-
 if TYPE_CHECKING:
     from wacruit.src.apps.member.models import Member
+
 
 class Project(DeclarativeBase):
     __tablename__ = "project"
@@ -30,8 +30,12 @@ class Project(DeclarativeBase):
     project_type: Mapped[ProjectType]
     is_active: Mapped[bool] = mapped_column(default=True)
     leader: Mapped["Member"] = relationship(back_populates="leading_projects")
-    members: Mapped[list["ProjectMember"]] = relationship(back_populates="project", cascade="all, delete-orphan")
-    urls: Mapped[list["ProjectURL"] | None] = relationship(back_populates="source_project")
+    members: Mapped[list["ProjectMember"]] = relationship(
+        back_populates="project", cascade="all, delete-orphan"
+    )
+    urls: Mapped[list["ProjectURL"] | None] = relationship(
+        back_populates="source_project"
+    )
     image_urls: Mapped[list["ProjectImageURL"] | None] = relationship(
         back_populates="source_project"
     )
@@ -56,6 +60,7 @@ class ProjectImageURL(DeclarativeBase):
     url: Mapped[str255]
 
     source_project: Mapped["Project"] = relationship(back_populates="image_urls")
+
 
 class ProjectMember(DeclarativeBase):
     __tablename__ = "project_member"
