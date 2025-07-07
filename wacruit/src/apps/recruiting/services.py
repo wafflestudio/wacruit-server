@@ -5,25 +5,30 @@ from fastapi import Depends
 from wacruit.src.apps.common.enums import RecruitingType
 from wacruit.src.apps.common.exceptions import InvalidRecruitTypeException
 from wacruit.src.apps.common.schemas import ListResponse
-from wacruit.src.apps.portfolio.file.services import PortfolioFileService
-from wacruit.src.apps.portfolio.url.services import PortfolioUrlService
-from wacruit.src.apps.problem.models import Problem
-from wacruit.src.apps.problem.models import Testcase
+from sqlalchemy.exc import IntegrityError
 from wacruit.src.apps.recruiting.exceptions import RecruitingNotAppliedException
 from wacruit.src.apps.recruiting.exceptions import RecruitingNotFoundException
-from wacruit.src.apps.recruiting.models import Recruiting
+from wacruit.src.apps.recruiting_info.exceptions import RecruitingInfoAlreadyExistsException
 from wacruit.src.apps.recruiting.repositories import RecruitingRepository
 from wacruit.src.apps.recruiting.schemas import RecruitingCreateRequest
+from wacruit.src.apps.recruiting.schemas import RecruitingUpdateRequest
+from wacruit.src.apps.recruiting.schemas import RecruitingInfoCreateRequest
+from wacruit.src.apps.recruiting.schemas import RecruitingInfoUpdateRequest
 from wacruit.src.apps.recruiting.schemas import RecruitingInfoResponse
 from wacruit.src.apps.recruiting.schemas import RecruitingResponse
 from wacruit.src.apps.recruiting.schemas import RecruitingResultResponse
 from wacruit.src.apps.recruiting.schemas import RecruitingSummaryResponse
-from wacruit.src.apps.recruiting.schemas import RecruitingUpdateRequest
 from wacruit.src.apps.recruiting.schemas import UserRecruitingResponse
-from wacruit.src.apps.resume.models import ResumeQuestion
-from wacruit.src.apps.resume.services import ResumeService
 from wacruit.src.apps.user.models import User
+from wacruit.src.apps.recruiting.models import Recruiting
+from wacruit.src.apps.resume.models import ResumeQuestion
+from wacruit.src.apps.problem.models import Problem
+from wacruit.src.apps.problem.models import Testcase
+from wacruit.src.apps.recruiting_info.models import RecruitingInfo
+from wacruit.src.apps.resume.services import ResumeService
 from wacruit.src.apps.user.services import UserService
+from wacruit.src.apps.portfolio.file.services import PortfolioFileService
+from wacruit.src.apps.portfolio.url.services import PortfolioUrlService
 
 
 class RecruitingService:
@@ -139,13 +144,16 @@ class RecruitingService:
             )
         return ListResponse(items=items)
 
-    def get_recruiting_info_by_type(
-        self, recruiting_type: RecruitingType
-    ) -> RecruitingInfoResponse | None:
-        info = self.recruiting_repository.get_recruiting_info_by_type(recruiting_type)
+    def get_recruiting_infos_by_type(
+        self, recruiting_type: str
+    ) -> ListResponse[RecruitingInfoResponse] | None:
+        if recruiting_type not in RecruitingType.__members__:
+            raise InvalidRecruitTypeException(recruiting_type)
+        type = RecruitingType[recruiting_type]
+        info = self.recruiting_repository.get_recruiting_infos_by_type(type)
         if not info:
             return None
-        return RecruitingInfoResponse(**info.__dict__, type=recruiting_type.name)
+        return ListResponse(items=[RecruitingInfoResponse(**item.__dict__, type=recruiting_type) for item in info])
 
     def create_recruiting(self, request: RecruitingCreateRequest) -> RecruitingResponse:
         if request.type not in RecruitingType.__members__:
@@ -223,3 +231,46 @@ class RecruitingService:
             raise RecruitingNotFoundException()
 
         return RecruitingResponse.from_orm(recruiting)
+    
+    def create_recruiting_info(
+        self, request: RecruitingInfoCreateRequest
+    ):
+        recruiting = self.recruiting_repository.get_recruiting_by_id(
+            request.recruiting_id
+        )
+        if not recruiting:
+            raise RecruitingNotFoundException()
+        if self.recruiting_repository.get_recruiting_info_by_info_num(
+            request.info_num, request.recruiting_id
+        ):
+            raise RecruitingInfoAlreadyExistsException()
+        recruit_type = recruiting.type
+        recruiting_info = RecruitingInfo(
+            info_num=request.info_num,
+            title=request.title,
+            date_info=request.date_info,
+            recruiting_id=request.recruiting_id,
+        )
+        self.recruiting_repository.create_recruiting_info(recruiting_info)
+        return RecruitingInfoResponse(**recruiting_info.__dict__, type=recruit_type.name)
+
+    def update_recruiting_info(
+        self, recruiting_info_id: int, request: RecruitingInfoUpdateRequest
+    ) -> RecruitingInfoResponse:
+        recruiting_info = self.recruiting_repository.get_recruiting_info_by_id(
+            recruiting_info_id
+        )
+        if not recruiting_info:
+            raise RecruitingNotFoundException()
+
+        recruiting_type = recruiting_info.recruiting.type
+
+        for key, value in request.dict(exclude_none=True).items():
+            setattr(recruiting_info, key, value)
+        try:
+            updated_recruiting_info = self.recruiting_repository.update_recruiting_info(
+                recruiting_info
+            )
+            return RecruitingInfoResponse(**updated_recruiting_info.__dict__, type=recruiting_type.name)
+        except IntegrityError as e:
+            raise RecruitingInfoAlreadyExistsException() from e

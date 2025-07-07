@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 class RecruitingSummaryResponse(OrmModel):
     id: int
     name: str
+    generation: str
     type: RecruitingType
     is_active: bool
     from_date: datetime | None
@@ -121,3 +122,14 @@ class RecruitingInfoResponse(OrmModel):
     info_num: int
     title: str
     date_info: datetime
+
+class RecruitingInfoCreateRequest(BaseModel):
+    info_num: int
+    title: str
+    date_info: datetime
+    recruiting_id: int
+
+class RecruitingInfoUpdateRequest(BaseModel):
+    info_num: int | None = None
+    title: str | None = None
+    date_info: datetime | None = None
