@@ -5,6 +5,7 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
+from wacruit.src.apps.common.enums import Position
 from wacruit.src.apps.common.sql import CURRENT_TIMESTAMP
 from wacruit.src.database.base import DeclarativeBase
 from wacruit.src.database.base import intpk
@@ -30,6 +31,6 @@ class Member(DeclarativeBase):
     generation: Mapped[str30]
     is_active: Mapped[bool]
     created_at: Mapped[datetime] = mapped_column(server_default=CURRENT_TIMESTAMP)
-    position: Mapped[str50 | None] = mapped_column(default=None)
+    position: Mapped[Position | None] = mapped_column(default=None)
 
     review: Mapped["Review"] = relationship(back_populates="member")

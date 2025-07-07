@@ -78,3 +78,9 @@ class RecruitingApplicationStatus(Enum):
 class ProjectType(Enum):
     SERVICE = 1
     STUDY = 2
+
+
+class Position(Enum):
+    FRONTEND = 1
+    BACKEND = 2
+    DESIGNER = 3

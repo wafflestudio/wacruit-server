@@ -136,23 +136,20 @@ class RecruitingRepository:
             .order_by(Recruiting.to_date.desc())
             .limit(1)
         ).scalar_subquery()
-        
+
         query = (
             select(RecruitingInfo)
             .where(RecruitingInfo.recruiting_id == latest_recruiting_subquery)
             .order_by(RecruitingInfo.info_num.asc())
         )
         return self.session.execute(query).scalars().all()
-    
+
     def get_recruiting_info_by_info_num(
         self, info_num: int, recruiting_id: int
     ) -> RecruitingInfo | None:
-        query = (
-            select(RecruitingInfo)
-            .where(
-                RecruitingInfo.info_num == info_num,
-                RecruitingInfo.recruiting_id == recruiting_id,
-            )
+        query = select(RecruitingInfo).where(
+            RecruitingInfo.info_num == info_num,
+            RecruitingInfo.recruiting_id == recruiting_id,
         )
         return self.session.execute(query).scalar()
 
@@ -167,17 +164,19 @@ class RecruitingRepository:
             self.session.merge(recruiting)
             self.session.flush()
         return recruiting
-    
+
     def create_recruiting_info(self, recruiting_info: RecruitingInfo):
         with self.transaction:
             self.session.add(recruiting_info)
             self.session.flush()
         return recruiting_info
-    
-    def get_recruiting_info_by_id(self, recruiting_info_id: int) -> RecruitingInfo | None:
+
+    def get_recruiting_info_by_id(
+        self, recruiting_info_id: int
+    ) -> RecruitingInfo | None:
         query = select(RecruitingInfo).where(RecruitingInfo.id == recruiting_info_id)
         return self.session.execute(query).scalar()
-        
+
     def update_recruiting_info(self, recruiting_info: RecruitingInfo) -> RecruitingInfo:
         with self.transaction:
             self.session.merge(recruiting_info)

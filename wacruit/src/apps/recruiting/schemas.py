@@ -123,11 +123,13 @@ class RecruitingInfoResponse(OrmModel):
     title: str
     date_info: datetime
 
+
 class RecruitingInfoCreateRequest(BaseModel):
     info_num: int
     title: str
     date_info: datetime
     recruiting_id: int
+
 
 class RecruitingInfoUpdateRequest(BaseModel):
     info_num: int | None = None

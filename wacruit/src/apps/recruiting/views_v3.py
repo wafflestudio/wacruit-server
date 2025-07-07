@@ -6,15 +6,14 @@ from fastapi import Depends
 from wacruit.src.apps.common.enums import RecruitingType
 from wacruit.src.apps.common.schemas import ListResponse
 from wacruit.src.apps.recruiting.schemas import RecruitingCreateRequest
-from wacruit.src.apps.recruiting.schemas import RecruitingUpdateRequest
 from wacruit.src.apps.recruiting.schemas import RecruitingInfoCreateRequest
-from wacruit.src.apps.recruiting.schemas import RecruitingInfoUpdateRequest
 from wacruit.src.apps.recruiting.schemas import RecruitingInfoResponse
+from wacruit.src.apps.recruiting.schemas import RecruitingInfoUpdateRequest
 from wacruit.src.apps.recruiting.schemas import RecruitingResponse
 from wacruit.src.apps.recruiting.schemas import RecruitingSummaryResponse
+from wacruit.src.apps.recruiting.schemas import RecruitingUpdateRequest
 from wacruit.src.apps.recruiting.services import RecruitingService
 from wacruit.src.apps.user.dependencies import AdminUser
-
 
 v3_router = APIRouter(prefix="/v3/recruitings", tags=["recruitings"])
 
@@ -37,8 +36,7 @@ def get_active_recruitings(
 
 @v3_router.get("/{recruiting_type}")
 def get_recruitings_by_type(
-    recruiting_type: str,
-    recruiting_service: Annotated[RecruitingService, Depends()]
+    recruiting_type: str, recruiting_service: Annotated[RecruitingService, Depends()]
 ) -> ListResponse[RecruitingInfoResponse]:
     result = recruiting_service.get_recruiting_infos_by_type(recruiting_type)
     if result is not None:
@@ -72,6 +70,7 @@ def create_recruiting_info(
     request: RecruitingInfoCreateRequest,
 ) -> RecruitingInfoResponse:
     return recruiting_service.create_recruiting_info(request)
+
 
 @v3_router.patch("/info/{recruiting_info_id}")
 def update_recruiting_info(
