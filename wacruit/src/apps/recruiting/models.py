@@ -34,6 +34,7 @@ class Recruiting(DeclarativeBase):
 
     id: Mapped[intpk]
     name: Mapped[str30]
+    generation: Mapped[str30] = mapped_column(server_default=text("0.0"))
     type: Mapped[RecruitingType] = mapped_column(server_default=text("'ROOKIE'"))
     is_active: Mapped[bool]
     from_date: Mapped[datetime | None] = mapped_column(

@@ -19,7 +19,9 @@ def test_get_all_recruiting(
 def test_get_recruiting_by_id(
     recruiting_service: RecruitingService, recruiting: Recruiting, user: User
 ):
-    recruiting_response = recruiting_service.get_recruiting_by_id(recruiting.id, user)
+    recruiting_response = recruiting_service.get_user_recruiting_by_id(
+        recruiting.id, user
+    )
     assert recruiting_response.name == recruiting.name
     assert recruiting_response.is_active == recruiting.is_active
     assert recruiting_response.from_date == recruiting.from_date

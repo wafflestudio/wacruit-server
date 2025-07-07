@@ -58,5 +58,6 @@ async def get_submission(
     problem_service: Annotated[ProblemService, Depends()],
 ):
     return EventSourceResponse(
-        problem_service.get_recent_submission_result(request, user, problem_id), ping=3600
+        problem_service.get_recent_submission_result(request, user, problem_id),
+        ping=3600,
     )

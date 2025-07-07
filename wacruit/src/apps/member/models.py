@@ -5,8 +5,8 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
+from wacruit.src.apps.common.enums import Position
 from wacruit.src.apps.common.sql import CURRENT_TIMESTAMP
-from wacruit.src.apps.project.models import project_member_association
 from wacruit.src.database.base import DeclarativeBase
 from wacruit.src.database.base import intpk
 from wacruit.src.database.base import str30
@@ -31,9 +31,6 @@ class Member(DeclarativeBase):
     generation: Mapped[str30]
     is_active: Mapped[bool]
     created_at: Mapped[datetime] = mapped_column(server_default=CURRENT_TIMESTAMP)
+    position: Mapped[Position | None] = mapped_column(default=None)
 
-    leading_projects: Mapped[list["Project"]] = relationship(back_populates="leader")
-    projects: Mapped[list["Project"]] = relationship(
-        secondary=project_member_association, back_populates="members"
-    )
     review: Mapped["Review"] = relationship(back_populates="member")
