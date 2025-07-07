@@ -84,3 +84,8 @@ class Position(Enum):
     FRONTEND = 1
     BACKEND = 2
     DESIGNER = 3
+    ANDROID = 4
+    IOS = 5
+    # INFRA = 6
+    # PM = 7
+    # OPERATIONS = 8
