@@ -23,8 +23,7 @@ from wacruit.src.apps.recruiting.schemas import RecruitingResultResponse
 from wacruit.src.apps.recruiting.schemas import RecruitingSummaryResponse
 from wacruit.src.apps.recruiting.schemas import RecruitingUpdateRequest
 from wacruit.src.apps.recruiting.schemas import UserRecruitingResponse
-from wacruit.src.apps.recruiting_info.exceptions import (
-    RecruitingInfoAlreadyExistsException)
+from wacruit.src.apps.recruiting_info.exceptions import InfoAlreadyExistsException
 from wacruit.src.apps.recruiting_info.models import RecruitingInfo
 from wacruit.src.apps.resume.models import ResumeQuestion
 from wacruit.src.apps.resume.services import ResumeService
@@ -247,7 +246,7 @@ class RecruitingService:
         if self.recruiting_repository.get_recruiting_info_by_info_num(
             request.info_num, request.recruiting_id
         ):
-            raise RecruitingInfoAlreadyExistsException()
+            raise InfoAlreadyExistsException()
         recruit_type = recruiting.type
         recruiting_info = RecruitingInfo(
             info_num=request.info_num,
@@ -280,5 +279,5 @@ class RecruitingService:
             return RecruitingInfoResponse(
                 **updated_recruiting_info.__dict__, type=recruiting_type.name
             )
-        except IntegrityError as e:
-            raise RecruitingInfoAlreadyExistsException() from e
+        except IntegrityError as exc:
+            raise InfoAlreadyExistsException() from exc
