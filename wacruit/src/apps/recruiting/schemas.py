@@ -118,7 +118,7 @@ class RecruitingUpdateRequest(BaseModel):
 
 class RecruitingInfoResponse(OrmModel):
     id: int
-    type: str
+    type: RecruitingType
     info_num: int
     title: str
     date_info: datetime

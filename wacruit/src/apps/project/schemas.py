@@ -17,7 +17,7 @@ class ProjectCreateRequest(BaseModel):
     summary: str | None = Field(None, max_length=50)
     introduction: str | None = Field(None, max_length=255)
     thumbnail_url: str | None = Field(None, max_length=255)
-    project_type: str
+    project_type: ProjectType
     is_active: bool
     images: list[str] | None
     urls: list[ProjectLinkDto] | None
@@ -28,7 +28,7 @@ class ProjectUpdateRequest(BaseModel):
     summary: str | None = Field(None, max_length=50)
     introduction: str | None = Field(None, max_length=255)
     thumbnail_url: str | None = Field(None, max_length=255)
-    project_type: str | None
+    project_type: ProjectType | None
     is_active: bool | None
     images: list[str] | None
     urls: list[ProjectLinkDto] | None
@@ -40,7 +40,7 @@ class ProjectDetailResponse(OrmModel):
     summary: str | None
     introduction: str | None
     thumbnail_url: str | None
-    project_type: str
+    project_type: ProjectType
     is_active: bool
     images: list[str] | None
     urls: list[ProjectLinkDto] | None
@@ -73,7 +73,7 @@ class ProjectBriefResponse(OrmModel):
     name: str
     summary: str | None
     thumbnail_url: str | None
-    project_type: str
+    project_type: ProjectType
     is_active: bool
 
     @classmethod
