@@ -26,7 +26,3 @@ class SeminarResponse(BaseModel):
 
     class Config:
         orm_mode = True
-
-
-class SeminarListResponse(BaseModel):
-    items: list[SeminarResponse]

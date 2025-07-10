@@ -3,8 +3,8 @@ from typing import Annotated
 from fastapi import APIRouter
 from fastapi import Depends
 
+from wacruit.src.apps.common.schemas import ListResponse
 from wacruit.src.apps.seminar.schemas import CreateSeminarRequest
-from wacruit.src.apps.seminar.schemas import SeminarListResponse
 from wacruit.src.apps.seminar.schemas import SeminarResponse
 from wacruit.src.apps.seminar.schemas import UpdateSeminarRequest
 from wacruit.src.apps.seminar.services import SeminarService
@@ -16,10 +16,10 @@ v3_router = APIRouter(prefix="/v3/seminars", tags=["seminars"])
 @v3_router.get("/")
 def get_seminars(
     admin_user: AdminUser, seminar_service: Annotated[SeminarService, Depends()]
-) -> SeminarListResponse:
+) -> ListResponse:
     seminar_list = seminar_service.get_all_seminars()
 
-    return SeminarListResponse(
+    return ListResponse(
         items=[SeminarResponse.from_orm(seminar) for seminar in seminar_list]
     )
 
@@ -48,9 +48,9 @@ def update_seminar(
 @v3_router.get("/active")
 def get_active_seminar(
     seminar_service: Annotated[SeminarService, Depends()]
-) -> SeminarListResponse:
+) -> ListResponse:
     seminar_list = seminar_service.get_active_seminar()
 
-    return SeminarListResponse(
+    return ListResponse(
         items=[SeminarResponse.from_orm(seminar) for seminar in seminar_list]
     )
