@@ -46,3 +46,8 @@ class InvalidRecruitTypeException(WacruitException):
 class InvalidProjectTypeException(WacruitException):
     def __init__(self, type: str):
         super().__init__(status_code=400, detail=f"Invalid project type: {type}")
+
+
+class InvalidFieldFormatError(WacruitException):
+    def __init__(self, field: str = "Field"):
+        super().__init__(status_code=400, detail=f"Invalid format for {field}")
