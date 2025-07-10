@@ -24,6 +24,7 @@ class Member(DeclarativeBase):
     id: Mapped[intpk]
     first_name: Mapped[str30]
     last_name: Mapped[str30]
+    introduction: Mapped[str255 | None]
     department: Mapped[str50 | None]
     college: Mapped[str50 | None]
     phone_number: Mapped[str30 | None]
