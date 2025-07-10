@@ -34,9 +34,6 @@ class ProjectService:
         if self.project_repository.get_project_by_name(request.name):
             raise ProjectAlreadyExistsException
 
-        if request.project_type not in ProjectType.__members__:
-            raise InvalidProjectTypeException(request.project_type)
-
         project = Project(
             name=request.name,
             summary=request.summary,

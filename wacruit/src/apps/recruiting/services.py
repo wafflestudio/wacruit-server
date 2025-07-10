@@ -145,12 +145,9 @@ class RecruitingService:
         return ListResponse(items=items)
 
     def get_recruiting_infos_by_type(
-        self, recruiting_type: str
+        self, recruiting_type: RecruitingType
     ) -> ListResponse[RecruitingInfoResponse] | None:
-        if recruiting_type not in RecruitingType.__members__:
-            raise InvalidRecruitTypeException(recruiting_type)
-        type = RecruitingType[recruiting_type]
-        info = self.recruiting_repository.get_recruiting_infos_by_type(type)
+        info = self.recruiting_repository.get_recruiting_infos_by_type(recruiting_type)
         if not info:
             return None
         return ListResponse(
@@ -255,9 +252,7 @@ class RecruitingService:
             recruiting_id=request.recruiting_id,
         )
         self.recruiting_repository.create_recruiting_info(recruiting_info)
-        return RecruitingInfoResponse(
-            **recruiting_info.__dict__, type=recruit_type.name
-        )
+        return RecruitingInfoResponse(**recruiting_info.__dict__, type=recruit_type)
 
     def update_recruiting_info(
         self, recruiting_info_id: int, request: RecruitingInfoUpdateRequest
@@ -277,7 +272,7 @@ class RecruitingService:
                 recruiting_info
             )
             return RecruitingInfoResponse(
-                **updated_recruiting_info.__dict__, type=recruiting_type.name
+                **updated_recruiting_info.__dict__, type=recruiting_type
             )
         except IntegrityError as exc:
             raise InfoAlreadyExistsException() from exc
