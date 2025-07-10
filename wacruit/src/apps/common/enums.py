@@ -89,3 +89,11 @@ class Position(Enum):
     # INFRA = 6
     # PM = 7
     # OPERATIONS = 8
+
+
+class SeminarType(Enum):
+    SPRING = "SPRING"
+    FASTAPI = "FASTAPI"
+    FRONTEND = "FRONTEND"
+    ANDROID = "ANDROID"
+    IOS = "IOS"
