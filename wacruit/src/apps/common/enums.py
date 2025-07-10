@@ -92,8 +92,8 @@ class Position(Enum):
 
 
 class SeminarType(Enum):
-    SPRING = 1
-    FAST_API = 2
-    FRONTEND = 3
-    ANDROID = 4
-    IOS = 5
+    SPRING = "SPRING"
+    FASTAPI = "FASTAPI"
+    FRONTEND = "FRONTEND"
+    ANDROID = "ANDROID"
+    IOS = "IOS"
