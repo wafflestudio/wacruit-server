@@ -1,10 +1,13 @@
 from pydantic import BaseModel
+
 from wacruit.src.apps.common.enums import Position
+
 
 class ReviewCreateRequest(BaseModel):
     title: str
     content: str
     member_id: int
+
 
 class ReviewResponse(BaseModel):
     id: int
@@ -15,6 +18,7 @@ class ReviewResponse(BaseModel):
     member_last_name: str
     member_position: Position | None
     is_active: bool
+
 
 class ReviewUpdateRequest(BaseModel):
     title: str | None = None
