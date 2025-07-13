@@ -9,6 +9,7 @@ from wacruit.src.apps import problem
 from wacruit.src.apps import project
 from wacruit.src.apps import recruiting
 from wacruit.src.apps import resume
+from wacruit.src.apps import review
 from wacruit.src.apps import seminar
 from wacruit.src.apps import user
 
@@ -27,3 +28,4 @@ api_router.include_router(portfolio.v2_router)
 api_router.include_router(project.router)
 api_router.include_router(seminar.router)
 api_router.include_router(history.router)
+api_router.include_router(review.router)
