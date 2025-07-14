@@ -38,7 +38,7 @@ def list_projects(
     offset: int = 0,
     limit: int = 10,
 ) -> ListResponse[ProjectBriefResponse]:
-    return project_service.list_projects()
+    return project_service.list_projects(offset=offset, limit=limit)
 
 
 @v3_router.patch("/{project_id}")
