@@ -11,7 +11,7 @@ from wacruit.src.apps.user.dependencies import AdminUser
 v3_router = APIRouter(prefix="/v3/history", tags=["history"])
 
 
-@v3_router.patch("/")
+@v3_router.patch("")
 def update_history(
     admin_user: AdminUser,
     history_service: Annotated[HistoryService, Depends()],
@@ -25,7 +25,7 @@ def update_history(
     return HistoryResponse(__root__=response_dict)
 
 
-@v3_router.get("/")
+@v3_router.get("")
 def get_history(history_service: Annotated[HistoryService, Depends()]):
     history_list = history_service.get_history()
     response_dict = {}

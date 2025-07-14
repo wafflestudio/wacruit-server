@@ -18,7 +18,7 @@ from wacruit.src.apps.user.dependencies import AdminUser
 v3_router = APIRouter(prefix="/v3/recruitings", tags=["recruitings"])
 
 
-@v3_router.post("/")
+@v3_router.post("")
 def create_recruiting(
     admin_user: AdminUser,
     recruiting_service: Annotated[RecruitingService, Depends()],

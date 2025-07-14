@@ -13,7 +13,7 @@ from wacruit.src.apps.user.dependencies import AdminUser
 v3_router = APIRouter(prefix="/v3/seminars", tags=["seminars"])
 
 
-@v3_router.get("/")
+@v3_router.get("")
 def get_seminars(
     admin_user: AdminUser, seminar_service: Annotated[SeminarService, Depends()]
 ) -> ListResponse:
@@ -24,7 +24,7 @@ def get_seminars(
     )
 
 
-@v3_router.post("/")
+@v3_router.post("")
 def create_seminar(
     admin_user: AdminUser,
     request: CreateSeminarRequest,
