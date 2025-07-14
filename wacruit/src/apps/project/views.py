@@ -14,7 +14,7 @@ from wacruit.src.apps.user.dependencies import AdminUser
 v3_router = APIRouter(prefix="/v3/projects", tags=["projects"])
 
 
-@v3_router.post("/")
+@v3_router.post("")
 def create_project(
     request: ProjectCreateRequest,
     project_service: Annotated[ProjectService, Depends()],
@@ -30,7 +30,7 @@ def get_project(
     return project_service.get_project(project_id)
 
 
-@v3_router.get("/")
+@v3_router.get("")
 def list_projects(
     project_service: Annotated[ProjectService, Depends()]
 ) -> ListResponse[ProjectBriefResponse]:
