@@ -4,6 +4,7 @@ from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import Security
 from fastapi.security import APIKeyHeader
+from fastapi import Response
 
 from wacruit.src.apps.common.schemas import ListResponse
 from wacruit.src.apps.member.schemas import MemberBriefResponse
@@ -22,8 +23,9 @@ def create_member(
     admin_user: AdminUser,
     request: MemberCreateRequest,
     member_service: Annotated[MemberService, Depends()],
-):
-    return member_service.create_member(request)
+) -> Response:
+    member_service.create_member(request)
+    return Response(status_code=201)
 
 
 @v3_router.get("/{member_id}")
