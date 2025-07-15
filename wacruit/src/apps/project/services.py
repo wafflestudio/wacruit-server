@@ -62,7 +62,7 @@ class ProjectService:
             for url_dto in request.urls:
                 url_obj = ProjectURL(
                     project_id=created_project.id,
-                    title=url_dto.url_type,
+                    url_type=url_dto.url_type,
                     url=url_dto.url,
                 )
                 created_project.urls.append(url_obj)
