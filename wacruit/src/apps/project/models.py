@@ -8,6 +8,7 @@ from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
 from wacruit.src.apps.common.enums import ProjectType
+from wacruit.src.apps.common.enums import ProjectURLType
 from wacruit.src.database.base import DeclarativeBase
 from wacruit.src.database.base import intpk
 from wacruit.src.database.base import str30
@@ -41,7 +42,7 @@ class ProjectURL(DeclarativeBase):
 
     id: Mapped[intpk]
     project_id: Mapped[int] = mapped_column(ForeignKey("project.id"))
-    title: Mapped[str50]
+    url_type: Mapped[ProjectURLType]
     url: Mapped[str255]
 
     source_project: Mapped["Project"] = relationship(back_populates="urls")

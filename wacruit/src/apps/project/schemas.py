@@ -4,11 +4,12 @@ from pydantic import BaseModel
 from pydantic import Field
 
 from wacruit.src.apps.common.enums import ProjectType
+from wacruit.src.apps.common.enums import ProjectURLType
 from wacruit.src.apps.common.schemas import OrmModel
 
 
 class ProjectLinkDto(BaseModel):
-    title: str
+    url_type: ProjectURLType
     url: str
 
 
@@ -49,7 +50,9 @@ class ProjectDetailResponse(OrmModel):
     def from_orm(cls, obj):
         urls = None
         if obj.urls:
-            urls = [ProjectLinkDto(title=url.title, url=url.url) for url in obj.urls]
+            urls = [
+                ProjectLinkDto(url_type=url.url_type, url=url.url) for url in obj.urls
+            ]
 
         images = None
         if obj.image_urls:
