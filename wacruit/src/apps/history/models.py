@@ -6,7 +6,7 @@ from wacruit.src.database.base import str50
 
 
 class History(DeclarativeBase):
-    __tablename__ = "histroy"
+    __tablename__ = "history"
 
     id: Mapped[intpk]
     history_key: Mapped[str50]
