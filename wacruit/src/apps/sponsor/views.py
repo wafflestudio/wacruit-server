@@ -15,19 +15,18 @@ from wacruit.src.apps.user.dependencies import AdminUser
 v3_router = APIRouter(prefix="/v3/sponsor", tags=["sponsor"])
 
 
-@v3_router.post("")
+@v3_router.post("", status_code=201)
 def create_sponsor(
     admin_user: AdminUser,
     request: SponsorCreateRequest,
     sponsor_service: Annotated[SponsorService, Depends()],
-) -> Response:
+):
     sponsor_service.create_sponsor(request)
-
-    return Response(status_code=201)
 
 
 @v3_router.get("/{sponsor_id}")
 def get_sponsor(
+    admin_user: AdminUser,
     sponsor_id: str,
     sponsor_service: Annotated[SponsorService, Depends()],
 ) -> SponsorInfoResponse:
