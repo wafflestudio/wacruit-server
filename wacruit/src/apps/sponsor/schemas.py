@@ -1,6 +1,9 @@
-from pydantic import BaseModel
-from wacruit.src.apps.common.schemas import OrmModel
 from datetime import date
+
+from pydantic import BaseModel
+
+from wacruit.src.apps.common.schemas import OrmModel
+
 
 class SponsorCreateRequest(BaseModel):
     name: str
@@ -8,6 +11,7 @@ class SponsorCreateRequest(BaseModel):
     sponsored_date: date
     email: str | None = None
     phone_number: str | None = None
+
 
 class SponsorInfoResponse(OrmModel):
     id: int
@@ -17,9 +21,11 @@ class SponsorInfoResponse(OrmModel):
     email: str | None = None
     phone_number: str | None = None
 
+
 class SponsorBriefResponse(OrmModel):
     id: int
     name: str
+
 
 class SponsorUpdateRequest(BaseModel):
     email: str | None = None

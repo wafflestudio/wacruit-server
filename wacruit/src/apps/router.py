@@ -11,8 +11,8 @@ from wacruit.src.apps import recruiting
 from wacruit.src.apps import resume
 from wacruit.src.apps import review
 from wacruit.src.apps import seminar
-from wacruit.src.apps import user
 from wacruit.src.apps import sponsor
+from wacruit.src.apps import user
 
 api_router = APIRouter(prefix="/api")
 api_router.include_router(dummy.router)
