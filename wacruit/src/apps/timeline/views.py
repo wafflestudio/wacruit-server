@@ -17,7 +17,7 @@ from wacruit.src.apps.user.dependencies import AdminUser
 v3_router = APIRouter(prefix="/v3/timelines", tags=["timelines"])
 
 
-@v3_router.post("/categories", status_code=HTTPStatus.OK)
+@v3_router.post("/categories", status_code=HTTPStatus.CREATED)
 def create_timeline_category(
     admin_user: AdminUser,
     request: TimelineCategoryCreateUpdateRequest,
