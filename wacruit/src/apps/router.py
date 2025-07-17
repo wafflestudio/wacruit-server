@@ -13,6 +13,7 @@ from wacruit.src.apps import resume
 from wacruit.src.apps import review
 from wacruit.src.apps import seminar
 from wacruit.src.apps import sponsor
+from wacruit.src.apps import timeline
 from wacruit.src.apps import user
 
 api_router = APIRouter(prefix="/api")
@@ -33,3 +34,4 @@ api_router.include_router(seminar.router)
 api_router.include_router(history.router)
 api_router.include_router(review.router)
 api_router.include_router(faq.router)
+api_router.include_router(timeline.router)

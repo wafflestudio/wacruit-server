@@ -52,7 +52,7 @@ class SponsorService:
         if not sponsor:
             raise SponsorNotFoundException
 
-        for field, value in request.dict(exclude_unset=True).items():
+        for field, value in request.dict(exclude_none=True).items():
             setattr(sponsor, field, value)
 
         self.sponsor_repository.update_sponsor(sponsor)
