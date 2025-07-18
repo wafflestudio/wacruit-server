@@ -158,12 +158,9 @@ class RecruitingService:
         )
 
     def create_recruiting(self, request: RecruitingCreateRequest) -> RecruitingResponse:
-        if request.type not in RecruitingType.__members__:
-            raise InvalidRecruitTypeException(request.type)
-
         recruiting = Recruiting(
             name=request.name,
-            type=RecruitingType[request.type],
+            type=request.type,
             generation=request.generation,
             is_active=request.is_active,
             from_date=request.from_date,

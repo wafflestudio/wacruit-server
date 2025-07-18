@@ -32,8 +32,8 @@ class ProjectRepository:
     def get_project_by_name(self, name: str) -> Project | None:
         return self.session.query(Project).filter(Project.name == name).first()
 
-    def get_projects(self) -> list[Project]:
-        return self.session.query(Project).all()
+    def get_projects(self, offset: int = 0, limit: int = 10) -> list[Project]:
+        return self.session.query(Project).offset(offset).limit(limit).all()
 
     def create_project(self, project: Project) -> Project:
         with self.transaction:

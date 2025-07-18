@@ -112,6 +112,6 @@ class ProjectURLType(Enum):
 
 
 class TimelineGroupType(Enum):
-    ROOKIES = "ROOKIES"
-    PROGRAMMERS = "PROGRAMMERS"
-    DESIGNERS = "DESIGNERS"
+    ROOKIE = "ROOKIE"
+    PROGRAMMER = "PROGRAMMER"
+    DESIGNER = "DESIGNER"
