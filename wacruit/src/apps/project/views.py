@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from typing import Annotated
 
 from fastapi import APIRouter
@@ -14,7 +15,7 @@ from wacruit.src.apps.user.dependencies import AdminUser
 v3_router = APIRouter(prefix="/v3/projects", tags=["projects"])
 
 
-@v3_router.post("")
+@v3_router.post("", status_code=HTTPStatus.CREATED)
 def create_project(
     request: ProjectCreateRequest,
     project_service: Annotated[ProjectService, Depends()],
@@ -32,9 +33,11 @@ def get_project(
 
 @v3_router.get("")
 def list_projects(
-    project_service: Annotated[ProjectService, Depends()]
+    project_service: Annotated[ProjectService, Depends()],
+    offset: int = 0,
+    limit: int = 10,
 ) -> ListResponse[ProjectBriefResponse]:
-    return project_service.list_projects()
+    return project_service.list_projects(offset=offset, limit=limit)
 
 
 @v3_router.patch("/{project_id}")
