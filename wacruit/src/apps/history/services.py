@@ -2,7 +2,6 @@ from datetime import datetime
 
 from fastapi import Depends
 
-from wacruit.src.apps.history.exceptions import HistoryEmptyException
 from wacruit.src.apps.history.models import History
 from wacruit.src.apps.history.repositories import HistoryRepository
 from wacruit.src.apps.history.schemas import UpdateHistoryRequest
@@ -23,8 +22,6 @@ class HistoryService:
                 )
             )
 
-        if not history_list:
-            raise HistoryEmptyException
         return history_list
 
     def update_history(self, update_request: UpdateHistoryRequest):
