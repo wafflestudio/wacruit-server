@@ -2,7 +2,6 @@ from typing import Annotated
 
 from fastapi import Depends
 
-from wacruit.src.apps.faq.exceptions import QuestionListEmptyException
 from wacruit.src.apps.faq.exceptions import QuestionNowFoundException
 from wacruit.src.apps.faq.models import FAQ
 from wacruit.src.apps.faq.repositories import QuestionRepository
@@ -24,8 +23,6 @@ class QuestionService:
 
     def get_questions(self) -> list[FAQ]:
         questions = self.question_repository.get_questions()
-        if not questions:
-            raise QuestionListEmptyException
         return questions
 
     def update_question(self, questions_id: int, req: UpdateQuestionRequest) -> FAQ:
