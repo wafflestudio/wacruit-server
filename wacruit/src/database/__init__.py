@@ -13,3 +13,4 @@ import wacruit.src.apps.project.models  # isort: skip
 import wacruit.src.apps.faq.models  # isort: skip
 import wacruit.src.apps.history.models  # isort: skip
 import wacruit.src.apps.timeline.models  # isort: skip
+import wacruit.src.apps.pre_registration.models  # isort: skip
