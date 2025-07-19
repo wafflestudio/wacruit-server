@@ -6,6 +6,7 @@ from wacruit.src.apps import faq
 from wacruit.src.apps import history
 from wacruit.src.apps import member
 from wacruit.src.apps import portfolio
+from wacruit.src.apps import pre_registration
 from wacruit.src.apps import problem
 from wacruit.src.apps import project
 from wacruit.src.apps import recruiting
@@ -35,3 +36,4 @@ api_router.include_router(history.router)
 api_router.include_router(review.router)
 api_router.include_router(faq.router)
 api_router.include_router(timeline.router)
+api_router.include_router(pre_registration.router)
