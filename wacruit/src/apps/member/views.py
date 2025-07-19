@@ -1,10 +1,11 @@
+from http import HTTPStatus
 from typing import Annotated
 
 from fastapi import APIRouter
 from fastapi import Depends
+from fastapi import Response
 from fastapi import Security
 from fastapi.security import APIKeyHeader
-from fastapi import Response
 
 from wacruit.src.apps.common.schemas import ListResponse
 from wacruit.src.apps.member.schemas import MemberBriefResponse
@@ -18,14 +19,13 @@ from wacruit.src.apps.user.dependencies import CurrentUser
 v3_router = APIRouter(prefix="/v3/members", tags=["members"])
 
 
-@v3_router.post("")
+@v3_router.post("", status_code=HTTPStatus.CREATED)
 def create_member(
     admin_user: AdminUser,
     request: MemberCreateRequest,
     member_service: Annotated[MemberService, Depends()],
-) -> Response:
+):
     member_service.create_member(request)
-    return Response(status_code=201)
 
 
 @v3_router.get("/{member_id}")

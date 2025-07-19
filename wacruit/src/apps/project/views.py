@@ -3,7 +3,6 @@ from typing import Annotated
 
 from fastapi import APIRouter
 from fastapi import Depends
-from fastapi import Response
 
 from wacruit.src.apps.common.schemas import ListResponse
 from wacruit.src.apps.project.schemas import PresignedUrlWithIdResponse
@@ -24,9 +23,8 @@ def create_project(
     request: ProjectCreateRequest,
     project_service: Annotated[ProjectService, Depends()],
     admin_user: AdminUser,
-) -> Response:
+):
     project_service.create_project(request)
-    return Response(status_code=201)
 
 
 @v3_router.get("/{project_id}")

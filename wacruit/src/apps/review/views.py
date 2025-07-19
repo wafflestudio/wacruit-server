@@ -2,7 +2,6 @@ from typing import Annotated
 
 from fastapi import APIRouter
 from fastapi import Depends
-from fastapi import Response
 
 from wacruit.src.apps.common.schemas import ListResponse
 from wacruit.src.apps.review.schemas import ReviewCreateRequest
@@ -19,9 +18,8 @@ def create_review(
     admin_user: AdminUser,
     request: ReviewCreateRequest,
     review_service: Annotated[ReviewService, Depends()],
-) -> Response:
+):
     review_service.create_review(request)
-    return Response(status_code=201)
 
 
 @v3_router.get("/{review_id}")
@@ -56,6 +54,5 @@ def delete_review(
     admin_user: AdminUser,
     review_id: int,
     review_service: Annotated[ReviewService, Depends()],
-) -> Response:
+):
     review_service.delete_review(review_id)
-    return Response(status_code=204)
