@@ -33,12 +33,7 @@ class ProjectRepository:
         return self.session.query(Project).filter(Project.name == name).first()
 
     def get_projects(self, offset: int = 0, limit: int = 10) -> list[Project]:
-        return (
-            self.session.query(Project)
-            .offset(offset)
-            .limit(limit)
-            .all()
-        )
+        return self.session.query(Project).offset(offset).limit(limit).all()
 
     def create_project(self, project: Project) -> Project:
         with self.transaction:

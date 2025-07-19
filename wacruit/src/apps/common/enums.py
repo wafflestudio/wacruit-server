@@ -109,3 +109,9 @@ class ProjectURLType(Enum):
     IOS_GITHUB = "IOS_GITHUB"
     CRAWLER_GITHUB = "CRAWLER_GITHUB"
     BEHANCE = "BEHANCE"
+
+
+class TimelineGroupType(Enum):
+    ROOKIE = "ROOKIE"
+    PROGRAMMER = "PROGRAMMER"
+    DESIGNER = "DESIGNER"

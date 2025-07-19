@@ -78,7 +78,7 @@ class ProjectService:
         return ProjectDetailResponse.from_orm(project)
 
     def list_projects(
-            self, offset: int = 0, limit: int = 10
+        self, offset: int = 0, limit: int = 10
     ) -> ListResponse[ProjectBriefResponse]:
         projects = self.project_repository.get_projects(offset=offset, limit=limit)
         items = []

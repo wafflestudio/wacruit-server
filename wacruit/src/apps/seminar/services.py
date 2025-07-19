@@ -2,8 +2,6 @@ from typing import Annotated
 
 from fastapi import Depends
 
-from wacruit.src.apps.seminar.exceptions import SeminarListEmptyException
-from wacruit.src.apps.seminar.exceptions import SeminarNotActiveException
 from wacruit.src.apps.seminar.exceptions import SeminarNotFoundException
 from wacruit.src.apps.seminar.models import Seminar
 from wacruit.src.apps.seminar.repositories import SeminarRepository
@@ -23,14 +21,10 @@ class SeminarService:
 
     def get_active_seminar(self) -> list[Seminar]:
         seminar_list = self.seminar_repository.get_active_seminars()
-        if not seminar_list:
-            raise SeminarNotActiveException
         return seminar_list
 
     def get_all_seminars(self) -> list[Seminar]:
         seminar_list = self.seminar_repository.get_all_seminars()
-        if not seminar_list:
-            raise SeminarListEmptyException
         return seminar_list
 
     def create_seminar(self, request: CreateSeminarRequest) -> Seminar:

@@ -92,7 +92,7 @@ class RecruitingResultResponse(BaseModel):
 
 class RecruitingCreateRequest(BaseModel):
     name: str
-    type: str
+    type: RecruitingType
     generation: str
     is_active: bool
     from_date: datetime

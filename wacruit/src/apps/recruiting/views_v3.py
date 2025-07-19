@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from typing import Annotated
 
 from fastapi import APIRouter
@@ -18,7 +19,7 @@ from wacruit.src.apps.user.dependencies import AdminUser
 v3_router = APIRouter(prefix="/v3/recruitings", tags=["recruitings"])
 
 
-@v3_router.post("")
+@v3_router.post("", status_code=HTTPStatus.CREATED)
 def create_recruiting(
     admin_user: AdminUser,
     recruiting_service: Annotated[RecruitingService, Depends()],
@@ -34,8 +35,8 @@ def get_active_recruitings(
     return recruiting_service.get_active_recruitings()
 
 
-@v3_router.get("/info/{recruiting_type}")
-def get_recruitings_by_type(
+@v3_router.get("/info")
+def get_recruiting_infos_by_type(
     recruiting_type: RecruitingType,
     recruiting_service: Annotated[RecruitingService, Depends()],
 ) -> ListResponse[RecruitingInfoResponse]:
@@ -64,7 +65,7 @@ def get_recruiting_by_id(
     return recruiting_service.get_recruiting_by_id(recruiting_id)
 
 
-@v3_router.post("/info")
+@v3_router.post("/info", status_code=HTTPStatus.CREATED)
 def create_recruiting_info(
     admin_user: AdminUser,
     recruiting_service: Annotated[RecruitingService, Depends()],
