@@ -26,3 +26,15 @@ def shorten_column(width: int = 10, placeholder: str = "...", **kwargs) -> Forma
         )
 
     return formatter
+
+
+def member_formatter(model: type[DeclarativeBase], attribute: str) -> str | None:
+    member = getattr(model, "member")
+    return member and f"{member.last_name} {member.first_name}"
+
+
+def timeline_category_formatter(
+    model: type[DeclarativeBase], attribute: str
+) -> str | None:
+    category = getattr(model, "category")
+    return category and category.title
