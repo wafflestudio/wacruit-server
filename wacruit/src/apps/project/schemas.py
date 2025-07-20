@@ -20,7 +20,6 @@ class ProjectCreateRequest(BaseModel):
     thumbnail_url: str | None = Field(None, max_length=255)
     project_type: ProjectType
     is_active: bool
-    images: list[str] | None
     urls: list[ProjectLinkDto] | None
 
 
@@ -31,8 +30,21 @@ class ProjectUpdateRequest(BaseModel):
     thumbnail_url: str | None = Field(None, max_length=255)
     project_type: ProjectType | None
     is_active: bool | None
-    images: list[str] | None
     urls: list[ProjectLinkDto] | None
+
+
+class ProjectImageResponse(OrmModel):
+    id: int
+    project_id: int
+    object_key: str
+    is_uploaded: bool
+
+
+class PresignedUrlWithIdResponse(BaseModel):
+    object_name: str
+    presigned_url: str
+    fields: dict[str, str] = Field(default={})
+    project_image_id: int
 
 
 class ProjectDetailResponse(OrmModel):
@@ -43,32 +55,8 @@ class ProjectDetailResponse(OrmModel):
     thumbnail_url: str | None
     project_type: ProjectType
     is_active: bool
-    images: list[str] | None
+    images: list[PresignedUrlWithIdResponse] | None
     urls: list[ProjectLinkDto] | None
-
-    @classmethod
-    def from_orm(cls, obj):
-        urls = None
-        if obj.urls:
-            urls = [
-                ProjectLinkDto(url_type=url.url_type, url=url.url) for url in obj.urls
-            ]
-
-        images = None
-        if obj.image_urls:
-            images = [img.url for img in obj.image_urls]
-
-        return cls(
-            id=obj.id,
-            name=obj.name,
-            summary=obj.summary,
-            introduction=obj.introduction,
-            thumbnail_url=obj.thumbnail_url,
-            project_type=obj.project_type.name,
-            is_active=obj.is_active,
-            images=images,
-            urls=urls,
-        )
 
 
 class ProjectBriefResponse(OrmModel):
@@ -89,6 +77,11 @@ class ProjectBriefResponse(OrmModel):
             project_type=obj.project_type.name,
             is_active=obj.is_active,
         )
+
+
+class ProjectImageUploadRequest(BaseModel):
+    project_id: int
+    file_name: str
 
 
 class ProjectListResponse(OrmModel):

@@ -19,7 +19,7 @@ def create_review(
     request: ReviewCreateRequest,
     review_service: Annotated[ReviewService, Depends()],
 ):
-    return review_service.create_review(request)
+    review_service.create_review(request)
 
 
 @v3_router.get("/{review_id}")
@@ -55,4 +55,4 @@ def delete_review(
     review_id: int,
     review_service: Annotated[ReviewService, Depends()],
 ):
-    return review_service.delete_review(review_id)
+    review_service.delete_review(review_id)
