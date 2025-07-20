@@ -40,6 +40,13 @@ class ProjectImageResponse(OrmModel):
     is_uploaded: bool
 
 
+class PresignedUrlWithIdResponse(BaseModel):
+    object_name: str
+    presigned_url: str
+    fields: dict[str, str] = Field(default={})
+    project_image_id: int
+
+
 class ProjectDetailResponse(OrmModel):
     id: int
     name: str
@@ -48,32 +55,8 @@ class ProjectDetailResponse(OrmModel):
     thumbnail_url: str | None
     project_type: ProjectType
     is_active: bool
-    images: list[ProjectImageResponse] | None
+    images: list[PresignedUrlWithIdResponse] | None
     urls: list[ProjectLinkDto] | None
-
-    @classmethod
-    def from_orm(cls, obj):
-        urls = None
-        if obj.urls:
-            urls = [
-                ProjectLinkDto(url_type=url.url_type, url=url.url) for url in obj.urls
-            ]
-
-        images = None
-        if obj.images:
-            images = [ProjectImageResponse.from_orm(image) for image in obj.images]
-
-        return cls(
-            id=obj.id,
-            name=obj.name,
-            summary=obj.summary,
-            introduction=obj.introduction,
-            thumbnail_url=obj.thumbnail_url,
-            project_type=obj.project_type.name,
-            is_active=obj.is_active,
-            images=images,
-            urls=urls,
-        )
 
 
 class ProjectBriefResponse(OrmModel):
@@ -103,10 +86,3 @@ class ProjectImageUploadRequest(BaseModel):
 
 class ProjectListResponse(OrmModel):
     projects: list[ProjectBriefResponse]
-
-
-class PresignedUrlWithIdResponse(BaseModel):
-    object_name: str
-    presigned_url: str
-    fields: dict[str, str] = Field(default={})
-    project_image_id: int

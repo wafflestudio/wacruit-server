@@ -21,6 +21,7 @@ from wacruit.src.apps.project.schemas import ProjectBriefResponse
 from wacruit.src.apps.project.schemas import ProjectCreateRequest
 from wacruit.src.apps.project.schemas import ProjectDetailResponse
 from wacruit.src.apps.project.schemas import ProjectImageResponse
+from wacruit.src.apps.project.schemas import ProjectLinkDto
 from wacruit.src.apps.project.schemas import ProjectUpdateRequest
 
 _1_MIN = 60
@@ -67,7 +68,7 @@ class ProjectService:
                 )
                 created_project.urls.append(url_obj)
 
-        # 이미지와 URL이 추가된 프로젝트를 업데이트
+        # URL이 추가된 프로젝트를 업데이트
         if request.urls:
             created_project = self.project_repository.update_project(created_project)
 
@@ -75,7 +76,35 @@ class ProjectService:
         project = self.project_repository.get_project_by_id(project_id)
         if not project:
             raise ProjectNotFoundException
-        return ProjectDetailResponse.from_orm(project)
+        images = []
+        if project.images is not None:
+            for image in project.images:
+                if image.is_uploaded:
+                    presigned_url = self.generate_presigned_url_for_get_image(image.id)
+                    images.append(
+                        PresignedUrlWithIdResponse(
+                            object_name=image.object_key,
+                            presigned_url=presigned_url,
+                            project_image_id=image.id,
+                        )
+                    )
+
+        return ProjectDetailResponse(
+            id=project.id,
+            name=project.name,
+            summary=project.summary,
+            introduction=project.introduction,
+            thumbnail_url=project.thumbnail_url,
+            project_type=project.project_type,
+            is_active=project.is_active,
+            images=images,
+            urls=[
+                ProjectLinkDto(url_type=url.url_type, url=url.url)
+                for url in project.urls
+            ]
+            if project.urls
+            else None,
+        )
 
     def list_projects(
         self, offset: int = 0, limit: int = 10
@@ -92,12 +121,57 @@ class ProjectService:
         project = self.project_repository.get_project_by_id(project_id)
         if not project:
             raise ProjectNotFoundException
-        for key, value in request.dict(exclude_none=True).items():
+
+        # urls는 별도로 처리
+        request_dict = request.dict(exclude_none=True)
+        urls_data = request_dict.pop("urls", None)
+
+        for key, value in request_dict.items():
             setattr(project, key, value)
+
+        if urls_data is not None:
+            if project.urls is None:
+                project.urls = []
+            for url_dto in urls_data:
+                url_obj = ProjectURL(
+                    project_id=project.id,
+                    url_type=url_dto["url_type"],
+                    url=url_dto["url"],
+                )
+                project.urls.append(url_obj)
+
         updated_project = self.project_repository.update_project(project)
         if not updated_project:
             raise ProjectNotFoundException
-        return ProjectDetailResponse.from_orm(updated_project)
+        images = []
+        if updated_project.images is not None:
+            for image in updated_project.images:
+                if image.is_uploaded:
+                    presigned_url = self.generate_presigned_url_for_get_image(image.id)
+                    images.append(
+                        PresignedUrlWithIdResponse(
+                            object_name=image.object_key,
+                            presigned_url=presigned_url,
+                            project_image_id=image.id,
+                        )
+                    )
+
+        return ProjectDetailResponse(
+            id=updated_project.id,
+            name=updated_project.name,
+            summary=updated_project.summary,
+            introduction=updated_project.introduction,
+            thumbnail_url=updated_project.thumbnail_url,
+            project_type=updated_project.project_type,
+            is_active=updated_project.is_active,
+            images=images,
+            urls=[
+                ProjectLinkDto(url_type=url.url_type, url=url.url)
+                for url in updated_project.urls
+            ]
+            if updated_project.urls
+            else None,
+        )
 
     def get_project_object_name(self, project_id: int, file_name: str) -> str:
         return f"PROJECT/{project_id}/{file_name}"
@@ -133,9 +207,7 @@ class ProjectService:
             project_image_id=project_image.id,
         )
 
-    def generate_presigned_url_for_get_image(
-        self, file_id: int
-    ) -> PresignedUrlWithIdResponse:
+    def generate_presigned_url_for_get_image(self, file_id: int) -> str:
         project_image = self.project_repository.get_project_image_by_id(file_id)
         if not project_image or not project_image.is_uploaded:
             raise ProjectImageNotFoundException
@@ -149,11 +221,7 @@ class ProjectService:
             },
             expires_in=_10_MIN,
         )
-        return PresignedUrlWithIdResponse(
-            object_name=object_name,
-            presigned_url=url,
-            project_image_id=project_image.id,
-        )
+        return url
 
     def register_project_image_info_in_db(self, file_id: int) -> ProjectImageResponse:
         project_image = self.project_repository.get_project_image_by_id(file_id)

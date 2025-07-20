@@ -64,15 +64,6 @@ def get_upload_project_image_url(
     )
 
 
-@v3_router.get("/image/download/{file_id}")
-def get_download_project_image_url(
-    admin_user: AdminUser,
-    file_id: int,
-    project_service: Annotated[ProjectService, Depends()],
-) -> PresignedUrlWithIdResponse:
-    return project_service.generate_presigned_url_for_get_image(file_id=file_id)
-
-
 @v3_router.get("/image/check-upload-completed/{file_id}")
 def check_upload_project_image_completed(
     admin_user: AdminUser,

@@ -52,6 +52,13 @@ class ProjectRepository:
             self.session.query(ProjectImage).filter(ProjectImage.id == image_id).first()
         )
 
+    def get_project_images_by_project_id(self, project_id: int) -> list[ProjectImage]:
+        return (
+            self.session.query(ProjectImage)
+            .filter(ProjectImage.project_id == project_id)
+            .all()
+        )
+
     def update_project_image(self, project_image_id: int) -> None:
         with self.transaction:
             query = (
