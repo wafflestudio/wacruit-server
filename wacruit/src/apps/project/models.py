@@ -13,7 +13,9 @@ from wacruit.src.database.base import DeclarativeBase
 from wacruit.src.database.base import intpk
 from wacruit.src.database.base import str30
 from wacruit.src.database.base import str50
+from wacruit.src.database.base import str100
 from wacruit.src.database.base import str255
+from wacruit.src.database.base import str1500
 
 if TYPE_CHECKING:
     from wacruit.src.apps.member.models import Member
@@ -24,8 +26,8 @@ class Project(DeclarativeBase):
 
     id: Mapped[intpk]
     name: Mapped[str30]
-    summary: Mapped[str50 | None]
-    introduction: Mapped[str255 | None]
+    summary: Mapped[str100 | None]
+    introduction: Mapped[str1500 | None]
     thumbnail_url: Mapped[str255 | None]
     project_type: Mapped[ProjectType]
     is_active: Mapped[bool] = mapped_column(default=True)

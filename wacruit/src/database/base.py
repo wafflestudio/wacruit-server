@@ -10,4 +10,6 @@ DeclarativeBase: type[Base] = declarative_base()
 intpk = Annotated[int, mapped_column(primary_key=True, autoincrement=True)]
 str30 = Annotated[str, mapped_column(String(30))]
 str50 = Annotated[str, mapped_column(String(50))]
+str100 = Annotated[str, mapped_column(String(100))]
 str255 = Annotated[str, mapped_column(String(255))]
+str1500 = Annotated[str, mapped_column(String(1500))]

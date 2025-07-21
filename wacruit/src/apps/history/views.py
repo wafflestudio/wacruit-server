@@ -17,19 +17,16 @@ def update_history(
     history_service: Annotated[HistoryService, Depends()],
     update_request: UpdateHistoryRequest,
 ):
-    updated_history = history_service.update_history(update_request)
-    response_dict = {}
-    for h in updated_history:
-        response_dict[h.history_key] = h.history_value
+    updated_history_list = history_service.update_history(update_request)
 
-    return HistoryResponse(__root__=response_dict)
+    return [
+        HistoryResponse.from_orm(updated_history)
+        for updated_history in updated_history_list
+    ]
 
 
 @v3_router.get("")
 def get_history(history_service: Annotated[HistoryService, Depends()]):
     history_list = history_service.get_history()
-    response_dict = {}
-    for h in history_list:
-        response_dict[h.history_key] = h.history_value
 
-    return HistoryResponse(__root__=response_dict)
+    return [HistoryResponse.from_orm(history) for history in history_list]
