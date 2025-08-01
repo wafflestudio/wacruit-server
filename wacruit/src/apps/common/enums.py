@@ -64,9 +64,9 @@ class CodeSubmissionResultStatus(Enum):
 
 
 class RecruitingType(Enum):
-    ROOKIE = "ROOKIE"
-    DESIGNER = "DESIGNER"
-    PROGRAMMER = "PROGRAMMER"
+    ROOKIE = 1
+    DESIGNER = 2
+    PROGRAMMER = 3
 
 
 class RecruitingApplicationStatus(Enum):
