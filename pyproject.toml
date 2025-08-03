@@ -27,7 +27,7 @@ pyjwt = "^2.8.0"
 pytest-mock = "3.8.2"
 moto = {version = "4.2.7", extras = ["all", "ec2", "s3"]}
 tenacity = "^9.0.0"
-pyyaml = "^6.0.2"
+pyyaml = "6.0.2"
 
 
 [tool.poetry.group.dev.dependencies]
