@@ -8,6 +8,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import Numeric
 from sqlalchemy import text
 from sqlalchemy import Text
+from sqlalchemy.dialects.mysql import MEDIUMTEXT
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
@@ -107,8 +108,8 @@ class Testcase(DeclarativeBase):
     problem_id: Mapped[int | None] = mapped_column(
         ForeignKey("problem.id", ondelete="SET NULL")
     )
-    stdin: Mapped[str] = mapped_column(Text, nullable=False)
-    expected_output: Mapped[str] = mapped_column(Text, nullable=False)
+    stdin: Mapped[str] = mapped_column(MEDIUMTEXT, nullable=False)
+    expected_output: Mapped[str] = mapped_column(MEDIUMTEXT, nullable=False)
     time_limit: Mapped[Decimal] = mapped_column(Numeric(10, 5))
     extra_time: Mapped[Decimal] = mapped_column(
         Numeric(10, 5), server_default=text("'0.00000'")
