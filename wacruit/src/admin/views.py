@@ -2,6 +2,7 @@ from typing import Any
 
 from sqladmin import ModelView
 from sqlalchemy import Column
+from wtforms import TextAreaField
 
 from wacruit.src.admin.formatters import member_formatter
 from wacruit.src.admin.formatters import recruiting_formatter
@@ -192,6 +193,8 @@ class TestcaseAdmin(ModelView, model=Testcase):
         Testcase.stdin: shorten_column(),  # type: ignore
         Testcase.expected_output: shorten_column(),  # type: ignore
     }
+
+    form_overrides = {"stdin": TextAreaField, "expected_output": TextAreaField}
 
     form_excluded_columns = [
         Testcase.submission_results,
