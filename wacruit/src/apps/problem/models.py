@@ -120,7 +120,7 @@ class Testcase(DeclarativeBase):
 
     problem: Mapped["Problem"] = relationship(back_populates="testcases")
     submission_results: Mapped[list["CodeSubmissionResult"]] = relationship(
-        back_populates="testcase"
+        back_populates="testcase", passive_deletes=True
     )
 
     def __str__(self) -> str:
