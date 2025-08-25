@@ -29,7 +29,7 @@ class SponsorService:
         )
         return self.sponsor_repository.create_sponsor(sponsor)
 
-    def get_sponsor_by_id(self, sponsor_id: str) -> SponsorInfoResponse:
+    def get_sponsor_by_id(self, sponsor_id: int) -> SponsorInfoResponse:
         sponsor = self.sponsor_repository.get_sponsor_by_id(sponsor_id)
         if not sponsor:
             raise SponsorNotFoundException
@@ -46,7 +46,7 @@ class SponsorService:
         )
 
     def update_sponsor(
-        self, sponsor_id: str, request: SponsorUpdateRequest
+        self, sponsor_id: int, request: SponsorUpdateRequest
     ) -> SponsorInfoResponse:
         sponsor = self.sponsor_repository.get_sponsor_by_id(sponsor_id)
         if not sponsor:
