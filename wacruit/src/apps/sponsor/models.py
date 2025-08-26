@@ -1,6 +1,6 @@
-from datetime import datetime
+from datetime import date
 
-from sqlalchemy import DateTime
+from sqlalchemy import Date
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 
@@ -14,7 +14,7 @@ class Sponsor(DeclarativeBase):
 
     id: Mapped[intpk]
     name: Mapped[str30]
-    amount: Mapped[str30]
+    amount: Mapped[int]
     email: Mapped[str30 | None]
     phone_number: Mapped[str30 | None]
-    sponsored_date: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    sponsored_date: Mapped[date] = mapped_column(Date)

@@ -27,7 +27,7 @@ def create_sponsor(
 @v3_router.get("/{sponsor_id}")
 def get_sponsor(
     admin_user: AdminUser,
-    sponsor_id: str,
+    sponsor_id: int,
     sponsor_service: Annotated[SponsorService, Depends()],
 ) -> SponsorInfoResponse:
     return sponsor_service.get_sponsor_by_id(sponsor_id)
@@ -43,7 +43,7 @@ def get_all_sponsors(
 @v3_router.patch("/{sponsor_id}")
 def update_sponsor(
     admin_user: AdminUser,
-    sponsor_id: str,
+    sponsor_id: int,
     request: SponsorUpdateRequest,
     sponsor_service: Annotated[SponsorService, Depends()],
 ) -> SponsorInfoResponse:

@@ -23,7 +23,7 @@ class SponsorRepository:
     def get_sponsor_by_sponsor_name(self, sponsor_name: str) -> Sponsor | None:
         return self.session.query(Sponsor).filter(Sponsor.name == sponsor_name).first()
 
-    def get_sponsor_by_id(self, sponsor_id: str) -> Sponsor | None:
+    def get_sponsor_by_id(self, sponsor_id: int) -> Sponsor | None:
         return self.session.query(Sponsor).filter(Sponsor.id == sponsor_id).first()
 
     def get_all_sponsors(self) -> list[Sponsor]:
