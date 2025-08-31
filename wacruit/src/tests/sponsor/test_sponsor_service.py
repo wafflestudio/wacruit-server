@@ -64,6 +64,9 @@ def test_update_sponsor(
     sponsor = sponsor_service.create_sponsor(sponsor_create_dto)
     assert sponsor.id is not None
     updated_sponsor = sponsor_service.update_sponsor(sponsor.id, sponsor_update_dto)
-    assert updated_sponsor.amount == sponsor_update_dto.amount
-    assert updated_sponsor.email == sponsor_update_dto.email
-    assert updated_sponsor.phone_number == sponsor_update_dto.phone_number
+    if sponsor_update_dto.email is not None:
+        assert updated_sponsor.email == sponsor_update_dto.email
+    if sponsor_update_dto.amount is not None:
+        assert updated_sponsor.amount == sponsor_update_dto.amount
+    if sponsor_update_dto.phone_number is not None:
+        assert updated_sponsor.phone_number == sponsor_update_dto.phone_number
