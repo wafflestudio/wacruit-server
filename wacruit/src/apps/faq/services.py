@@ -2,9 +2,10 @@ from typing import Annotated
 
 from fastapi import Depends
 
-from wacruit.src.apps.faq.exceptions import QuestionNowFoundException
+from wacruit.src.apps.faq.exceptions import QuestionNotFoundException
 from wacruit.src.apps.faq.models import FAQ
 from wacruit.src.apps.faq.repositories import QuestionRepository
+from wacruit.src.apps.faq.schemas import CreateQuestionRequest
 from wacruit.src.apps.faq.schemas import UpdateQuestionRequest
 
 
@@ -15,10 +16,11 @@ class QuestionService:
     def get_question_by_id(self, questions_id: int) -> FAQ:
         question = self.question_repository.get_question_by_id(questions_id)
         if question is None:
-            raise QuestionNowFoundException
+            raise QuestionNotFoundException
         return question
 
-    def create_question(self, question: FAQ) -> FAQ:
+    def create_question(self, request: CreateQuestionRequest) -> FAQ:
+        question = FAQ(question=request.question, answer=request.answer)
         return self.question_repository.create_questions(question)
 
     def get_questions(self) -> list[FAQ]:

@@ -34,9 +34,7 @@ def create_question(
     request: CreateQuestionRequest,
     question_service: Annotated[QuestionService, Depends()],
 ) -> QuestionResponse:
-    res = question_service.create_question(
-        FAQ(question=request.question, answer=request.answer)
-    )
+    res = question_service.create_question(request)
 
     return QuestionResponse.from_orm(res)
 
