@@ -44,6 +44,7 @@ class ReviewService:
             member_id=review.member_id,
             member_first_name=writer.first_name,
             member_last_name=writer.last_name,
+            member_generation=writer.generation,
             member_position=writer.position if writer.position else None,
             is_active=writer.is_active,
         )
@@ -62,6 +63,7 @@ class ReviewService:
                     member_id=review.member_id,
                     member_first_name=review.member.first_name,
                     member_last_name=review.member.last_name,
+                    member_generation=review.member.generation,
                     member_position=review.member.position
                     if review.member.position
                     else None,
@@ -101,6 +103,7 @@ class ReviewService:
             member_id=updated_review.member_id,
             member_first_name=updated_review.member.first_name,
             member_last_name=updated_review.member.last_name,
+            member_generation=updated_review.member.generation,
             member_position=updated_review.member.position
             if updated_review.member.position
             else None,
