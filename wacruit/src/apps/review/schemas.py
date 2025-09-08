@@ -16,6 +16,7 @@ class ReviewResponse(BaseModel):
     member_id: int
     member_first_name: str
     member_last_name: str
+    member_generation: str
     member_position: Position | None
     is_active: bool
 
