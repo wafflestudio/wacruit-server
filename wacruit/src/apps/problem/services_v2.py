@@ -148,9 +148,21 @@ class ProblemService(LoggingMixin):
             response = await self.hodu_api_repository.submit(hodu_request)
             if isinstance(response, HoduSubmitResponse):
                 submission_result_status = response.status.to_submission_result_status()
-                if submission_result_status != CodeSubmissionResultStatus.CORRECT and submission_result_status != CodeSubmissionResultStatus.INTERNAL_SERVER_ERROR:
+                if submission_result_status not in (
+                    CodeSubmissionResultStatus.CORRECT,
+                    CodeSubmissionResultStatus.INTERNAL_SERVER_ERROR,
+                ):
+                    print("############################################")
+                    print(f"hodu_request: {hodu_request.json()}")
+                    print(f"status: {response.status}")
+                    print(f"stdout: {response.fields.stdout}")
+                    print(f"stderr: {response.fields.stderr}")
+                    print("\n\n")
                     merge_status(CodeSubmissionStatus.WRONG)
-                elif submission_result_status == CodeSubmissionResultStatus.INTERNAL_SERVER_ERROR:
+                elif (
+                    submission_result_status
+                    == CodeSubmissionResultStatus.INTERNAL_SERVER_ERROR
+                ):
                     merge_status(CodeSubmissionStatus.ERROR)
                 self.problem_repository.update_submission_result(
                     submission_result,

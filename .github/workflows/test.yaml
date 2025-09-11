@@ -30,12 +30,12 @@ jobs:
       - name: change mysql charset
         run: mysql -h 127.0.0.1 -P 3307 -u root -p'root-password' -e "ALTER DATABASE testdb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
 
-      - name: Install poetry
-        run: pipx install poetry
-
       - uses: actions/setup-python@v4
         with:
           python-version: 3.11
+
+      - name: Install poetry
+        run: pipx install poetry --python python3.11
 
       - name: Set poetry environment & install dependencies
         run: |

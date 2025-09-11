@@ -73,3 +73,45 @@ class RecruitingApplicationStatus(Enum):
     IN_PROGRESS = 1
     ACCEPTED = 2
     REJECTED = 3
+
+
+class ProjectType(Enum):
+    SERVICE = "SERVICE"
+    STUDY = "STUDY"
+
+
+class Position(Enum):
+    FRONTEND = "FRONTEND"
+    BACKEND = "BACKEND"
+    DESIGNER = "DESIGNER"
+    ANDROID = "ANDROID"
+    IOS = "IOS"
+    # INFRA = 6
+    # PM = 7
+    # OPERATIONS = 8
+
+
+class SeminarType(Enum):
+    SPRING = "SPRING"
+    FASTAPI = "FASTAPI"
+    FRONTEND = "FRONTEND"
+    ANDROID = "ANDROID"
+    IOS = "IOS"
+
+
+class ProjectURLType(Enum):
+    ANDROID_STORE = "ANDROID_STORE"
+    IOS_STORE = "IOS_STORE"
+    FRONTEND_GITHUB = "FRONTEND_GITHUB"
+    BACKEND_GITHUB = "BACKEND_GITHUB"
+    ANDROID_GITHUB = "ANDROID_GITHUB"
+    WEBSITE = "WEBSITE"
+    IOS_GITHUB = "IOS_GITHUB"
+    CRAWLER_GITHUB = "CRAWLER_GITHUB"
+    BEHANCE = "BEHANCE"
+
+
+class TimelineGroupType(Enum):
+    ROOKIE = "ROOKIE"
+    PROGRAMMER = "PROGRAMMER"
+    DESIGNER = "DESIGNER"

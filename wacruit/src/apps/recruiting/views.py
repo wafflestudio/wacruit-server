@@ -9,9 +9,9 @@ from wacruit.src.apps.common.schemas import ListResponse
 from wacruit.src.apps.recruiting.exceptions import RecruitingAlreadyAppliedException
 from wacruit.src.apps.recruiting.exceptions import RecruitingNotAppliedException
 from wacruit.src.apps.recruiting.exceptions import RecruitingNotFoundException
-from wacruit.src.apps.recruiting.schemas import RecruitingResponse
 from wacruit.src.apps.recruiting.schemas import RecruitingResultResponse
 from wacruit.src.apps.recruiting.schemas import RecruitingSummaryResponse
+from wacruit.src.apps.recruiting.schemas import UserRecruitingResponse
 from wacruit.src.apps.recruiting.services import RecruitingService
 from wacruit.src.apps.user.dependencies import CurrentUser
 
@@ -32,8 +32,8 @@ def get_recruiting(
     user: CurrentUser,
     recruiting_id: int,
     recruiting_service: Annotated[RecruitingService, Depends()],
-) -> RecruitingResponse:
-    return recruiting_service.get_recruiting_by_id(recruiting_id, user)
+) -> UserRecruitingResponse:
+    return recruiting_service.get_user_recruiting_by_id(recruiting_id, user)
 
 
 @v1_router.get(

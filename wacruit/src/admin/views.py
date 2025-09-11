@@ -2,18 +2,32 @@ from typing import Any
 
 from sqladmin import ModelView
 from sqlalchemy import Column
+from wtforms import TextAreaField
 
+from wacruit.src.admin.formatters import member_formatter
 from wacruit.src.admin.formatters import recruiting_formatter
 from wacruit.src.admin.formatters import shorten_column
+from wacruit.src.admin.formatters import timeline_category_formatter
 from wacruit.src.admin.formatters import user_formatter
 from wacruit.src.apps.announcement.models import Announcement
+from wacruit.src.apps.faq.models import FAQ
+from wacruit.src.apps.history.models import History
+from wacruit.src.apps.member.models import Member
+from wacruit.src.apps.pre_registration.models import PreRegistration
 from wacruit.src.apps.problem.models import CodeSubmission
 from wacruit.src.apps.problem.models import Problem
 from wacruit.src.apps.problem.models import Testcase
+from wacruit.src.apps.project.models import Project
 from wacruit.src.apps.recruiting.models import Recruiting
 from wacruit.src.apps.recruiting.models import RecruitingApplication
+from wacruit.src.apps.recruiting_info.models import RecruitingInfo
 from wacruit.src.apps.resume.models import ResumeQuestion
 from wacruit.src.apps.resume.models import ResumeSubmission
+from wacruit.src.apps.review.models import Review
+from wacruit.src.apps.seminar.models import Seminar
+from wacruit.src.apps.sponsor.models import Sponsor
+from wacruit.src.apps.timeline.models import Timeline
+from wacruit.src.apps.timeline.models import TimelineCategory
 from wacruit.src.apps.user.models import User
 
 
@@ -84,6 +98,7 @@ class RecruitingAdmin(ModelView, model=Recruiting):
         Recruiting.to_date,
         Recruiting.description,
         Recruiting.short_description,
+        Recruiting.recruiting_info,
     ]
 
     column_formatters = {
@@ -178,6 +193,8 @@ class TestcaseAdmin(ModelView, model=Testcase):
         Testcase.stdin: shorten_column(),  # type: ignore
         Testcase.expected_output: shorten_column(),  # type: ignore
     }
+
+    form_overrides = {"stdin": TextAreaField, "expected_output": TextAreaField}
 
     form_excluded_columns = [
         Testcase.submission_results,
@@ -284,6 +301,196 @@ class RecruitingApplicationAdmin(ModelView, model=RecruitingApplication):
     column_sortable_list = RecruitingApplication.__table__.columns.keys()
 
 
+class ProjectAdmin(ModelView, model=Project):
+    column_list = [
+        Project.id,
+        Project.name,
+        Project.summary,
+        Project.introduction,
+        Project.thumbnail_url,
+        Project.project_type,
+        Project.is_active,
+    ]
+
+    form_excluded_columns = [
+        Project.images,
+        Project.urls,
+    ]
+
+    column_searchable_list = [
+        Project.name,
+        Project.summary,
+        Project.introduction,
+    ]
+
+    column_sortable_list = Project.__table__.columns.keys()
+
+
+class MemberAdmin(ModelView, model=Member):
+    column_list = [
+        Member.id,
+        Member.first_name,
+        Member.last_name,
+        Member.introduction,
+        Member.department,
+        Member.college,
+        Member.phone_number,
+        Member.github_id,
+        Member.generation,
+        Member.is_active,
+        Member.created_at,
+        Member.position,
+    ]
+
+    column_searchable_list = [Member.first_name, Member.last_name]
+
+    column_sortable_list = Member.__table__.columns.keys()
+
+
+class ReviewAdmin(ModelView, model=Review):
+    column_list = [
+        Review.id,
+        Review.member,
+        Review.title,
+        Review.content,
+    ]
+
+    column_formatters = {
+        Review.member: member_formatter,  # type: ignore
+    }
+
+    column_searchable_list = [
+        Review.title,
+    ]
+
+    column_sortable_list = Review.__table__.columns.keys()
+
+
+class SeminarAdmin(ModelView, model=Seminar):
+    column_list = [
+        Seminar.id,
+        Seminar.seminar_type,
+        Seminar.curriculum_info,
+        Seminar.prerequisite_info,
+        Seminar.is_active,
+    ]
+
+    column_searchable_list = [Seminar.seminar_type]
+
+    column_sortable_list = Seminar.__table__.columns.keys()
+
+
+class PreRegistrationAdmin(ModelView, model=PreRegistration):
+    column_list = [
+        PreRegistration.id,
+        PreRegistration.url,
+        PreRegistration.generation,
+        PreRegistration.is_active,
+    ]
+    column_searchable_list = [
+        PreRegistration.url,
+        PreRegistration.generation,
+    ]
+
+    column_sortable_list = PreRegistration.__table__.columns.keys()
+
+
+class SponsorAdmin(ModelView, model=Sponsor):
+    column_list = [
+        Sponsor.id,
+        Sponsor.name,
+        Sponsor.amount,
+        Sponsor.email,
+        Sponsor.phone_number,
+        Sponsor.sponsored_date,
+    ]
+
+    column_searchable_list = [
+        Sponsor.name,
+    ]
+
+    column_sortable_list = Sponsor.__table__.columns.keys()
+
+
+class TimelineAdmin(ModelView, model=Timeline):
+    column_list = [
+        Timeline.id,
+        Timeline.title,
+        Timeline.category,
+        Timeline.group,
+        Timeline.start_date,
+        Timeline.end_date,
+    ]
+    column_formatters = {
+        Timeline.category: timeline_category_formatter,  # type: ignore
+    }
+    column_searchable_list = [
+        Timeline.title,
+    ]
+
+    column_sortable_list = Timeline.__table__.columns.keys()
+
+
+class TimelineCategoryAdmin(ModelView, model=TimelineCategory):
+    column_list = [
+        TimelineCategory.id,
+        TimelineCategory.title,
+    ]
+
+    column_searchable_list = [
+        TimelineCategory.title,
+    ]
+
+    column_sortable_list = TimelineCategory.__table__.columns.keys()
+
+
+class FAQAdmin(ModelView, model=FAQ):
+    column_list = [
+        FAQ.id,
+        FAQ.question,
+        FAQ.answer,
+    ]
+
+    column_searchable_list = [
+        FAQ.question,
+    ]
+
+    column_sortable_list = FAQ.__table__.columns.keys()
+
+
+class RecruitingInfoAdmin(ModelView, model=RecruitingInfo):
+    column_list = [
+        RecruitingInfo.id,
+        RecruitingInfo.recruiting,
+        RecruitingInfo.info_num,
+    ]
+
+    column_formatters = {
+        RecruitingInfo.recruiting: recruiting_formatter  # type: ignore
+    }
+
+    column_searchable_list = [
+        "recruiting.name",
+        RecruitingInfo.info_num,
+    ]
+
+    column_sortable_list = RecruitingInfo.__table__.columns.keys()
+
+
+class HistoryAdmin(ModelView, model=History):
+    column_list = [
+        History.id,
+        History.history_key,
+        History.history_value,
+    ]
+
+    column_searchable_list = [
+        History.history_key,
+    ]
+
+    column_sortable_list = History.__table__.columns.keys()
+
+
 admin_views = [
     UserAdmin,
     RecruitingAdmin,
@@ -294,4 +501,15 @@ admin_views = [
     ResumeQuestionAdmin,
     ResumeSubmissionAdmin,
     RecruitingApplicationAdmin,
+    ProjectAdmin,
+    MemberAdmin,
+    ReviewAdmin,
+    SeminarAdmin,
+    PreRegistrationAdmin,
+    SponsorAdmin,
+    TimelineAdmin,
+    TimelineCategoryAdmin,
+    FAQAdmin,
+    RecruitingInfoAdmin,
+    HistoryAdmin,
 ]
