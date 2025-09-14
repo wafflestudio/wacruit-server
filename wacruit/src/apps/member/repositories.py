@@ -1,6 +1,7 @@
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
+from wacruit.src.apps.common.enums import Position
 from wacruit.src.apps.member.models import Member
 from wacruit.src.database.connection import get_db_session
 from wacruit.src.database.connection import Transaction
@@ -23,8 +24,17 @@ class MemberRepository:
             self.session.add(member)
         return member
 
-    def get_all_members(self) -> list[Member]:
-        return self.session.query(Member).all()
+    def get_all_members(
+        self, position: Position | None, offset: int, limit: int
+    ) -> list[Member]:
+        query = self.session.query(Member)
+
+        if position is not None:
+            query = query.where(Member.position == position)
+
+        members = query.offset(offset).limit(limit).all()
+
+        return members
 
     def update_member(self, member: Member) -> Member:
         with self.transaction:
