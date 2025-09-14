@@ -3,10 +3,12 @@ from typing import Annotated
 
 from fastapi import APIRouter
 from fastapi import Depends
+from fastapi import Query
 from fastapi import Response
 from fastapi import Security
 from fastapi.security import APIKeyHeader
 
+from wacruit.src.apps.common.enums import Position
 from wacruit.src.apps.common.schemas import ListResponse
 from wacruit.src.apps.member.schemas import MemberBriefResponse
 from wacruit.src.apps.member.schemas import MemberCreateRequest
@@ -14,7 +16,6 @@ from wacruit.src.apps.member.schemas import MemberInfoResponse
 from wacruit.src.apps.member.schemas import MemberUpdateRequest
 from wacruit.src.apps.member.services import MemberService
 from wacruit.src.apps.user.dependencies import AdminUser
-from wacruit.src.apps.user.dependencies import CurrentUser
 
 v3_router = APIRouter(prefix="/v3/members", tags=["members"])
 
@@ -48,8 +49,11 @@ def get_members(
         ),
     ],
     member_service: Annotated[MemberService, Depends()],
+    position: Annotated[Position | None, Query()] = None,
+    offset: Annotated[int, Query()] = 0,
+    limit: Annotated[int, Query()] = 20,
 ) -> ListResponse[MemberInfoResponse] | ListResponse[MemberBriefResponse]:
-    return member_service.get_members(waffle_sso_id)
+    return member_service.get_members(waffle_sso_id, position, offset, limit)
 
 
 @v3_router.patch("/{member_id}")
