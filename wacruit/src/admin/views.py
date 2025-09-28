@@ -9,6 +9,7 @@ from wacruit.src.admin.formatters import recruiting_formatter
 from wacruit.src.admin.formatters import shorten_column
 from wacruit.src.admin.formatters import timeline_category_formatter
 from wacruit.src.admin.formatters import user_formatter
+from wacruit.src.admin.formatters import project_urls_formatter
 from wacruit.src.apps.announcement.models import Announcement
 from wacruit.src.apps.faq.models import FAQ
 from wacruit.src.apps.history.models import History
@@ -29,6 +30,7 @@ from wacruit.src.apps.sponsor.models import Sponsor
 from wacruit.src.apps.timeline.models import Timeline
 from wacruit.src.apps.timeline.models import TimelineCategory
 from wacruit.src.apps.user.models import User
+from wacruit.src.apps.project.models import ProjectURL
 
 
 class UserAdmin(ModelView, model=User):
@@ -310,11 +312,16 @@ class ProjectAdmin(ModelView, model=Project):
         Project.thumbnail_url,
         Project.project_type,
         Project.is_active,
+        Project.formed_at,
+        Project.urls,
     ]
+
+    column_formatters = {
+        Project.urls: project_urls_formatter,  # type: ignore
+    }
 
     form_excluded_columns = [
         Project.images,
-        Project.urls,
     ]
 
     column_searchable_list = [
@@ -324,6 +331,16 @@ class ProjectAdmin(ModelView, model=Project):
     ]
 
     column_sortable_list = Project.__table__.columns.keys()
+
+class ProjectURLAdmin(ModelView, model=ProjectURL):
+    column_list = [
+        ProjectURL.id,
+        ProjectURL.url,
+        ProjectURL.url_type,
+        ProjectURL.project_id,
+    ]
+
+    column_sortable_list = ProjectURL.__table__.columns.keys()
 
 
 class MemberAdmin(ModelView, model=Member):
@@ -502,6 +519,7 @@ admin_views = [
     ResumeSubmissionAdmin,
     RecruitingApplicationAdmin,
     ProjectAdmin,
+    ProjectURLAdmin,
     MemberAdmin,
     ReviewAdmin,
     SeminarAdmin,
