@@ -344,12 +344,8 @@ class ProjectURLAdmin(ModelView, model=ProjectURL):
     form_ajax_refs = {
         "source_project": {
             "fields": (Project.name,),
-            # 드롭다운에 표시될 라벨을 지정 (모델 코드를 수정하지 않고 이름을 표시)
-            "format": lambda p: getattr(p, "name", str(p)),
         }
     }
-
-    # Ajax 모드에서는 라벨을 form_ajax_refs의 "format" 콜백으로 지정합니다.
 
     column_sortable_list = ProjectURL.__table__.columns.keys()
 
