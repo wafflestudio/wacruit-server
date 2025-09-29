@@ -40,11 +40,9 @@ def timeline_category_formatter(
     return category and category.title
 
 
-def project_urls_formatter(model: type[DeclarativeBase], attribute: str) -> str | None:
-    urls = getattr(model, "urls")
-    if not urls:
-        return None
-    result = []
-    for url in urls:
-        url_str = f"{url.url_type.name}: {url.url}"
-        return urls and url_str
+def project_urls_formatter(model: type[DeclarativeBase], attribute: str):
+    urls = getattr(model, "urls", None) or []
+    return [
+        getattr(getattr(u, "url_type", None), "name", str(getattr(u, "url_type", "")))
+        for u in urls
+    ]

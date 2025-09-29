@@ -5,11 +5,11 @@ from sqlalchemy import Column
 from wtforms import TextAreaField
 
 from wacruit.src.admin.formatters import member_formatter
+from wacruit.src.admin.formatters import project_urls_formatter
 from wacruit.src.admin.formatters import recruiting_formatter
 from wacruit.src.admin.formatters import shorten_column
 from wacruit.src.admin.formatters import timeline_category_formatter
 from wacruit.src.admin.formatters import user_formatter
-from wacruit.src.admin.formatters import project_urls_formatter
 from wacruit.src.apps.announcement.models import Announcement
 from wacruit.src.apps.faq.models import FAQ
 from wacruit.src.apps.history.models import History
@@ -19,6 +19,7 @@ from wacruit.src.apps.problem.models import CodeSubmission
 from wacruit.src.apps.problem.models import Problem
 from wacruit.src.apps.problem.models import Testcase
 from wacruit.src.apps.project.models import Project
+from wacruit.src.apps.project.models import ProjectURL
 from wacruit.src.apps.recruiting.models import Recruiting
 from wacruit.src.apps.recruiting.models import RecruitingApplication
 from wacruit.src.apps.recruiting_info.models import RecruitingInfo
@@ -30,7 +31,6 @@ from wacruit.src.apps.sponsor.models import Sponsor
 from wacruit.src.apps.timeline.models import Timeline
 from wacruit.src.apps.timeline.models import TimelineCategory
 from wacruit.src.apps.user.models import User
-from wacruit.src.apps.project.models import ProjectURL
 
 
 class UserAdmin(ModelView, model=User):
@@ -316,13 +316,11 @@ class ProjectAdmin(ModelView, model=Project):
         Project.urls,
     ]
 
+    form_excluded_columns = [Project.images, Project.urls]
+
     column_formatters = {
         Project.urls: project_urls_formatter,  # type: ignore
     }
-
-    form_excluded_columns = [
-        Project.images,
-    ]
 
     column_searchable_list = [
         Project.name,
@@ -332,6 +330,7 @@ class ProjectAdmin(ModelView, model=Project):
 
     column_sortable_list = Project.__table__.columns.keys()
 
+
 class ProjectURLAdmin(ModelView, model=ProjectURL):
     column_list = [
         ProjectURL.id,
@@ -339,6 +338,18 @@ class ProjectURLAdmin(ModelView, model=ProjectURL):
         ProjectURL.url_type,
         ProjectURL.project_id,
     ]
+
+    form_columns = [ProjectURL.url, ProjectURL.url_type, ProjectURL.source_project]
+
+    form_ajax_refs = {
+        "source_project": {
+            "fields": (Project.name,),
+            # 드롭다운에 표시될 라벨을 지정 (모델 코드를 수정하지 않고 이름을 표시)
+            "format": lambda p: getattr(p, "name", str(p)),
+        }
+    }
+
+    # Ajax 모드에서는 라벨을 form_ajax_refs의 "format" 콜백으로 지정합니다.
 
     column_sortable_list = ProjectURL.__table__.columns.keys()
 
