@@ -37,7 +37,7 @@ def get_active_recruitings(
 
 @v3_router.get("/info")
 def get_recruiting_infos_by_type(
-    recruiting_type: RecruitingType,
+    recruiting_type: str,
     recruiting_service: Annotated[RecruitingService, Depends()],
 ) -> ListResponse[RecruitingInfoResponse]:
     result = recruiting_service.get_recruiting_infos_by_type(recruiting_type)

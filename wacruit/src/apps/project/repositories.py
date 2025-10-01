@@ -34,7 +34,14 @@ class ProjectRepository:
         return self.session.query(Project).filter(Project.name == name).first()
 
     def get_projects(self, offset: int = 0, limit: int = 10) -> list[Project]:
-        return self.session.query(Project).offset(offset).limit(limit).all()
+        # formed_at이 작은 순서대로 정렬
+        return (
+            self.session.query(Project)
+            .order_by(Project.formed_at)
+            .offset(offset)
+            .limit(limit)
+            .all()
+        )
 
     def create_project(self, project: Project) -> Project:
         with self.transaction:

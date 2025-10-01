@@ -121,17 +121,17 @@ class RecruitingInfoResponse(OrmModel):
     type: RecruitingType
     info_num: int
     title: str
-    date_info: datetime
+    date_info: str | None = None
 
 
 class RecruitingInfoCreateRequest(BaseModel):
     info_num: int
     title: str
-    date_info: datetime
+    date_info: str | None = None
     recruiting_id: int
 
 
 class RecruitingInfoUpdateRequest(BaseModel):
     info_num: int | None = None
     title: str | None = None
-    date_info: datetime | None = None
+    date_info: str | None = None

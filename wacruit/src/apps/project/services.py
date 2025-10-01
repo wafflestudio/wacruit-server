@@ -51,6 +51,7 @@ class ProjectService:
             introduction=request.introduction,
             thumbnail_url=request.thumbnail_url,
             project_type=request.project_type,
+            formed_at=request.formed_at,
             is_active=request.is_active,
         )
 
@@ -96,6 +97,7 @@ class ProjectService:
             introduction=project.introduction,
             thumbnail_url=project.thumbnail_url,
             project_type=project.project_type,
+            formed_at=project.formed_at,
             is_active=project.is_active,
             images=images,
             urls=[
@@ -163,6 +165,7 @@ class ProjectService:
             introduction=updated_project.introduction,
             thumbnail_url=updated_project.thumbnail_url,
             project_type=updated_project.project_type,
+            formed_at=updated_project.formed_at,
             is_active=updated_project.is_active,
             images=images,
             urls=[

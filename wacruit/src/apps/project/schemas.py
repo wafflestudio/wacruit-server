@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import datetime
+
 from pydantic import BaseModel
 from pydantic import Field
 
@@ -19,6 +21,7 @@ class ProjectCreateRequest(BaseModel):
     introduction: str | None = Field(None, max_length=255)
     thumbnail_url: str | None = Field(None, max_length=255)
     project_type: ProjectType
+    formed_at: datetime | None
     is_active: bool
     urls: list[ProjectLinkDto] | None
 
@@ -29,6 +32,7 @@ class ProjectUpdateRequest(BaseModel):
     introduction: str | None = Field(None, max_length=255)
     thumbnail_url: str | None = Field(None, max_length=255)
     project_type: ProjectType | None
+    formed_at: datetime | None
     is_active: bool | None
     urls: list[ProjectLinkDto] | None
 
@@ -54,6 +58,7 @@ class ProjectDetailResponse(OrmModel):
     introduction: str | None
     thumbnail_url: str | None
     project_type: ProjectType
+    formed_at: datetime | None
     is_active: bool
     images: list[PresignedUrlWithIdResponse] | None
     urls: list[ProjectLinkDto] | None
@@ -66,6 +71,7 @@ class ProjectBriefResponse(OrmModel):
     thumbnail_url: str | None
     project_type: ProjectType
     is_active: bool
+    formed_at: datetime | None
 
     @classmethod
     def from_orm(cls, obj):
@@ -76,6 +82,7 @@ class ProjectBriefResponse(OrmModel):
             thumbnail_url=obj.thumbnail_url,
             project_type=obj.project_type.name,
             is_active=obj.is_active,
+            formed_at=obj.formed_at,
         )
 
 

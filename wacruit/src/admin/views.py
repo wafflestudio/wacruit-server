@@ -5,6 +5,7 @@ from sqlalchemy import Column
 from wtforms import TextAreaField
 
 from wacruit.src.admin.formatters import member_formatter
+from wacruit.src.admin.formatters import project_urls_formatter
 from wacruit.src.admin.formatters import recruiting_formatter
 from wacruit.src.admin.formatters import shorten_column
 from wacruit.src.admin.formatters import timeline_category_formatter
@@ -18,6 +19,7 @@ from wacruit.src.apps.problem.models import CodeSubmission
 from wacruit.src.apps.problem.models import Problem
 from wacruit.src.apps.problem.models import Testcase
 from wacruit.src.apps.project.models import Project
+from wacruit.src.apps.project.models import ProjectURL
 from wacruit.src.apps.recruiting.models import Recruiting
 from wacruit.src.apps.recruiting.models import RecruitingApplication
 from wacruit.src.apps.recruiting_info.models import RecruitingInfo
@@ -310,12 +312,15 @@ class ProjectAdmin(ModelView, model=Project):
         Project.thumbnail_url,
         Project.project_type,
         Project.is_active,
-    ]
-
-    form_excluded_columns = [
-        Project.images,
+        Project.formed_at,
         Project.urls,
     ]
+
+    form_excluded_columns = [Project.images, Project.urls]
+
+    column_formatters = {
+        Project.urls: project_urls_formatter,  # type: ignore
+    }
 
     column_searchable_list = [
         Project.name,
@@ -324,6 +329,25 @@ class ProjectAdmin(ModelView, model=Project):
     ]
 
     column_sortable_list = Project.__table__.columns.keys()
+
+
+class ProjectURLAdmin(ModelView, model=ProjectURL):
+    column_list = [
+        ProjectURL.id,
+        ProjectURL.url,
+        ProjectURL.url_type,
+        ProjectURL.project_id,
+    ]
+
+    form_columns = [ProjectURL.url, ProjectURL.url_type, ProjectURL.source_project]
+
+    form_ajax_refs = {
+        "source_project": {
+            "fields": (Project.name,),
+        }
+    }
+
+    column_sortable_list = ProjectURL.__table__.columns.keys()
 
 
 class MemberAdmin(ModelView, model=Member):
@@ -502,6 +526,7 @@ admin_views = [
     ResumeSubmissionAdmin,
     RecruitingApplicationAdmin,
     ProjectAdmin,
+    ProjectURLAdmin,
     MemberAdmin,
     ReviewAdmin,
     SeminarAdmin,

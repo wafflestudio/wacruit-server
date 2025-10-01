@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import TYPE_CHECKING
 
 from sqlalchemy import Column
@@ -31,6 +32,7 @@ class Project(DeclarativeBase):
     thumbnail_url: Mapped[str255 | None]
     project_type: Mapped[ProjectType]
     is_active: Mapped[bool] = mapped_column(default=True)
+    formed_at: Mapped[datetime | None] = mapped_column(default=None)
     urls: Mapped[list["ProjectURL"] | None] = relationship(
         back_populates="source_project"
     )
