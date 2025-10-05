@@ -290,7 +290,7 @@ class ProjectService:
         if not project_image:
             raise ProjectImageNotFoundException
         object_name = project_image.object_key
-        # DB에서 삭제
-        self.project_repository.delete_project_image(file_id)
         # S3에서 삭제
         delete_object(self._s3_client.client, self._s3_config.bucket_name, object_name)
+        # DB에서 삭제
+        self.project_repository.delete_project_image(file_id)
