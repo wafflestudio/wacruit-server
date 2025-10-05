@@ -30,14 +30,6 @@ class Project(DeclarativeBase):
     summary: Mapped[str100 | None]
     introduction: Mapped[str1500 | None]
 
-    thumbnail_image_id: Mapped[int | None] = mapped_column(
-        ForeignKey("project_image.id"), default=None
-    )
-    thumbnail_image: Mapped["ProjectImage | None"] = relationship(
-        "ProjectImage",
-        foreign_keys=[thumbnail_image_id],
-        uselist=False,
-    )
     project_type: Mapped[ProjectType]
     is_active: Mapped[bool] = mapped_column(default=True)
     formed_at: Mapped[datetime | None] = mapped_column(default=None)
@@ -68,6 +60,7 @@ class ProjectImage(DeclarativeBase):
     project_id: Mapped[int] = mapped_column(ForeignKey("project.id"))
     object_key: Mapped[str255]
     is_uploaded: Mapped[bool] = mapped_column(default=False)
+    is_thumbnail: Mapped[bool] = mapped_column(default=False)
 
     source_project: Mapped["Project"] = relationship(
         back_populates="images",

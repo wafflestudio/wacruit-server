@@ -79,36 +79,24 @@ class ProjectService:
         if not project:
             raise ProjectNotFoundException
         images = []
+        thumbnail_image = None
         if project.images is not None:
             for image in project.images:
-                if image.is_uploaded:
-                    try:
-                        presigned_url = self.generate_presigned_url_for_get_image(
-                            image.id
-                        )
-                        images.append(
-                            PresignedUrlWithIdResponse(
-                                object_name=image.object_key,
-                                presigned_url=presigned_url,
-                                project_image_id=image.id,
-                            )
-                        )
-                    except Exception as exc:
-                        raise GetPresignedURLException() from exc
-
-        thumbnail_image = None
-        if project.thumbnail_image and project.thumbnail_image.is_uploaded:
-            try:
-                presigned_url = self.generate_presigned_url_for_get_image(
-                    project.thumbnail_image.id
-                )
-                thumbnail_image = PresignedUrlWithIdResponse(
-                    object_name=project.thumbnail_image.object_key,
-                    presigned_url=presigned_url,
-                    project_image_id=project.thumbnail_image.id,
-                )
-            except Exception as exc:
-                raise GetPresignedURLException() from exc
+                if not image.is_uploaded:
+                    continue
+                try:
+                    presigned_url = self.generate_presigned_url_for_get_image(image.id)
+                    dto = PresignedUrlWithIdResponse(
+                        object_name=image.object_key,
+                        presigned_url=presigned_url,
+                        project_image_id=image.id,
+                    )
+                    if image.is_thumbnail and thumbnail_image is None:
+                        thumbnail_image = dto
+                    else:
+                        images.append(dto)
+                except Exception as exc:
+                    raise GetPresignedURLException() from exc
 
         return ProjectDetailResponse(
             id=project.id,
@@ -166,39 +154,24 @@ class ProjectService:
         if not updated_project:
             raise ProjectNotFoundException
         images = []
+        thumbnail_image = None
         if updated_project.images is not None:
             for image in updated_project.images:
-                if image.is_uploaded:
-                    try:
-                        presigned_url = self.generate_presigned_url_for_get_image(
-                            image.id
-                        )
-                        images.append(
-                            PresignedUrlWithIdResponse(
-                                object_name=image.object_key,
-                                presigned_url=presigned_url,
-                                project_image_id=image.id,
-                            )
-                        )
-                    except Exception as exc:
-                        raise GetPresignedURLException() from exc
-
-        thumbnail_image = None
-        if (
-            updated_project.thumbnail_image
-            and updated_project.thumbnail_image.is_uploaded
-        ):
-            try:
-                presigned_url = self.generate_presigned_url_for_get_image(
-                    updated_project.thumbnail_image.id
-                )
-                thumbnail_image = PresignedUrlWithIdResponse(
-                    object_name=updated_project.thumbnail_image.object_key,
-                    presigned_url=presigned_url,
-                    project_image_id=updated_project.thumbnail_image.id,
-                )
-            except Exception as exc:
-                raise GetPresignedURLException() from exc
+                if not image.is_uploaded:
+                    continue
+                try:
+                    presigned_url = self.generate_presigned_url_for_get_image(image.id)
+                    dto = PresignedUrlWithIdResponse(
+                        object_name=image.object_key,
+                        presigned_url=presigned_url,
+                        project_image_id=image.id,
+                    )
+                    if image.is_thumbnail and thumbnail_image is None:
+                        thumbnail_image = dto
+                    else:
+                        images.append(dto)
+                except Exception as exc:
+                    raise GetPresignedURLException() from exc
 
         return ProjectDetailResponse(
             id=updated_project.id,
@@ -246,13 +219,16 @@ class ProjectService:
         project_image = ProjectImage(
             project_id=project_id,
             object_key=object_name,
+            is_thumbnail=is_thumbnail,
         )
+        if project.images is None:
+            project.images = []
+        # 썸네일을 업로드하려는 경우 기존 썸네일 플래그 해제
         if is_thumbnail:
-            project.thumbnail_image = project_image
-        else:
-            if project.images is None:
-                project.images = []
-            project.images.append(project_image)
+            for img in project.images:
+                if img.is_thumbnail:
+                    img.is_thumbnail = False
+        project.images.append(project_image)
         self.project_repository.update_project(project)
 
         return PresignedUrlWithIdResponse(
@@ -291,8 +267,6 @@ class ProjectService:
         return ProjectImageResponse.from_orm(project_image)
 
     def update_project_image(self, file_id: int) -> PresignedUrlWithIdResponse:
-        # 이미 존재하는 이미지를 같은 S3 키에 덮어쓸 수 있는 presigned URL을 생성
-
         project_image = self.project_repository.get_project_image_by_id(file_id)
         if not project_image:
             raise ProjectImageNotFoundException

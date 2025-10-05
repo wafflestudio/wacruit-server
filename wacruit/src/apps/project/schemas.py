@@ -26,7 +26,6 @@ class ProjectCreateRequest(BaseModel):
     name: str = Field(..., max_length=30)
     summary: str | None = Field(None, max_length=50)
     introduction: str | None = Field(None, max_length=255)
-    thumbnail_image: PresignedUrlWithIdResponse | None
     project_type: ProjectType
     formed_at: datetime | None
     is_active: bool

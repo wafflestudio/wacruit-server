@@ -25,7 +25,6 @@ class ProjectRepository:
             .options(
                 joinedload(Project.urls),
                 joinedload(Project.images),
-                joinedload(Project.thumbnail_image),
             )
             .filter(Project.id == project_id)
             .first()
@@ -78,11 +77,6 @@ class ProjectRepository:
 
     def delete_project_image(self, project_image_id: int) -> None:
         with self.transaction:
-            self.session.execute(
-                update(Project)
-                .where(Project.thumbnail_image_id == project_image_id)
-                .values(thumbnail_image_id=None)
-            )
             project_image = (
                 self.session.query(ProjectImage)
                 .filter(ProjectImage.id == project_image_id)

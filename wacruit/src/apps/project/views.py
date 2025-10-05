@@ -81,7 +81,6 @@ def update_project_image(
     admin_user: AdminUser,
     file_id: int,
     project_service: Annotated[ProjectService, Depends()],
-    is_thumbnail: bool = False,
 ) -> PresignedUrlWithIdResponse:
     return project_service.update_project_image(file_id=file_id)
 
