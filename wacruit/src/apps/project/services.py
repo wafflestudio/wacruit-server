@@ -122,7 +122,30 @@ class ProjectService:
         projects = self.project_repository.get_projects(offset=offset, limit=limit)
         items = []
         for project in projects:
-            items.append(ProjectBriefResponse.from_orm(project))
+            thumbnail_image = self.project_repository.get_thumbnail_image_by_project_id(
+                project.id
+            )
+            dto = None
+            if thumbnail_image:
+                presigned_url = self.generate_presigned_url_for_get_image(
+                    thumbnail_image.id
+                )
+                dto = PresignedUrlWithIdResponse(
+                    object_name=thumbnail_image.object_key,
+                    presigned_url=presigned_url,
+                    project_image_id=thumbnail_image.id,
+                )
+            items.append(
+                ProjectBriefResponse(
+                    id=project.id,
+                    name=project.name,
+                    summary=project.summary,
+                    thumbnail_image=dto,
+                    project_type=project.project_type,
+                    is_active=project.is_active,
+                    formed_at=project.formed_at,
+                )
+            )
         return ListResponse(items=items)
 
     def update_project(

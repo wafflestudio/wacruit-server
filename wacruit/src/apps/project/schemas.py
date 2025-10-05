@@ -66,22 +66,10 @@ class ProjectBriefResponse(OrmModel):
     id: int
     name: str
     summary: str | None
-    thumbnail_url: str | None
+    thumbnail_image: PresignedUrlWithIdResponse | None
     project_type: ProjectType
     is_active: bool
     formed_at: datetime | None
-
-    @classmethod
-    def from_orm(cls, obj):
-        return cls(
-            id=obj.id,
-            name=obj.name,
-            summary=obj.summary,
-            thumbnail_url=obj.thumbnail_url,
-            project_type=obj.project_type.name,
-            is_active=obj.is_active,
-            formed_at=obj.formed_at,
-        )
 
 
 class ProjectImageUploadRequest(BaseModel):
