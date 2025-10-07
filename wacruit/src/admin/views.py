@@ -309,7 +309,6 @@ class ProjectAdmin(ModelView, model=Project):
         Project.name,
         Project.summary,
         Project.introduction,
-        Project.thumbnail_url,
         Project.project_type,
         Project.is_active,
         Project.formed_at,

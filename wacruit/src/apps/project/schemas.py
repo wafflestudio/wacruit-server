@@ -15,11 +15,17 @@ class ProjectLinkDto(BaseModel):
     url: str
 
 
+class PresignedUrlWithIdResponse(BaseModel):
+    object_name: str
+    presigned_url: str
+    fields: dict[str, str] = Field(default={})
+    project_image_id: int
+
+
 class ProjectCreateRequest(BaseModel):
     name: str = Field(..., max_length=30)
     summary: str | None = Field(None, max_length=50)
     introduction: str | None = Field(None, max_length=255)
-    thumbnail_url: str | None = Field(None, max_length=255)
     project_type: ProjectType
     formed_at: datetime | None
     is_active: bool
@@ -30,7 +36,6 @@ class ProjectUpdateRequest(BaseModel):
     name: str | None = Field(None, max_length=30)
     summary: str | None = Field(None, max_length=50)
     introduction: str | None = Field(None, max_length=255)
-    thumbnail_url: str | None = Field(None, max_length=255)
     project_type: ProjectType | None
     formed_at: datetime | None
     is_active: bool | None
@@ -44,19 +49,12 @@ class ProjectImageResponse(OrmModel):
     is_uploaded: bool
 
 
-class PresignedUrlWithIdResponse(BaseModel):
-    object_name: str
-    presigned_url: str
-    fields: dict[str, str] = Field(default={})
-    project_image_id: int
-
-
 class ProjectDetailResponse(OrmModel):
     id: int
     name: str
     summary: str | None
     introduction: str | None
-    thumbnail_url: str | None
+    thumbnail_image: PresignedUrlWithIdResponse | None
     project_type: ProjectType
     formed_at: datetime | None
     is_active: bool
@@ -68,22 +66,10 @@ class ProjectBriefResponse(OrmModel):
     id: int
     name: str
     summary: str | None
-    thumbnail_url: str | None
+    thumbnail_image: PresignedUrlWithIdResponse | None
     project_type: ProjectType
     is_active: bool
     formed_at: datetime | None
-
-    @classmethod
-    def from_orm(cls, obj):
-        return cls(
-            id=obj.id,
-            name=obj.name,
-            summary=obj.summary,
-            thumbnail_url=obj.thumbnail_url,
-            project_type=obj.project_type.name,
-            is_active=obj.is_active,
-            formed_at=obj.formed_at,
-        )
 
 
 class ProjectImageUploadRequest(BaseModel):

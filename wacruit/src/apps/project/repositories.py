@@ -74,3 +74,24 @@ class ProjectRepository:
                 .values(is_uploaded=True)
             )
             self.session.execute(query)
+
+    def delete_project_image(self, project_image_id: int) -> None:
+        with self.transaction:
+            project_image = (
+                self.session.query(ProjectImage)
+                .filter(ProjectImage.id == project_image_id)
+                .first()
+            )
+            if project_image:
+                self.session.delete(project_image)
+
+    def get_thumbnail_image_by_project_id(self, project_id: int) -> ProjectImage | None:
+        return (
+            self.session.query(ProjectImage)
+            .filter(
+                ProjectImage.project_id == project_id,
+                ProjectImage.is_thumbnail.is_(True),
+                ProjectImage.is_uploaded.is_(True),
+            )
+            .first()
+        )
