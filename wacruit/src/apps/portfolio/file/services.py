@@ -122,4 +122,10 @@ class PortfolioFileService(LoggingMixin):
             s3_bucket=self._s3_config.bucket_name,
             s3_prefix="",
         )
-        return list(set(int(obj.split("/")[0]) for obj in objects))
+        return list(
+            set(
+                int(obj.split("/")[0])
+                for obj in objects
+                if "/" in obj and obj.split("/")[0].isdigit()
+            )
+        )
