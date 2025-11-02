@@ -1,4 +1,4 @@
-from typing import Annotated, TYPE_CHECKING
+from typing import Annotated, cast, TYPE_CHECKING
 
 from fastapi import Depends
 
@@ -7,8 +7,10 @@ from wacruit.src.apps.member.repositories import MemberRepository
 from wacruit.src.apps.portfolio.file.aws.config import s3_config
 from wacruit.src.apps.portfolio.file.aws.s3.client import S3Client
 from wacruit.src.apps.portfolio.file.aws.s3.method import S3PresignedUrlMethod
+from wacruit.src.apps.portfolio.file.aws.s3.utils import delete_object
 from wacruit.src.apps.portfolio.file.aws.s3.utils import generate_presigned_post_url
 from wacruit.src.apps.portfolio.file.aws.s3.utils import generate_presigned_url
+from wacruit.src.apps.project.exceptions import GetPresignedURLException
 from wacruit.src.apps.project.exceptions import ProjectAlreadyExistsException
 from wacruit.src.apps.project.exceptions import ProjectImageNotFoundException
 from wacruit.src.apps.project.exceptions import ProjectNotFoundException
@@ -49,8 +51,8 @@ class ProjectService:
             name=request.name,
             summary=request.summary,
             introduction=request.introduction,
-            thumbnail_url=request.thumbnail_url,
             project_type=request.project_type,
+            formed_at=request.formed_at,
             is_active=request.is_active,
         )
 
@@ -77,25 +79,33 @@ class ProjectService:
         if not project:
             raise ProjectNotFoundException
         images = []
+        thumbnail_image = None
         if project.images is not None:
             for image in project.images:
-                if image.is_uploaded:
+                if not image.is_uploaded:
+                    continue
+                try:
                     presigned_url = self.generate_presigned_url_for_get_image(image.id)
-                    images.append(
-                        PresignedUrlWithIdResponse(
-                            object_name=image.object_key,
-                            presigned_url=presigned_url,
-                            project_image_id=image.id,
-                        )
+                    dto = PresignedUrlWithIdResponse(
+                        object_name=image.object_key,
+                        presigned_url=presigned_url,
+                        project_image_id=image.id,
                     )
+                    if image.is_thumbnail and thumbnail_image is None:
+                        thumbnail_image = dto
+                    else:
+                        images.append(dto)
+                except Exception as exc:
+                    raise GetPresignedURLException() from exc
 
         return ProjectDetailResponse(
             id=project.id,
             name=project.name,
             summary=project.summary,
             introduction=project.introduction,
-            thumbnail_url=project.thumbnail_url,
+            thumbnail_image=thumbnail_image,
             project_type=project.project_type,
+            formed_at=project.formed_at,
             is_active=project.is_active,
             images=images,
             urls=[
@@ -112,7 +122,30 @@ class ProjectService:
         projects = self.project_repository.get_projects(offset=offset, limit=limit)
         items = []
         for project in projects:
-            items.append(ProjectBriefResponse.from_orm(project))
+            thumbnail_image = self.project_repository.get_thumbnail_image_by_project_id(
+                project.id
+            )
+            dto = None
+            if thumbnail_image:
+                presigned_url = self.generate_presigned_url_for_get_image(
+                    thumbnail_image.id
+                )
+                dto = PresignedUrlWithIdResponse(
+                    object_name=thumbnail_image.object_key,
+                    presigned_url=presigned_url,
+                    project_image_id=thumbnail_image.id,
+                )
+            items.append(
+                ProjectBriefResponse(
+                    id=project.id,
+                    name=project.name,
+                    summary=project.summary,
+                    thumbnail_image=dto,
+                    project_type=project.project_type,
+                    is_active=project.is_active,
+                    formed_at=project.formed_at,
+                )
+            )
         return ListResponse(items=items)
 
     def update_project(
@@ -144,25 +177,33 @@ class ProjectService:
         if not updated_project:
             raise ProjectNotFoundException
         images = []
+        thumbnail_image = None
         if updated_project.images is not None:
             for image in updated_project.images:
-                if image.is_uploaded:
+                if not image.is_uploaded:
+                    continue
+                try:
                     presigned_url = self.generate_presigned_url_for_get_image(image.id)
-                    images.append(
-                        PresignedUrlWithIdResponse(
-                            object_name=image.object_key,
-                            presigned_url=presigned_url,
-                            project_image_id=image.id,
-                        )
+                    dto = PresignedUrlWithIdResponse(
+                        object_name=image.object_key,
+                        presigned_url=presigned_url,
+                        project_image_id=image.id,
                     )
+                    if image.is_thumbnail and thumbnail_image is None:
+                        thumbnail_image = dto
+                    else:
+                        images.append(dto)
+                except Exception as exc:
+                    raise GetPresignedURLException() from exc
 
         return ProjectDetailResponse(
             id=updated_project.id,
             name=updated_project.name,
             summary=updated_project.summary,
             introduction=updated_project.introduction,
-            thumbnail_url=updated_project.thumbnail_url,
+            thumbnail_image=thumbnail_image,
             project_type=updated_project.project_type,
+            formed_at=updated_project.formed_at,
             is_active=updated_project.is_active,
             images=images,
             urls=[
@@ -173,16 +214,22 @@ class ProjectService:
             else None,
         )
 
-    def get_project_object_name(self, project_id: int, file_name: str) -> str:
+    def get_project_image_object_name(self, project_id: int, file_name: str) -> str:
         return f"PROJECT/{project_id}/{file_name}"
 
+    def get_project_thumbnail_object_name(self, project_id: int, file_name: str) -> str:
+        return f"PROJECT/{project_id}/thumbnail/{file_name}"
+
     def generate_presigned_url_for_post_image(
-        self, project_id: int, file_name: str
+        self, project_id: int, file_name: str, is_thumbnail: bool = False
     ) -> PresignedUrlWithIdResponse:
         project = self.project_repository.get_project_by_id(project_id)
         if not project:
             raise ProjectNotFoundException
-        object_name = self.get_project_object_name(project_id, file_name)
+        if is_thumbnail:
+            object_name = self.get_project_thumbnail_object_name(project_id, file_name)
+        else:
+            object_name = self.get_project_image_object_name(project_id, file_name)
         url, fields = generate_presigned_post_url(
             s3_client=self._s3_client.client,
             s3_bucket=self._s3_config.bucket_name,
@@ -195,11 +242,18 @@ class ProjectService:
         project_image = ProjectImage(
             project_id=project_id,
             object_key=object_name,
+            is_thumbnail=is_thumbnail,
         )
         if project.images is None:
             project.images = []
+        # 썸네일을 업로드하려는 경우 기존 썸네일 플래그 해제
+        if is_thumbnail:
+            for img in project.images:
+                if img.is_thumbnail:
+                    img.is_thumbnail = False
         project.images.append(project_image)
         self.project_repository.update_project(project)
+
         return PresignedUrlWithIdResponse(
             object_name=object_name,
             presigned_url=url,
@@ -212,16 +266,18 @@ class ProjectService:
         if not project_image or not project_image.is_uploaded:
             raise ProjectImageNotFoundException
         object_name = project_image.object_key
-        url = generate_presigned_url(
+        return self._generate_presigned_url_for_get_object(object_name)
+
+    def _generate_presigned_url_for_get_object(self, object_key: str) -> str:
+        return generate_presigned_url(
             s3_client=self._s3_client.client,
             client_method=S3PresignedUrlMethod.GET,
             method_parameters={
                 "Bucket": self._s3_config.bucket_name,
-                "Key": object_name,
+                "Key": object_key,
             },
             expires_in=_10_MIN,
         )
-        return url
 
     def register_project_image_info_in_db(self, file_id: int) -> ProjectImageResponse:
         project_image = self.project_repository.get_project_image_by_id(file_id)
@@ -232,3 +288,32 @@ class ProjectService:
         )
         project_image = self.project_repository.get_project_image_by_id(file_id)
         return ProjectImageResponse.from_orm(project_image)
+
+    def update_project_image(self, file_id: int) -> PresignedUrlWithIdResponse:
+        project_image = self.project_repository.get_project_image_by_id(file_id)
+        if not project_image:
+            raise ProjectImageNotFoundException
+
+        url, fields = generate_presigned_post_url(
+            s3_client=self._s3_client.client,
+            s3_bucket=self._s3_config.bucket_name,
+            s3_object=project_image.object_key,
+            expires_in=_10_MIN,
+            conditions=[["content-length-range", 0, _50_MB]],
+        )
+        return PresignedUrlWithIdResponse(
+            object_name=project_image.object_key,
+            presigned_url=url,
+            fields=fields,
+            project_image_id=project_image.id,
+        )
+
+    def delete_project_image(self, file_id: int) -> None:
+        project_image = self.project_repository.get_project_image_by_id(file_id)
+        if not project_image:
+            raise ProjectImageNotFoundException
+        object_name = project_image.object_key
+        # S3에서 삭제
+        delete_object(self._s3_client.client, self._s3_config.bucket_name, object_name)
+        # DB에서 삭제
+        self.project_repository.delete_project_image(file_id)

@@ -58,9 +58,12 @@ def get_upload_project_image_url(
     admin_user: AdminUser,
     request: ProjectImageUploadRequest,
     project_service: Annotated[ProjectService, Depends()],
+    is_thumbnail: bool = False,
 ) -> PresignedUrlWithIdResponse:
     return project_service.generate_presigned_url_for_post_image(
-        project_id=request.project_id, file_name=request.file_name
+        project_id=request.project_id,
+        file_name=request.file_name,
+        is_thumbnail=is_thumbnail,
     )
 
 
@@ -71,3 +74,21 @@ def check_upload_project_image_completed(
     project_service: Annotated[ProjectService, Depends()],
 ) -> ProjectImageResponse:
     return project_service.register_project_image_info_in_db(file_id=file_id)
+
+
+@v3_router.put("/image/{file_id}")
+def update_project_image(
+    admin_user: AdminUser,
+    file_id: int,
+    project_service: Annotated[ProjectService, Depends()],
+) -> PresignedUrlWithIdResponse:
+    return project_service.update_project_image(file_id=file_id)
+
+
+@v3_router.delete("/image/{file_id}", status_code=HTTPStatus.NO_CONTENT)
+def delete_project_image(
+    admin_user: AdminUser,
+    file_id: int,
+    project_service: Annotated[ProjectService, Depends()],
+) -> None:
+    project_service.delete_project_image(file_id=file_id)

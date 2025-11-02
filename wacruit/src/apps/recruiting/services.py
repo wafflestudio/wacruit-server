@@ -145,16 +145,20 @@ class RecruitingService:
         return ListResponse(items=items)
 
     def get_recruiting_infos_by_type(
-        self, recruiting_type: RecruitingType
+        self, recruiting_type: str
     ) -> ListResponse[RecruitingInfoResponse] | None:
-        info = self.recruiting_repository.get_recruiting_infos_by_type(recruiting_type)
+        if isinstance(recruiting_type, str):
+            if recruiting_type not in RecruitingType.__members__:
+                raise InvalidRecruitTypeException(recruiting_type)
+        rt = RecruitingType.ROOKIE
+        for enum_type in RecruitingType:
+            if enum_type.name == recruiting_type:
+                rt = enum_type
+        info = self.recruiting_repository.get_recruiting_infos_by_type(rt)
         if not info:
             return None
         return ListResponse(
-            items=[
-                RecruitingInfoResponse(**item.__dict__, type=recruiting_type)
-                for item in info
-            ]
+            items=[RecruitingInfoResponse(**item.__dict__, type=rt) for item in info]
         )
 
     def create_recruiting(self, request: RecruitingCreateRequest) -> RecruitingResponse:
