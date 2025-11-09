@@ -1,6 +1,7 @@
 from fastapi.routing import APIRouter
 
 from wacruit.src.apps import announcement
+from wacruit.src.apps import auth
 from wacruit.src.apps import dummy
 from wacruit.src.apps import faq
 from wacruit.src.apps import history
@@ -37,3 +38,4 @@ api_router.include_router(review.router)
 api_router.include_router(faq.router)
 api_router.include_router(timeline.router)
 api_router.include_router(pre_registration.router)
+api_router.include_router(auth.router)
