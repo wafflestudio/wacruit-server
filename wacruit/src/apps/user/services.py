@@ -1,6 +1,9 @@
+from typing import Annotated
+
 from fastapi import Depends
 from sqlalchemy.exc import IntegrityError
 
+from wacruit.src.apps.common.security import PasswordService
 from wacruit.src.apps.user.exceptions import EmailAlreadyExistsException
 from wacruit.src.apps.user.exceptions import UserAlreadyExistsException
 from wacruit.src.apps.user.exceptions import UserNotFoundException
@@ -17,20 +20,19 @@ from wacruit.src.apps.user.schemas import UserUpdateRequest
 class UserService:
     def __init__(
         self,
+        password_service: Annotated[PasswordService, Depends()],
         user_repository: UserRepository = Depends(),
     ) -> None:
         self.user_repository = user_repository
+        self.password_service = password_service
 
     def check_signup(self, sso_id: str) -> SignupCheckResponse:
         return SignupCheckResponse(
             signup=self.user_repository.check_signup_by_sso_id(sso_id)
         )
 
-    def create_user(
-        self, sso_id: str, request: UserCreateRequest
-    ) -> UserCreateUpdateResponse:
+    def create_user(self, request: UserCreateRequest) -> UserCreateUpdateResponse:
         user = User(
-            sso_id=sso_id,
             first_name=request.first_name,
             last_name=request.last_name,
             department=request.department,
@@ -41,6 +43,8 @@ class UserService:
             github_email=request.email,
             notion_email=request.email,
             slack_email=request.email,
+            username=request.username,
+            password=PasswordService.hash_password(request.password),
         )  # noqa
         try:
             user = self.user_repository.create_user(user)

@@ -20,6 +20,9 @@ class UserCreateRequest(BaseModel):
     college: str | None = Field(default=None, max_length=50)
     university: str | None = Field(default=None, max_length=50)
 
+    username: str = Field(max_length=50)
+    password: str = Field(max_length=50)
+
 
 class UserUpdateRequest(BaseModel):
     first_name: str | None = Field(max_length=30)
