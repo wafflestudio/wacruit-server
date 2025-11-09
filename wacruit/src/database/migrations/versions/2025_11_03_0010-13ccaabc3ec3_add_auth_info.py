@@ -23,8 +23,8 @@ def upgrade() -> None:
         sa.Column("token", sa.String(length=255), nullable=False),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.add_column("user", sa.Column("username", sa.String(length=50), nullable=False))
-    op.add_column("user", sa.Column("password", sa.String(length=255), nullable=False))
+    op.add_column("user", sa.Column("username", sa.String(length=50), nullable=True))
+    op.add_column("user", sa.Column("password", sa.String(length=255), nullable=True))
     # ### end Alembic commands ###
 
 
