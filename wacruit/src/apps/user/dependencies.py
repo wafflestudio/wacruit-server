@@ -18,6 +18,9 @@ def get_current_user(
     auth_service: Annotated[AuthService, Depends()],
 ) -> User:
     waffle_token = waffle_credentials.credentials
+    decoded_token = auth_service.decode_token(waffle_token)
+    if decoded_token["token_type"] != "access":
+        raise UserPermissionDeniedException
     user_id = auth_service.decode_token(waffle_token)["sub"]
     user = auth_service.get_user_by_id(user_id)
     if user is None:
