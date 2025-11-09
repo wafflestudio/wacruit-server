@@ -37,6 +37,8 @@ class AuthService:
 
         if user is None:
             raise UserNotFoundException()
+        if user.password is None:
+            raise UserNotFoundException()
 
         if PasswordService.verify_password(password, user.password):
             access_token = self.issue_token(user.id, 24, "access")
