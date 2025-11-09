@@ -20,11 +20,9 @@ from wacruit.src.apps.user.schemas import UserUpdateRequest
 class UserService:
     def __init__(
         self,
-        password_service: Annotated[PasswordService, Depends()],
         user_repository: UserRepository = Depends(),
     ) -> None:
         self.user_repository = user_repository
-        self.password_service = password_service
 
     def check_signup(self, sso_id: str) -> SignupCheckResponse:
         return SignupCheckResponse(

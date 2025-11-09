@@ -3,6 +3,7 @@ from typing import cast
 from pydantic import EmailStr
 import pytest
 
+from wacruit.src.apps.common.security import PasswordService
 from wacruit.src.apps.user.exceptions import EmailAlreadyExistsException
 from wacruit.src.apps.user.exceptions import UserAlreadyExistsException
 from wacruit.src.apps.user.exceptions import UserNotFoundException
@@ -19,37 +20,26 @@ def test_create_user(user_service: UserService):
         last_name="test",
         phone_number="010-0000-0000",
         email=EmailStr("test@test.com"),
+        username="name",
+        password="password123",
     )
-    response = user_service.create_user("sso_id", request)
+    response = user_service.create_user(request)
     assert response.id is not None
 
 
-def test_create_user_duplicate_sso_id(user_service: UserService):
-    sso_id = "test"
-    request = UserCreateRequest(
-        first_name="test",
-        last_name="test",
-        phone_number="010-0000-0000",
-        email=EmailStr("test2@test.com"),
-    )
-    user_service.create_user(sso_id, request)
-    with pytest.raises(UserAlreadyExistsException):
-        new_request = request.copy()
-        user_service.create_user(sso_id, new_request)
-
-
 def test_create_user_duplicate_email(user_service: UserService):
-    sso_id = "test"
     request = UserCreateRequest(
         first_name="test",
         last_name="test",
         phone_number="010-0000-0000",
         email=EmailStr("test@test.com"),
+        username="name",
+        password="password123",
     )
-    user_service.create_user(sso_id, request)
+    user_service.create_user(request)
     with pytest.raises(UserAlreadyExistsException):
         new_request = request.copy()
-        user_service.create_user(sso_id, new_request)
+        user_service.create_user(new_request)
 
 
 def test_update_user(created_user: User, user_service: UserService):
@@ -97,14 +87,15 @@ def test_partial_update_user(created_user: User, user_service: UserService):
 
 
 def test_update_user_duplicate_email(created_user: User, user_service: UserService):
-    sso_id = "test"
     create_request = UserCreateRequest(
         first_name="test",
         last_name="test",
         phone_number="010-0000-0000",
         email=EmailStr("test2@test.com"),
+        username="name",
+        password="password123",
     )
-    user_service.create_user(sso_id, create_request)
+    user_service.create_user(create_request)
     with pytest.raises(EmailAlreadyExistsException):
         update_request = UserUpdateRequest(  # type: ignore
             email=create_request.email,
@@ -113,20 +104,20 @@ def test_update_user_duplicate_email(created_user: User, user_service: UserServi
 
 
 def test_list_user_detail(user_service: UserService):
-    sso_id = "test"
     request = UserCreateRequest(
         first_name="test",
         last_name="test",
         phone_number="010-0000-0000",
         email=EmailStr("test@test.com"),
+        username="name",
+        password="password123",
     )
-    response = user_service.create_user(sso_id, request)
+    response = user_service.create_user(request)
     assert response.id is not None
 
     users = user_service.list_users()
     assert len(users) == 1
     assert users[0].id == response.id
-    assert users[0].sso_id == sso_id
 
 
 def test_update_invitation_emails(created_user: User, user_service: UserService):
