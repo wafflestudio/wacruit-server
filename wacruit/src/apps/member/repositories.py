@@ -34,7 +34,7 @@ class MemberRepository:
         # generation을 숫자로 캐스트하여 내림차순 정렬, NULL은 뒤로 보내기
         safe_num = case(
             (
-                Member.generation.op("~")("^[0-9]+(\\.[0-9]+)?$"),
+                Member.generation.op("REGEXP")("^[0-9]+(\\.[0-9]+)?$"),
                 cast(Member.generation, Float),
             ),
             else_=null(),
@@ -51,7 +51,7 @@ class MemberRepository:
         )
 
         query = self.session.query(Member).order_by(
-            safe_num.desc().nulls_last(), position_order.asc()
+            safe_num.desc(), position_order.asc()
         )
 
         if position is not None:
