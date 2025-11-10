@@ -21,13 +21,13 @@ class MemberInfoResponse(OrmModel):
     first_name: str
     last_name: str
     introduction: str | None = None
-    department: str
-    college: str
-    phone_number: str
-    github_id: str
+    department: str | None = None
+    college: str | None = None
+    phone_number: str | None = None
+    github_id: str | None = None
     is_active: bool
     generation: str
-    position: Position
+    position: Position | None = None
 
 
 class MemberBriefResponse(OrmModel):
