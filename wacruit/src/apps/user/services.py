@@ -1,6 +1,9 @@
+from typing import Annotated
+
 from fastapi import Depends
 from sqlalchemy.exc import IntegrityError
 
+from wacruit.src.apps.common.security import PasswordService
 from wacruit.src.apps.user.exceptions import EmailAlreadyExistsException
 from wacruit.src.apps.user.exceptions import UserAlreadyExistsException
 from wacruit.src.apps.user.exceptions import UserNotFoundException
@@ -26,11 +29,8 @@ class UserService:
             signup=self.user_repository.check_signup_by_sso_id(sso_id)
         )
 
-    def create_user(
-        self, sso_id: str, request: UserCreateRequest
-    ) -> UserCreateUpdateResponse:
+    def create_user(self, request: UserCreateRequest) -> UserCreateUpdateResponse:
         user = User(
-            sso_id=sso_id,
             first_name=request.first_name,
             last_name=request.last_name,
             department=request.department,
@@ -41,6 +41,8 @@ class UserService:
             github_email=request.email,
             notion_email=request.email,
             slack_email=request.email,
+            username=request.username,
+            password=PasswordService.hash_password(request.password),
         )  # noqa
         try:
             user = self.user_repository.create_user(user)

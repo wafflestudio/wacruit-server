@@ -2,30 +2,27 @@ from typing import Annotated
 
 from fastapi import Depends
 from fastapi import Security
-from fastapi.security import APIKeyHeader
+from fastapi.security import HTTPAuthorizationCredentials
+from fastapi.security import HTTPBearer
 
+from wacruit.src.apps.auth.services import AuthService
 from wacruit.src.apps.user.exceptions import UserPermissionDeniedException
 from wacruit.src.apps.user.models import User
 from wacruit.src.apps.user.repositories import UserRepository
 
+security = HTTPBearer(scheme_name="waffle_token", description="인증을 위한 access token")
+
 
 def get_current_user(
-    waffle_user_id: Annotated[
-        str,
-        Security(
-            APIKeyHeader(
-                name="waffle-user-id",
-                scheme_name="waffle-user-id",
-                description=(
-                    "와플스튜디오 SSO를 통해 발급받은 액세스 토큰에 포함된 사용자의 고유 식별자입니다. "
-                    "액세스 토큰을 디코드하면 확인할 수 있습니다."
-                ),
-            )
-        ),
-    ],
-    user_repository: Annotated[UserRepository, Depends()],
+    waffle_credentials: Annotated[HTTPAuthorizationCredentials, Security(security)],
+    auth_service: Annotated[AuthService, Depends()],
 ) -> User:
-    user = user_repository.get_user_by_sso_id(waffle_user_id)
+    waffle_token = waffle_credentials.credentials
+    decoded_token = auth_service.decode_token(waffle_token)
+    if decoded_token["token_type"] != "access":
+        raise UserPermissionDeniedException
+    user_id = auth_service.decode_token(waffle_token)["sub"]
+    user = auth_service.get_user_by_id(user_id)
     if user is None:
         raise UserPermissionDeniedException
     return user

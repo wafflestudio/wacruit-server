@@ -46,10 +46,9 @@ def update_user(
 @v1_router.post("", responses=responses_from(UserAlreadyExistsException))
 def create_user(
     request: UserCreateRequest,
-    waffle_user_id: Annotated[str, Header()],
     user_service: Annotated[UserService, Depends()],
 ) -> UserCreateUpdateResponse:
-    return user_service.create_user(waffle_user_id, request)
+    return user_service.create_user(request)
 
 
 @v1_router.get("", responses=responses_from(UserPermissionDeniedException))
