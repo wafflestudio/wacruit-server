@@ -10,24 +10,19 @@ from fastapi import Depends
 from wacruit.src.apps.auth.exceptions import InvalidTokenException
 from wacruit.src.apps.auth.exceptions import UserNotFoundException
 from wacruit.src.apps.auth.repositories import AuthRepository
+from wacruit.src.apps.common.security import get_token_secret
 from wacruit.src.apps.common.security import PasswordService
 from wacruit.src.apps.user.models import User
-from wacruit.src.secrets import AWSSecretManager
-from wacruit.src.settings import settings
 
 
 class AuthService:
     def __init__(
         self,
         auth_repository: Annotated[AuthRepository, Depends()],
+        token_secret: Annotated[str, Depends(get_token_secret)],
     ) -> None:
-        self.secret_manager = AWSSecretManager()
         self.auth_repository = auth_repository
-
-        if self.secret_manager.is_available():
-            self.secret_token = self.secret_manager.get_secret("token_secret")
-        else:
-            self.secret_token = settings.TOKEN_SECRET
+        self.token_secret = token_secret
 
     def get_user_by_id(self, user_id: int) -> User | None:
         return self.auth_repository.get_user_by_id(user_id)
@@ -72,7 +67,7 @@ class AuthService:
 
     def decode_token(self, token: str) -> JWTClaims:
         try:
-            claims = jwt.decode(token, key=self.secret_token)
+            claims = jwt.decode(token, key=self.token_secret)
             claims.validate()
             return claims
         except JoseError as e:
@@ -86,4 +81,4 @@ class AuthService:
             "token_type": token_type,
         }
 
-        return jwt.encode(header, payload, key=self.secret_token).decode("utf-8")
+        return jwt.encode(header, payload, key=self.token_secret).decode("utf-8")
