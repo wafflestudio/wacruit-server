@@ -234,6 +234,7 @@ class ProjectService:
             s3_client=self._s3_client.client,
             s3_bucket=self._s3_config.bucket_name,
             s3_object=object_name,
+            fields={"Cache-Control": "max-age=7889400"},
             expires_in=_10_MIN,
             conditions=[
                 ["content-length-range", 0, _50_MB],
@@ -299,6 +300,7 @@ class ProjectService:
             s3_bucket=self._s3_config.bucket_name,
             s3_object=project_image.object_key,
             expires_in=_10_MIN,
+            fields={"Cache-Control": "max-age=7889400"},
             conditions=[["content-length-range", 0, _50_MB]],
         )
         return PresignedUrlWithIdResponse(

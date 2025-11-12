@@ -88,7 +88,6 @@ class Position(Enum):
     IOS = "IOS"
     # INFRA = 6
     # PM = 7
-    # OPERATIONS = 8
 
 
 class SeminarType(Enum):
@@ -108,6 +107,7 @@ class ProjectURLType(Enum):
     WEBSITE = "WEBSITE"
     IOS_GITHUB = "IOS_GITHUB"
     CRAWLER_GITHUB = "CRAWLER_GITHUB"
+    DATA_GITHUB = "DATA_GITHUB"
     BEHANCE = "BEHANCE"
 
 

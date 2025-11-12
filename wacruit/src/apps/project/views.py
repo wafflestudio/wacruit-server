@@ -91,4 +91,4 @@ def delete_project_image(
     file_id: int,
     project_service: Annotated[ProjectService, Depends()],
 ) -> None:
-    project_service.delete_project_image(file_id=file_id)
+    return project_service.delete_project_image(file_id=file_id)
