@@ -4,6 +4,7 @@ from datetime import timedelta
 import pytest
 from sqlalchemy.orm import Session
 
+from wacruit.src.apps.common.security import PasswordService
 from wacruit.src.apps.portfolio.file.repositories import PortfolioFileRepository
 from wacruit.src.apps.portfolio.file.services_v2 import PortfolioFileService
 from wacruit.src.apps.portfolio.url.repositories import PortfolioUrlRepository
@@ -28,6 +29,8 @@ def user(db_session: Session) -> User:
         phone_number="010-0000-0000",
         email="example@email.com",
         is_admin=False,
+        username="name",
+        password=PasswordService.hash_password("password123"),
     )
     db_session.add(user)
     db_session.commit()

@@ -37,6 +37,10 @@ class User(DeclarativeBase):
     slack_email: Mapped[str255 | None]
     notion_email: Mapped[str255 | None]
 
+    # auth
+    username: Mapped[str50 | None]
+    password: Mapped[str255 | None]
+
     code_submissions: Mapped[list["CodeSubmission"]] = relationship(
         back_populates="user"
     )
