@@ -1,7 +1,7 @@
 """add DATA_GITHUB in ProjectURLType
 
 Revision ID: 564952e2cd49
-Revises: c2493af16868
+Revises: 13ccaabc3ec3
 Create Date: 2025-11-12 23:03:32.895041
 
 """
@@ -11,7 +11,7 @@ from sqlalchemy.dialects import mysql
 
 # revision identifiers, used by Alembic.
 revision = "564952e2cd49"
-down_revision = "c2493af16868"
+down_revision = "13ccaabc3ec3"
 branch_labels = None
 depends_on = None
 
