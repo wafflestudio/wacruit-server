@@ -4,6 +4,7 @@ from fastapi import Depends
 
 from wacruit.src.apps.history.models import History
 from wacruit.src.apps.history.repositories import HistoryRepository
+from wacruit.src.apps.history.schemas import DeleteHistoryRequest
 from wacruit.src.apps.history.schemas import UpdateHistoryRequest
 
 
@@ -13,30 +14,23 @@ class HistoryService:
 
     def get_history(self) -> list[History]:
         history_list = self.history_repository.get_history()
-        operation_period = self.calculate_operation_period()
-
-        if operation_period is not None:
-            history_list.append(
-                History(
-                    history_key="operation_period", history_value=str(operation_period)
-                )
-            )
 
         return history_list
 
     def update_history(self, update_request: UpdateHistoryRequest):
-        req = update_request.dict()
+        to_update_list = []
 
-        for k, v in req.items():
-            to_update = History(history_key=k, history_value=v)
-            self.history_repository.update_history(to_update)
+        for item in update_request.items:
+            to_update = History(
+                history_key=item.history_key,
+                history_value=item.history_value,
+                history_unit=item.history_unit,
+            )
+            to_update_list.append(to_update)
+
+        self.history_repository.update_history(to_update_list)
 
         return self.get_history()
 
-    def calculate_operation_period(self) -> int | None:
-        start_date = self.history_repository.get_start_date()
-        now = datetime.now()
-
-        if start_date is None:
-            return None
-        return now.year - start_date.year
+    def delete_history(self, delete_request: DeleteHistoryRequest):
+        self.history_repository.delete_history(delete_request.history_key)
