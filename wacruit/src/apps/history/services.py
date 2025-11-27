@@ -2,6 +2,7 @@ from datetime import datetime
 
 from fastapi import Depends
 
+from wacruit.src.apps.history.exceptions import HistoryNotFoundException
 from wacruit.src.apps.history.models import History
 from wacruit.src.apps.history.repositories import HistoryRepository
 from wacruit.src.apps.history.schemas import DeleteHistoryRequest
@@ -33,4 +34,6 @@ class HistoryService:
         return self.get_history()
 
     def delete_history(self, delete_request: DeleteHistoryRequest):
-        self.history_repository.delete_history(delete_request.history_key)
+        result = self.history_repository.delete_history(delete_request.history_key)
+        if not result:
+            raise HistoryNotFoundException()
