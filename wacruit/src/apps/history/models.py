@@ -11,3 +11,4 @@ class History(DeclarativeBase):
     id: Mapped[intpk]
     history_key: Mapped[str50]
     history_value: Mapped[str50]
+    history_unit: Mapped[str50]
