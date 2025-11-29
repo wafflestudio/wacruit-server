@@ -505,6 +505,7 @@ class HistoryAdmin(ModelView, model=History):
         History.id,
         History.history_key,
         History.history_value,
+        History.history_unit,
     ]
 
     column_searchable_list = [
