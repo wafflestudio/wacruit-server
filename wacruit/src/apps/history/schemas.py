@@ -23,4 +23,4 @@ class HistoryResponse(OrmModel):
     id: int
     history_key: str
     history_value: str
-    history_unit: str
+    history_unit: str | None = None
