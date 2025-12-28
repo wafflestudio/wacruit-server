@@ -30,23 +30,19 @@ jobs:
       - name: change mysql charset
         run: mysql -h 127.0.0.1 -P 3307 -u root -p'root-password' -e "ALTER DATABASE testdb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
 
-      - uses: actions/setup-python@v4
+      - name: Setup uv
+      - uses: astral-sh/setup-uv@v3
         with:
           python-version: 3.11
+          enable-cache: true
 
-      - name: Install poetry
-        run: pipx install poetry --python python3.11
-
-      - name: Set poetry environment & install dependencies
-        run: |
-          poetry config virtualenvs.in-project true
-          poetry env use 3.11
-          poetry install --no-root
+      - name: Install dependencies
+        run: uv sync --frozen --no-dev
 
       - name: Run tests
         run: |
           cd ${GITHUB_WORKSPACE}/wacruit/
-          poetry run pytest --junit-xml=${GITHUB_WORKSPACE}/wacruit/test.xml ./
+          uv run pytest --junit-xml=${GITHUB_WORKSPACE}/wacruit/test.xml ./
 
       - name: Test reports
         uses: dorny/test-reporter@v1
@@ -61,10 +57,10 @@ jobs:
       - name: Run pre-commit
         run: |
           git fetch origin ${{ github.base_ref }}
-          poetry run pre-commit run --from-ref origin/${{ github.base_ref }} --to-ref HEAD
+          uv run pre-commit run --from-ref origin/${{ github.base_ref }} --to-ref HEAD
 
       - name: Run alembic migration test
         run: |
           mkdir -p wacruit/src/database/migrations/versions
-          ls wacruit/src/database/migrations/versions/* || poetry run alembic revision --autogenerate
-          poetry run alembic upgrade head
+          ls wacruit/src/database/migrations/versions/* || uv run alembic revision --autogenerate
+          uv run alembic upgrade head
