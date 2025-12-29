@@ -138,7 +138,6 @@ class ProblemAdmin(ModelView, model=Problem):
 
     form_excluded_columns = [
         Problem.submissions,
-        Problem.code_submissions,
         Problem.testcases,
     ]
 
