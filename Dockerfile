@@ -1,25 +1,29 @@
-FROM python:3.11-bookworm as builder
+FROM python:3.11-bookworm AS builder
 
-RUN pip install poetry==1.5.0
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-ENV POETRY_NO_INTERACTION=1 \
-    POETRY_VIRTUALENVS_IN_PROJECT=1 \
-    POETRY_VIRTUALENVS_CREATE=1 \
-    POETRY_CACHE_DIR=/tmp/poetry_cache
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_HTTP_TIMEOUT=300 \
+    UV_LINK_MODE=copy \
+    UV_PROJECT_ENVIRONMENT=/app/.venv
 
 WORKDIR /app
 
-COPY pyproject.toml poetry.lock ./
+COPY pyproject.toml uv.lock ./
 
-RUN --mount=type=cache,target=$POETRY_CACHE_DIR poetry install --without dev --no-root
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev --no-install-project
 
-FROM python:3.11-slim-bookworm as runtime
+FROM python:3.11-slim-bookworm AS runtime
 
 ARG ENV
 
 ENV VIRTUAL_ENV=/app/.venv \
     PATH="/app/.venv/bin:$PATH" \
-    env=$ENV
+    env=$ENV \
+    PYTHONUNBUFFERED=1
+
+WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libmariadb-dev \
