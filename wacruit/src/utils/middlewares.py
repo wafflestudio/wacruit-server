@@ -9,6 +9,8 @@ class HttpToHttpsRequestMiddleware:
         self.app = app
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
-        if scope["type"] in ("http", "websocket"):
+        if scope["type"] == "http":
             scope["scheme"] = "https"
+        elif scope["type"] == "websocket":
+            scope["scheme"] = "wss"
         await self.app(scope, receive, send)
