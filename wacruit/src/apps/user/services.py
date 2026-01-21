@@ -32,6 +32,8 @@ class UserService:
     def create_user(self, request: UserCreateRequest) -> UserCreateUpdateResponse:
         if self.user_repository.get_user_by_email(request.email):
             raise EmailAlreadyExistsException
+        if self.user_repository.get_user_by_username(request.username):
+            raise UserAlreadyExistsException
         user = User(
             first_name=request.first_name,
             last_name=request.last_name,
