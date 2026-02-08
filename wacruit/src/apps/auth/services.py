@@ -6,6 +6,7 @@ from authlib.jose import jwt
 from authlib.jose import JWTClaims
 from authlib.jose.errors import JoseError
 from fastapi import Depends
+from pydantic import EmailStr
 
 from wacruit.src.apps.auth.exceptions import InvalidTokenException
 from wacruit.src.apps.auth.exceptions import UserNotFoundException
@@ -27,8 +28,8 @@ class AuthService:
     def get_user_by_id(self, user_id: int) -> User | None:
         return self.auth_repository.get_user_by_id(user_id)
 
-    def login(self, username: str, password: str) -> tuple[str, str]:
-        user = self.auth_repository.get_user_by_username(username)
+    def login(self, email: EmailStr, password: str) -> tuple[str, str]:
+        user = self.auth_repository.get_user_by_email(email)
 
         if user is None:
             raise UserNotFoundException()
@@ -82,3 +83,9 @@ class AuthService:
         }
 
         return jwt.encode(header, payload, key=self.token_secret).decode("utf-8")
+
+    def check_available_email(self, email: EmailStr) -> bool:
+        user = self.auth_repository.get_user_by_email(email)
+        if user:
+            return False
+        return True
