@@ -6,7 +6,8 @@ from wacruit.src.apps.user.models import User
 def test_cant_create_announcement_if_not_admin(user: User, test_client: TestClient):
     assert user.is_admin is False
     token_response = test_client.post(
-        "/api/v3/auth/login", json={"username": "name", "password": "password123"}
+        "/api/v3/auth/login",
+        json={"email": "example@email.com", "password": "password123"},
     ).json()
     response = test_client.post(
         "/api/v1/announcements/",
@@ -22,7 +23,8 @@ def test_cant_create_announcement_if_not_admin(user: User, test_client: TestClie
 def test_can_create_announcement_if_admin(admin_user: User, test_client: TestClient):
     assert admin_user.is_admin is True
     token_res = test_client.post(
-        "/api/v3/auth/login", json={"username": "admin", "password": "password123"}
+        "/api/v3/auth/login",
+        json={"email": "example2@email.com", "password": "password123"},
     ).json()
     response = test_client.post(
         "/api/v1/announcements/",
