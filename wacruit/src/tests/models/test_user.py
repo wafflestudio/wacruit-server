@@ -30,7 +30,6 @@ def test_create_user_with_same_email(db_session: Session, user: User):
         phone_number="010-0000-0000",
         email="test@test.com",
         is_admin=False,
-        username="name",
         password=PasswordService.hash_password("password123"),
     )
 

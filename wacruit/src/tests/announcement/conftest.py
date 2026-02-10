@@ -22,7 +22,6 @@ def user(db_session: Session) -> User:
         phone_number="010-0000-0000",
         email="example@email.com",
         is_admin=False,
-        username="name",
         password=PasswordService.hash_password("password123"),
     )
     db_session.add(user)
@@ -37,9 +36,8 @@ def admin_user(db_session: Session) -> User:
         first_name="Test",
         last_name="User",
         phone_number="010-0000-0000",
-        email="example@email.com",
+        email="example2@email.com",
         is_admin=True,
-        username="admin",
         password=PasswordService.hash_password("password123"),
     )
     db_session.add(user)

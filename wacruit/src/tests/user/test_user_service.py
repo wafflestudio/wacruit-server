@@ -20,7 +20,6 @@ def test_create_user(user_service: UserService):
         last_name="test",
         phone_number="010-0000-0000",
         email=EmailStr("test@test.com"),
-        username="name",
         password="password123",
     )
     response = user_service.create_user(request)
@@ -33,7 +32,6 @@ def test_create_user_duplicate_email(user_service: UserService):
         last_name="test",
         phone_number="010-0000-0000",
         email=EmailStr("test@test.com"),
-        username="name1",
         password="password123",
     )
     user_service.create_user(request)
@@ -92,7 +90,6 @@ def test_update_user_duplicate_email(created_user: User, user_service: UserServi
         last_name="test",
         phone_number="010-0000-0000",
         email=EmailStr("test2@test.com"),
-        username="name1",
         password="password123",
     )
     user_service.create_user(create_request)
@@ -109,7 +106,6 @@ def test_list_user_detail(user_service: UserService):
         last_name="test",
         phone_number="010-0000-0000",
         email=EmailStr("test@test.com"),
-        username="name",
         password="password123",
     )
     response = user_service.create_user(request)

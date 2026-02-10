@@ -13,6 +13,5 @@ def user() -> User:
         phone_number="010-0000-0000",
         email="test@test.com",
         is_admin=False,
-        username="name",
         password=PasswordService.hash_password("password123"),
     )
