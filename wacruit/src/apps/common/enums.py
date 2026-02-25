@@ -88,6 +88,7 @@ class Position(Enum):
     IOS = "IOS"
     # INFRA = 6
     # PM = 7
+    # OPERATIONS = 8
 
 
 class SeminarType(Enum):
