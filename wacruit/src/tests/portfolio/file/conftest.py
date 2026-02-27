@@ -6,6 +6,7 @@ import moto
 import pytest
 from sqlalchemy.orm import Session
 
+from wacruit.src.apps.common.security import PasswordService
 from wacruit.src.apps.portfolio.file.repositories import PortfolioFileRepository
 from wacruit.src.apps.portfolio.file.services_v2 import PortfolioFileService
 from wacruit.src.apps.recruiting.models import Recruiting
@@ -25,6 +26,7 @@ def user1(db_session: Session) -> User:
         phone_number="010-1111-1111",
         email="example1@email.com",
         is_admin=False,
+        password=PasswordService.hash_password("password123"),
     )
     db_session.add(user1)
     db_session.commit()

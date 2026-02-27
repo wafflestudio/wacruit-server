@@ -1,4 +1,5 @@
 from fastapi import Depends
+from pydantic import EmailStr
 from sqlalchemy import update
 from sqlalchemy.orm import Session
 
@@ -30,6 +31,12 @@ class UserRepository:
 
     def get_user_by_sso_id(self, sso_id: str) -> User | None:
         return self.session.query(User).filter(User.sso_id == sso_id).first()
+
+    def get_user_by_email(self, email: EmailStr) -> User | None:
+        return self.session.query(User).filter(User.email == email).first()
+
+    def get_user_by_username(self, username: str) -> User | None:
+        return self.session.query(User).filter(User.username == username).first()
 
     def create_user(self, user: User) -> User:
         with self.transaction:

@@ -1,5 +1,6 @@
 import pytest
 
+from wacruit.src.apps.common.security import PasswordService
 from wacruit.src.apps.user.models import User
 
 
@@ -12,4 +13,5 @@ def user() -> User:
         phone_number="010-0000-0000",
         email="test@test.com",
         is_admin=False,
+        password=PasswordService.hash_password("password123"),
     )

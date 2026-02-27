@@ -1,12 +1,12 @@
 # wacruit-server
 
 [![Python 3.11.1](https://img.shields.io/badge/python-3.11.1-blue.svg)](https://www.python.org/downloads/release/python-3111/)
-[![Poetry 1.5.1](https://img.shields.io/badge/poetry-1.5.1-yellow.svg)](https://github.com/python-poetry/poetry/releases/tag/1.5.1)
+[![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
 
 ## Prerequisites
 
 - Python version 3.11 and above is required.
-- Install [Poetry](https://python-poetry.org/docs/#installation) package manager to install all the dependencies.
+- Install [uv](https://docs.astral.sh/uv/getting-started/installation/) package manager to install all the dependencies.
 - A MySQL client is required for database operations in your local machine. On macos, you can install via `brew install mysql-client` or `brew install mysql`. Don't forget to add it to PATH.
 - This project requires [wacruit-judge](https://github.com/wafflestudio/wacruit-judge) which is the fork version of [Judge0](https://github.com/judge0/judge0). To test this project, you first need to clone wacruit-judge and run it using docker-compose.
 
@@ -16,10 +16,9 @@
 
 Run the following command to install all the dependencies:
 ```bash
-poetry config virtualenvs.in-project true
-poetry install
+uv sync
 ```
-The above command will install all the required dependencies in a virtual environment. **Ensure that poetry have created `.venv` folder inside the project root. Otherwise pre-commit hooks won't work.**
+The above command will install all the required dependencies in a virtual environment.
 
 ### Pre-commit hooks
 

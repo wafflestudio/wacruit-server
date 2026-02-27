@@ -1,6 +1,7 @@
 from fastapi import Depends
 from sqlalchemy.exc import IntegrityError
 
+from wacruit.src.apps.common.enums import Position
 from wacruit.src.apps.common.schemas import ListResponse
 from wacruit.src.apps.member.exceptions import MemberAlreadyExistsException
 from wacruit.src.apps.member.exceptions import MemberNotFoundException
@@ -48,9 +49,13 @@ class MemberService:
         return MemberInfoResponse.from_orm(member)
 
     def get_members(
-        self, waffle_sso_id: str | None
+        self,
+        waffle_sso_id: str | None,
+        position: Position | None,
+        offset: int,
+        limit: int,
     ) -> ListResponse[MemberBriefResponse] | ListResponse[MemberInfoResponse]:
-        members = self.member_repository.get_all_members()
+        members = self.member_repository.get_all_members(position, offset, limit)
         if waffle_sso_id:
             user = self.user_repository.get_user_by_sso_id(waffle_sso_id)
             if user and user.is_admin:

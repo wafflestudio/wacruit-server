@@ -7,6 +7,7 @@ from wacruit.src.apps.announcement.repositories import AnnouncementRepository
 from wacruit.src.apps.announcement.schemas import AnnouncementCreateDto
 from wacruit.src.apps.announcement.services import AnnouncementService
 from wacruit.src.apps.announcement.views import v1_router
+from wacruit.src.apps.common.security import PasswordService
 from wacruit.src.apps.user.models import User
 from wacruit.src.apps.user.repositories import UserRepository
 from wacruit.src.database.connection import Transaction
@@ -21,6 +22,7 @@ def user(db_session: Session) -> User:
         phone_number="010-0000-0000",
         email="example@email.com",
         is_admin=False,
+        password=PasswordService.hash_password("password123"),
     )
     db_session.add(user)
     db_session.commit()
@@ -34,8 +36,9 @@ def admin_user(db_session: Session) -> User:
         first_name="Test",
         last_name="User",
         phone_number="010-0000-0000",
-        email="example@email.com",
+        email="example2@email.com",
         is_admin=True,
+        password=PasswordService.hash_password("password123"),
     )
     db_session.add(user)
     db_session.commit()

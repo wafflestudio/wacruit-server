@@ -1,8 +1,10 @@
+from http import HTTPStatus
 from typing import Annotated
 
 from fastapi import APIRouter
 from fastapi import Depends
 
+from wacruit.src.apps.history.schemas import DeleteHistoryRequest
 from wacruit.src.apps.history.schemas import HistoryResponse
 from wacruit.src.apps.history.schemas import UpdateHistoryRequest
 from wacruit.src.apps.history.services import HistoryService
@@ -30,3 +32,12 @@ def get_history(history_service: Annotated[HistoryService, Depends()]):
     history_list = history_service.get_history()
 
     return [HistoryResponse.from_orm(history) for history in history_list]
+
+
+@v3_router.delete("", status_code=HTTPStatus.NO_CONTENT)
+def delete_history(
+    admin_user: AdminUser,
+    history_service: Annotated[HistoryService, Depends()],
+    delete_request: DeleteHistoryRequest,
+):
+    history_service.delete_history(delete_request)

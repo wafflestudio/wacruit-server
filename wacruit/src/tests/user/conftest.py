@@ -1,6 +1,7 @@
 import pytest
 from sqlalchemy.orm import Session
 
+from wacruit.src.apps.common.security import PasswordService
 import wacruit.src.apps.problem.models  # nopycln: import
 from wacruit.src.apps.user.models import User
 from wacruit.src.apps.user.repositories import UserRepository
@@ -17,6 +18,7 @@ def user() -> User:
         phone_number="010-0000-0000",
         email="example@email.com",
         is_admin=False,
+        password=PasswordService.hash_password("password123"),
     )
 
 

@@ -34,7 +34,14 @@ class ProjectRepository:
         return self.session.query(Project).filter(Project.name == name).first()
 
     def get_projects(self, offset: int = 0, limit: int = 10) -> list[Project]:
-        return self.session.query(Project).offset(offset).limit(limit).all()
+        # formed_at이 작은 순서대로 정렬
+        return (
+            self.session.query(Project)
+            .order_by(Project.formed_at)
+            .offset(offset)
+            .limit(limit)
+            .all()
+        )
 
     def create_project(self, project: Project) -> Project:
         with self.transaction:
@@ -67,3 +74,24 @@ class ProjectRepository:
                 .values(is_uploaded=True)
             )
             self.session.execute(query)
+
+    def delete_project_image(self, project_image_id: int) -> None:
+        with self.transaction:
+            project_image = (
+                self.session.query(ProjectImage)
+                .filter(ProjectImage.id == project_image_id)
+                .first()
+            )
+            if project_image:
+                self.session.delete(project_image)
+
+    def get_thumbnail_image_by_project_id(self, project_id: int) -> ProjectImage | None:
+        return (
+            self.session.query(ProjectImage)
+            .filter(
+                ProjectImage.project_id == project_id,
+                ProjectImage.is_thumbnail.is_(True),
+                ProjectImage.is_uploaded.is_(True),
+            )
+            .first()
+        )

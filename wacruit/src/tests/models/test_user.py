@@ -2,6 +2,7 @@ import pytest
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from wacruit.src.apps.common.security import PasswordService
 from wacruit.src.apps.user.models import User
 
 
@@ -29,6 +30,7 @@ def test_create_user_with_same_email(db_session: Session, user: User):
         phone_number="010-0000-0000",
         email="test@test.com",
         is_admin=False,
+        password=PasswordService.hash_password("password123"),
     )
 
     db_session.add(user)

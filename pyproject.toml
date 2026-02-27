@@ -1,46 +1,54 @@
-[tool.poetry]
+[project]
 name = "wacruit-server"
 version = "0.1.0"
 description = ""
-authors = ["shinhong-park <shinhong.park@linecorp.com>"]
+authors = [{ name = "shinhong-park", email = "shinhong.park@linecorp.com" }]
+requires-python = ">=3.11, <3.12"
 readme = "README.md"
-packages = [{include = "wacruit"}]
+dependencies = [
+    "fastapi>=0.95.1,<0.96",
+    "sqlalchemy>=2.0.13,<3",
+    "loguru>=0.7.0,<0.8",
+    "python-dotenv>=1.0.0,<2",
+    "uvicorn>=0.22.0,<0.23",
+    "bcrypt>=4.0.1,<5",
+    "alembic>=1.11.1,<2",
+    "mysqlclient==2.2.4",
+    "aws-secretsmanager-caching>=1.1.1.5,<2",
+    "sse-starlette>=1.6.1,<2",
+    "httpx>=0.24.1,<0.25",
+    "email-validator>=2.0.0.post2,<3",
+    "boto3>=1.28.3,<2",
+    "sqladmin>=0.16.0,<0.17",
+    "itsdangerous>=2.1.2,<3",
+    "pyjwt>=2.8.0,<3",
+    "pytest-mock==3.8.2",
+    "moto[ec2, s3]==4.2.7",
+    "tenacity>=9.0.0,<10",
+    "pyyaml==6.0.2",
+    "argon2-cffi>=25.1.0,<26",
+    "authlib>=1.6.5,<2",
+]
 
-[tool.poetry.dependencies]
-python = "^3.11"
-fastapi = "^0.95.1"
-sqlalchemy = "^2.0.13"
-loguru = "^0.7.0"
-python-dotenv = "^1.0.0"
-uvicorn = "^0.22.0"
-bcrypt = "^4.0.1"
-alembic = "^1.11.1"
-mysqlclient = "2.2.4"
-aws-secretsmanager-caching = "^1.1.1.5"
-sse-starlette = "^1.6.1"
-httpx = "^0.24.1"
-email-validator = "^2.0.0.post2"
-boto3 = "^1.28.3"
-sqladmin = "^0.16.0"
-itsdangerous = "^2.1.2"
-pyjwt = "^2.8.0"
-pytest-mock = "3.8.2"
-moto = {version = "4.2.7", extras = ["all", "ec2", "s3"]}
-tenacity = "^9.0.0"
-pyyaml = "6.0.2"
+[dependency-groups]
+dev = [
+    "pytest>=7.3.1,<8",
+    "pre-commit>=3.3.1,<4",
+    "black>=23.3.0,<24",
+    "pylint>=2.17.4,<3",
+    "devtools>=0.11.0,<0.12",
+    "pyright>=1.1.314,<2",
+]
 
+[tool.hatch.build.targets.sdist]
+include = ["wacruit"]
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^7.3.1"
-pre-commit = "^3.3.1"
-black = "^23.3.0"
-pylint = "^2.17.4"
-devtools = "^0.11.0"
-pyright = "^1.1.314"
+[tool.hatch.build.targets.wheel]
+include = ["wacruit"]
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.pytest.ini_options]
 pythonpath = [

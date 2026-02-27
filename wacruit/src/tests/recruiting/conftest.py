@@ -3,6 +3,7 @@ from datetime import timedelta
 
 import pytest
 
+from wacruit.src.apps.common.security import PasswordService
 from wacruit.src.apps.portfolio.file.services import PortfolioFileService
 from wacruit.src.apps.portfolio.url.repositories import PortfolioUrlRepository
 from wacruit.src.apps.portfolio.url.services import PortfolioUrlService
@@ -69,6 +70,7 @@ def user(db_session: Session) -> User:
         phone_number="010-0000-0000",
         email="example@email.com",
         is_admin=False,
+        password=PasswordService.hash_password("password123"),
     )
     db_session.add(user)
     db_session.commit()
