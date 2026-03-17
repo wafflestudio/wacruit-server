@@ -1,6 +1,6 @@
 from pydantic import BaseSettings
 
-from wacruit.src.secrets import AWSSecretManager
+from wacruit.src.secrets import OCISecretManager
 
 
 class AdminConfig(BaseSettings):
@@ -10,7 +10,7 @@ class AdminConfig(BaseSettings):
 
     def __init__(self) -> None:
         super().__init__()
-        aws_secrets = AWSSecretManager()
+        aws_secrets = OCISecretManager()
         if aws_secrets.is_available():
             self.username = aws_secrets.get_secret("admin_username")
             self.password = aws_secrets.get_secret("admin_password")
