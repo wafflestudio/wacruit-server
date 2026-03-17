@@ -2,7 +2,7 @@ from urllib.parse import quote_plus
 
 from pydantic import BaseSettings
 
-from wacruit.src.secrets import AWSSecretManager
+from wacruit.src.secrets import OCISecretManager
 from wacruit.src.settings import settings
 
 
@@ -21,7 +21,7 @@ class DBConfig(BaseSettings):
 
     def __init__(self):
         super().__init__()
-        aws_secrets = AWSSecretManager()
+        aws_secrets = OCISecretManager()
         if aws_secrets.is_available():
             self.username = aws_secrets.get_secret("server_db_username")
             self.password = quote_plus(aws_secrets.get_secret("server_db_password"))
