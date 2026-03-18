@@ -11,31 +11,30 @@ jobs:
 
     env:
       IMAGE_TAG: ${{ github.run_number }}
-      ECR_REPOSITORY: wacruit-prod/wacruit-server
+      OCIR_REPOSITORY: wacruit-prod/wacruit-server
+      OCIR_REGISTRY: yny.ocir.io
+      OCIR_NAMESPACE: ax1dvc8vmenm
+
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+      - name: Login to OCIR
+        uses: docker/login-action@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-northeast-2
+          registry: ${{ env.OCIR_REGISTRY }}
+          username: ax1dvc8vmenm/members/waffle-deployer
+          password: ${{ secrets.OCI_PASSWORD }}
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-
-      - name: Build, tag, and push image to ECR to be deployed for K8S
-        id: build-image-k8s
-        uses: docker/build-push-action@v4
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      - name: Build and push image
+        id: build-image
+        uses: docker/build-push-action@v5
         with:
           context: .
+          file: ./Dockerfile
           push: true
-          tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+          platforms: linux/arm64
+          tags: ${{ env.OCIR_REGISTRY }}/${{ env.OCIR_NAMESPACE }}/${{ env.OCIR_REPOSITORY }}:${{ env.IMAGE_TAG }}
           build-args: |
             ENV=prod

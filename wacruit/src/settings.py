@@ -12,6 +12,15 @@ class Settings(BaseSettings):
     TOKEN_SECRET: str = "secret"
 
     @property
+    def oci_secret_ocid(self) -> str | None:
+        s = "ocid1.vaultsecret.oc1.ap-chuncheon-1."
+        if self.env == "dev":
+            return s + "amaaaaaat2m5lbqamvh6nypm72o2om2bk77d3gev3zsryfwt7idsoi7fccxa"
+        if self.env == "prod":
+            return s + "amaaaaaat2m5lbqad2qlgakgqhnym4ixoai7qywmfx2oft3zspsrxfgcic4q"
+        return None
+
+    @property
     def is_dev(self) -> bool:
         return self.env == "dev"
 
