@@ -35,10 +35,9 @@ dependencies = [
 dev = [
     "pytest>=7.3.1,<8",
     "pre-commit>=3.3.1,<4",
-    "black>=23.3.0,<24",
-    "pylint>=2.17.4,<3",
     "devtools>=0.11.0,<0.12",
     "pyright>=1.1.314,<2",
+    "ruff>=0.15.9",
 ]
 
 [tool.hatch.build.targets.sdist]
@@ -66,17 +65,17 @@ venvPath = "."
 venv = ".venv"
 reportShadowedImports = false
 
-[tool.isort]
-profile="google"
-src_paths="wacruit"
-use_parentheses=true
-float_to_top=true
-line_length=88
-ensure_newline_before_comments=true
-sections=["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
-
-[tool.pycln]
-all = true
+[tool.ruff]
+line-length = 88
 exclude = [
     "**/database/migrations/env.py",
+    "**/migrations/versions",
+    "**/node_modules",
+    "**/__pycache__",
 ]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "PL"]
+
+[tool.ruff.lint.isort]
+force-sort-within-sections = true
