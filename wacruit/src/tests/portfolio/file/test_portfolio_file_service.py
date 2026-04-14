@@ -25,7 +25,7 @@ def test_get_upload_portfolio_file_v2(
     expected_url = (
         f"{storage_config.endpoint_url}/{storage_config.bucket_name}"
         if storage_config.endpoint_url
-        else f"https://{storage_config.bucket_name}.s3.amazonaws.com/"
+        else f"https://s3.amazonaws.com/{storage_config.bucket_name}"
     )
 
     assert response.object_name == expected_object_name
@@ -128,10 +128,9 @@ def test_get_download_portfolio_file_url_v2(
         assert parsed.netloc == endpoint.netloc
         assert parsed.path == expected_path
     else:
-        assert url == (
-            f"https://{storage_config.bucket_name}.s3.amazonaws.com/"
-            f"{recruiting1.id}/{user1.id}/test1.pdf"
-        )
+        assert parsed.scheme == "https"
+        assert parsed.netloc == "s3.amazonaws.com"
+        assert parsed.path == expected_path
 
 
 def test_delete_portfolio_file_v2(
