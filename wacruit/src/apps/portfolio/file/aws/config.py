@@ -1,28 +1,35 @@
 from pydantic import BaseSettings
-from pydantic import Field
 
 from wacruit.src.secrets import OCISecretManager
 from wacruit.src.settings import settings
 
 
-class S3PortfolioConfig(BaseSettings):
+class StorageConfig(BaseSettings):
     bucket_name: str = ""
+    region: str = "ap-northeast-2"
+    endpoint_url: str | None = None
+    access_key_id: str | None = None
+    secret_access_key: str | None = None
+    addressing_style: str = "path"
 
     class Config:
         case_sensitive = False
-        env_prefix = "S3_PORTFOLIO_"
-
+        env_prefix = "OBJECT_STORAGE_"
         env_file = settings.env_files
 
     def __init__(self):
         super().__init__()
-        aws_secrets = OCISecretManager()
-        if aws_secrets.is_available():
-            self.bucket_name = aws_secrets.get_secret("portfolio_bucket_name")
+        secret_manager = OCISecretManager()
+        if secret_manager.is_available():
+            self.bucket_name = secret_manager.get_secret("object_storage_bucket_name")
+            self.region = secret_manager.get_secret("object_storage_region")
+            self.endpoint_url = secret_manager.get_secret("object_storage_endpoint_url")
+            self.access_key_id = secret_manager.get_secret(
+                "object_storage_access_key_id"
+            )
+            self.secret_access_key = secret_manager.get_secret(
+                "object_storage_secret_access_key"
+            )
 
-    @property
-    def bucket_region(self) -> str:
-        return "ap-northeast-2"
 
-
-s3_config = S3PortfolioConfig()
+storage_config = StorageConfig()

@@ -28,7 +28,9 @@ db.sqlite3
 
 # Environments
 .env
+.env.local
 .venv
+.codex
 
 # VScode
 .vscode
