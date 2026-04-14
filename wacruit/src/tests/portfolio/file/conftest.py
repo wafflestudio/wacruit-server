@@ -88,30 +88,31 @@ def portfolio_file_repository(db_session: Session):
 
 
 @pytest.fixture
-@moto.mock_s3
 def portfolio_file_service(
     portfolio_file_repository: PortfolioFileRepository,
     recruiting_repository: RecruitingRepository,
 ):
-    storage_config.bucket_name = "wacruit-portfolio-test"
-    storage_config.region = "ap-northeast-2"
-    storage_config.endpoint_url = None
-    storage_config.access_key_id = "testing"
-    storage_config.secret_access_key = "testing"
-    storage_config.addressing_style = "path"
-    SingletonMeta._instances.pop(S3Client, None)
+    with moto.mock_s3():
+        storage_config.bucket_name = "wacruit-portfolio-test"
+        storage_config.region = "ap-northeast-2"
+        storage_config.endpoint_url = None
+        storage_config.access_key_id = "testing"
+        storage_config.secret_access_key = "testing"
+        storage_config.addressing_style = "path"
+        SingletonMeta._instances.pop(S3Client, None)
 
-    s3_client = boto3.client(
-        "s3",
-        region_name=storage_config.region,
-        aws_access_key_id=storage_config.access_key_id,
-        aws_secret_access_key=storage_config.secret_access_key,
-    )
-    s3_client.create_bucket(
-        Bucket=storage_config.bucket_name,
-        CreateBucketConfiguration={"LocationConstraint": storage_config.region},
-    )
-    return PortfolioFileService(
-        portfolio_file_repository=portfolio_file_repository,
-        recruiting_repository=recruiting_repository,
-    )
+        s3_client = boto3.client(
+            "s3",
+            region_name=storage_config.region,
+            aws_access_key_id=storage_config.access_key_id,
+            aws_secret_access_key=storage_config.secret_access_key,
+        )
+        s3_client.create_bucket(
+            Bucket=storage_config.bucket_name,
+            CreateBucketConfiguration={"LocationConstraint": storage_config.region},
+        )
+        yield PortfolioFileService(
+            portfolio_file_repository=portfolio_file_repository,
+            recruiting_repository=recruiting_repository,
+        )
+        SingletonMeta._instances.pop(S3Client, None)

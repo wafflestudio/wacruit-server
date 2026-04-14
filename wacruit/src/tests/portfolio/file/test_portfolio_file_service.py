@@ -25,7 +25,7 @@ def test_get_upload_portfolio_file_v2(
     expected_url = (
         f"{storage_config.endpoint_url}/{storage_config.bucket_name}"
         if storage_config.endpoint_url
-        else f"https://s3.amazonaws.com/{storage_config.bucket_name}"
+        else f"https://s3.{storage_config.region}.amazonaws.com/{storage_config.bucket_name}"
     )
 
     assert response.object_name == expected_object_name
@@ -129,7 +129,7 @@ def test_get_download_portfolio_file_url_v2(
         assert parsed.path == expected_path
     else:
         assert parsed.scheme == "https"
-        assert parsed.netloc == "s3.amazonaws.com"
+        assert parsed.netloc == f"s3.{storage_config.region}.amazonaws.com"
         assert parsed.path == expected_path
 
 
