@@ -40,7 +40,7 @@ class PortfolioFileService(LoggingMixin):
         self._portfolio_file_repository = portfolio_file_repository
         self._recruiting_repository = recruiting_repository
         self._s3_config = storage_config
-        self._s3_client = S3Client()
+        self._s3_client = S3Client(self._s3_config)
         self._num_portfolio_limit = 1
 
     @staticmethod

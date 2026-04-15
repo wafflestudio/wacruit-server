@@ -7,7 +7,6 @@ from sqlalchemy.orm import Session
 
 from wacruit.src.apps.common.security import PasswordService
 from wacruit.src.apps.portfolio.file.aws.config import storage_config
-from wacruit.src.apps.portfolio.file.aws.s3.client import S3Client
 from wacruit.src.apps.portfolio.file.repositories import PortfolioFileRepository
 from wacruit.src.apps.portfolio.file.services_v2 import PortfolioFileService
 from wacruit.src.apps.recruiting.models import Recruiting
@@ -16,7 +15,6 @@ from wacruit.src.apps.user.models import User
 from wacruit.src.apps.user.repositories import UserRepository
 from wacruit.src.apps.user.services import UserService
 from wacruit.src.database.connection import Transaction
-from wacruit.src.utils.singleton import SingletonMeta
 
 
 @pytest.fixture
@@ -99,7 +97,6 @@ def portfolio_file_service(
         storage_config.access_key_id = "testing"
         storage_config.secret_access_key = "testing"
         storage_config.addressing_style = "path"
-        SingletonMeta._instances.pop(S3Client, None)
 
         s3_client = boto3.client(
             "s3",
@@ -115,4 +112,3 @@ def portfolio_file_service(
             portfolio_file_repository=portfolio_file_repository,
             recruiting_repository=recruiting_repository,
         )
-        SingletonMeta._instances.pop(S3Client, None)

@@ -41,7 +41,7 @@ class ProjectService:
         project_repository: ProjectRepository = Depends(),
     ) -> None:
         self._s3_config = storage_config
-        self._s3_client = S3Client()
+        self._s3_client = S3Client(self._s3_config)
         self.member_repository = member_repository
         self.project_repository = project_repository
 

@@ -26,7 +26,7 @@ _50_MB = 50 * _1_MB
 class PortfolioFileService(LoggingMixin):
     def __init__(self):
         self._s3_config = storage_config
-        self._s3_client = S3Client()
+        self._s3_client = S3Client(self._s3_config)
         self._num_portfolio_limit = 1
 
     @staticmethod
