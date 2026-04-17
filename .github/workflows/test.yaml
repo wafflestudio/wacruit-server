@@ -53,7 +53,7 @@ jobs:
           reporter: java-junit
 
       # run pre-commit only different from base branch
-      # it contains pylint, black, isort, etc.
+      # it contains ruff, pyright, etc.
       - name: Run pre-commit
         run: |
           git fetch origin ${{ github.base_ref }}

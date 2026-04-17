@@ -1,14 +1,20 @@
-from wacruit.src.apps.portfolio.file.aws.config import s3_config
+from wacruit.src.apps.portfolio.file.aws.config import storage_config
 from wacruit.src.apps.portfolio.file.aws.s3.client import S3Client
 from wacruit.src.apps.portfolio.file.aws.s3.method import S3PresignedUrlMethod
-from wacruit.src.apps.portfolio.file.aws.s3.utils import delete_object
-from wacruit.src.apps.portfolio.file.aws.s3.utils import generate_presigned_post_url
-from wacruit.src.apps.portfolio.file.aws.s3.utils import generate_presigned_url
-from wacruit.src.apps.portfolio.file.aws.s3.utils import get_list_of_objects
-from wacruit.src.apps.portfolio.file.exceptions import NumPortfolioLimitException
-from wacruit.src.apps.portfolio.file.exceptions import PortfolioNotFoundException
-from wacruit.src.apps.portfolio.file.schemas import PortfolioNameResponse
-from wacruit.src.apps.portfolio.file.schemas import PresignedUrlResponse
+from wacruit.src.apps.portfolio.file.aws.s3.utils import (
+    delete_object,
+    generate_presigned_post_url,
+    generate_presigned_url,
+    get_list_of_objects,
+)
+from wacruit.src.apps.portfolio.file.exceptions import (
+    NumPortfolioLimitException,
+    PortfolioNotFoundException,
+)
+from wacruit.src.apps.portfolio.file.schemas import (
+    PortfolioNameResponse,
+    PresignedUrlResponse,
+)
 from wacruit.src.utils.mixins import LoggingMixin
 
 _1_MIN = 60
@@ -19,8 +25,8 @@ _50_MB = 50 * _1_MB
 
 class PortfolioFileService(LoggingMixin):
     def __init__(self):
-        self._s3_config = s3_config
-        self._s3_client = S3Client(region_name=self._s3_config.bucket_region)
+        self._s3_config = storage_config
+        self._s3_client = S3Client(self._s3_config)
         self._num_portfolio_limit = 1
 
     @staticmethod

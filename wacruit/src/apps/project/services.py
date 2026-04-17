@@ -1,30 +1,32 @@
-from typing import Annotated, cast, TYPE_CHECKING
-
 from fastapi import Depends
 
 from wacruit.src.apps.common.schemas import ListResponse
 from wacruit.src.apps.member.repositories import MemberRepository
-from wacruit.src.apps.portfolio.file.aws.config import s3_config
+from wacruit.src.apps.portfolio.file.aws.config import storage_config
 from wacruit.src.apps.portfolio.file.aws.s3.client import S3Client
 from wacruit.src.apps.portfolio.file.aws.s3.method import S3PresignedUrlMethod
-from wacruit.src.apps.portfolio.file.aws.s3.utils import delete_object
-from wacruit.src.apps.portfolio.file.aws.s3.utils import generate_presigned_post_url
-from wacruit.src.apps.portfolio.file.aws.s3.utils import generate_presigned_url
-from wacruit.src.apps.project.exceptions import GetPresignedURLException
-from wacruit.src.apps.project.exceptions import ProjectAlreadyExistsException
-from wacruit.src.apps.project.exceptions import ProjectImageNotFoundException
-from wacruit.src.apps.project.exceptions import ProjectNotFoundException
-from wacruit.src.apps.project.models import Project
-from wacruit.src.apps.project.models import ProjectImage
-from wacruit.src.apps.project.models import ProjectURL
+from wacruit.src.apps.portfolio.file.aws.s3.utils import (
+    delete_object,
+    generate_presigned_post_url,
+    generate_presigned_url,
+)
+from wacruit.src.apps.project.exceptions import (
+    GetPresignedURLException,
+    ProjectAlreadyExistsException,
+    ProjectImageNotFoundException,
+    ProjectNotFoundException,
+)
+from wacruit.src.apps.project.models import Project, ProjectImage, ProjectURL
 from wacruit.src.apps.project.repositories import ProjectRepository
-from wacruit.src.apps.project.schemas import PresignedUrlWithIdResponse
-from wacruit.src.apps.project.schemas import ProjectBriefResponse
-from wacruit.src.apps.project.schemas import ProjectCreateRequest
-from wacruit.src.apps.project.schemas import ProjectDetailResponse
-from wacruit.src.apps.project.schemas import ProjectImageResponse
-from wacruit.src.apps.project.schemas import ProjectLinkDto
-from wacruit.src.apps.project.schemas import ProjectUpdateRequest
+from wacruit.src.apps.project.schemas import (
+    PresignedUrlWithIdResponse,
+    ProjectBriefResponse,
+    ProjectCreateRequest,
+    ProjectDetailResponse,
+    ProjectImageResponse,
+    ProjectLinkDto,
+    ProjectUpdateRequest,
+)
 
 _1_MIN = 60
 _10_MIN = 10 * _1_MIN
@@ -38,8 +40,8 @@ class ProjectService:
         member_repository: MemberRepository = Depends(),
         project_repository: ProjectRepository = Depends(),
     ) -> None:
-        self._s3_config = s3_config
-        self._s3_client = S3Client(region_name=self._s3_config.bucket_region)
+        self._s3_config = storage_config
+        self._s3_client = S3Client(self._s3_config)
         self.member_repository = member_repository
         self.project_repository = project_repository
 
