@@ -1,9 +1,11 @@
 from typing import Annotated
+from typing import Optional
 
 from fastapi import APIRouter
 from fastapi import Depends
-from fastapi import Response
+from fastapi import Query
 
+from wacruit.src.apps.common.enums import SponsorOrder
 from wacruit.src.apps.common.schemas import ListResponse
 from wacruit.src.apps.sponsor.schemas import SponsorBriefResponse
 from wacruit.src.apps.sponsor.schemas import SponsorCreateRequest
@@ -36,8 +38,16 @@ def get_sponsor(
 @v3_router.get("")
 def get_all_sponsors(
     sponsor_service: Annotated[SponsorService, Depends()],
+    order: Annotated[
+        Optional[SponsorOrder],
+        Query(
+            description="sorting order(e.g. amount, -amount, date, -date), "
+            "'-' prefix for descending order"
+        ),
+    ] = None,
+    year: Annotated[Optional[int], Query(description="sponsors by year")] = None,
 ) -> ListResponse[SponsorBriefResponse]:
-    return sponsor_service.get_all_sponsors()
+    return sponsor_service.get_all_sponsors(order, year)
 
 
 @v3_router.patch("/{sponsor_id}")

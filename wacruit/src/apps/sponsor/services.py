@@ -1,7 +1,9 @@
 from typing import Annotated
+from typing import Optional
 
 from fastapi import Depends
 
+from wacruit.src.apps.common.enums import SponsorOrder
 from wacruit.src.apps.common.schemas import ListResponse
 from wacruit.src.apps.sponsor.exceptions import SponsorAlreadyExistsException
 from wacruit.src.apps.sponsor.exceptions import SponsorNotFoundException
@@ -35,8 +37,11 @@ class SponsorService:
             raise SponsorNotFoundException
         return SponsorInfoResponse.from_orm(sponsor)
 
-    def get_all_sponsors(self) -> ListResponse[SponsorBriefResponse]:
-        sponsors = self.sponsor_repository.get_all_sponsors()
+    def get_all_sponsors(
+        self, order: Optional[SponsorOrder] = None, year: Optional[int] = None
+    ) -> ListResponse[SponsorBriefResponse]:
+        sponsors = self.sponsor_repository.get_all_sponsors(order, year)
+
         return (
             ListResponse[SponsorBriefResponse](
                 items=[SponsorBriefResponse.from_orm(sponsor) for sponsor in sponsors]

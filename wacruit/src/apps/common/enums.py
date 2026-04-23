@@ -116,3 +116,10 @@ class TimelineGroupType(Enum):
     ROOKIE = "ROOKIE"
     PROGRAMMER = "PROGRAMMER"
     DESIGNER = "DESIGNER"
+
+
+class SponsorOrder(str, Enum):
+    AMOUNT_ASC = "amount"
+    AMOUNT_DESC = "-amount"
+    DATE_ASC = "date"
+    DATE_DESC = "-date"
