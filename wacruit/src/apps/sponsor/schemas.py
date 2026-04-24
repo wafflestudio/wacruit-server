@@ -27,6 +27,7 @@ class SponsorInfoResponse(OrmModel):
 class SponsorBriefResponse(OrmModel):
     id: int
     name: str
+    sponsored_date: date
 
 
 class SponsorUpdateRequest(BaseModel):
