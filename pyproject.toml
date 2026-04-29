@@ -79,3 +79,4 @@ select = ["E", "F", "W", "I", "PL"]
 
 [tool.ruff.lint.isort]
 force-sort-within-sections = true
+force-single-line = true
