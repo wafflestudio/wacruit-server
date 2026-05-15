@@ -1,5 +1,8 @@
 from datetime import datetime
-from typing import Literal, TYPE_CHECKING
+from typing import TYPE_CHECKING
+from typing import List
+from typing import Literal
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -11,7 +14,7 @@ from wacruit.src.apps.problem.schemas_v2 import ProblemCreateDto
 from wacruit.src.apps.resume.schemas import ResumeQuestionCreateDto
 
 if TYPE_CHECKING:
-    from wacruit.src.apps.problem.models import Problem
+    pass
 
 
 class RecruitingSummaryResponse(OrmModel):
@@ -135,3 +138,28 @@ class RecruitingInfoUpdateRequest(BaseModel):
     info_num: int | None = None
     title: str | None = None
     date_info: str | None = None
+
+
+class RecruitingSubmissionResponse(OrmModel):
+    first_name: Optional[str]
+    last_name: Optional[str]
+    university: Optional[str]
+    college: Optional[str]
+    department: Optional[str]
+    phone_number: Optional[str]
+    github_email: Optional[str]
+    slack_email: Optional[str]
+    notion_email: Optional[str]
+    q1_answer: Optional[str]
+    q2_answer: Optional[str]
+    q3_answer: Optional[str]
+    problem_1_code: Optional[str]
+    problem_2_code: Optional[str]
+    problem_3_code: Optional[str]
+    problem_1_correct: Optional[int]
+    problem_2_correct: Optional[int]
+    problem_3_correct: Optional[int]
+
+
+class RecruitingSubmissionListResponse(OrmModel):
+    items: List[RecruitingSubmissionResponse]
