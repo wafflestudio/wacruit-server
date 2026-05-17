@@ -33,7 +33,11 @@ class EmailService:
         message.set_content(content)
 
         try:
-            with smtplib.SMTP(mail_config.host, mail_config.port) as smtp:
+            with smtplib.SMTP(
+                mail_config.host,
+                mail_config.port,
+                timeout=mail_config.timeout,
+            ) as smtp:
                 if mail_config.use_tls:
                     smtp.starttls()
                 smtp.login(mail_config.username, mail_config.password)

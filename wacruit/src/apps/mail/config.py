@@ -19,6 +19,7 @@ class MailConfig(BaseSettings):
     password: str = ""
     from_email: str = ""
     use_tls: bool = True
+    timeout: float = 10
 
     class Config(BaseSettings.Config):
         case_sensitive = False

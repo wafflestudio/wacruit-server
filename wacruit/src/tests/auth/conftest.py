@@ -33,6 +33,15 @@ class FakeAuthRepository:
         self.verifications.append(verification)
         return verification
 
+    def replace_active_password_reset_for_email(
+        self,
+        email: EmailStr,
+        verification: PasswordResetVerification,
+        expires_at: datetime,
+    ) -> PasswordResetVerification:
+        self.expire_unused_password_reset_verifications(email, expires_at)
+        return self.create_password_reset_verification(verification)
+
     def get_latest_password_reset_verification(
         self, email: EmailStr
     ) -> PasswordResetVerification | None:
@@ -52,6 +61,33 @@ class FakeAuthRepository:
         self, verification: PasswordResetVerification
     ) -> PasswordResetVerification:
         return verification
+
+    def consume_password_reset_verification(
+        self,
+        verification_id: int,
+        email: EmailStr,
+        password_hash: str,
+        used_at: datetime,
+    ) -> bool:
+        verification = next(
+            (
+                verification
+                for verification in self.verifications
+                if verification.id == verification_id
+                and verification.email == str(email)
+            ),
+            None,
+        )
+        if verification is None or verification.used_at is not None:
+            return False
+
+        user = self.users.get(str(email))
+        if user is None:
+            return False
+
+        user.password = password_hash
+        verification.used_at = used_at
+        return True
 
     def expire_unused_password_reset_verifications(
         self, email: EmailStr, expires_at: datetime

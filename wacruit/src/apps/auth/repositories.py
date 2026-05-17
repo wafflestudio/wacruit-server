@@ -39,6 +39,27 @@ class AuthRepository:
             self.session.add(verification)
         return verification
 
+    def replace_active_password_reset_for_email(
+        self,
+        email: EmailStr,
+        verification: PasswordResetVerification,
+        expires_at: datetime,
+    ) -> PasswordResetVerification:
+        with self.transaction:
+            (
+                self.session.query(PasswordResetVerification)
+                .where(
+                    PasswordResetVerification.email == email,
+                    PasswordResetVerification.used_at.is_(None),
+                )
+                .update(
+                    {PasswordResetVerification.expires_at: expires_at},
+                    synchronize_session="fetch",
+                )
+            )
+            self.session.add(verification)
+        return verification
+
     def get_latest_password_reset_verification(
         self, email: EmailStr
     ) -> PasswordResetVerification | None:
@@ -58,6 +79,39 @@ class AuthRepository:
         with self.transaction:
             self.session.merge(verification)
         return verification
+
+    def consume_password_reset_verification(
+        self,
+        verification_id: int,
+        email: EmailStr,
+        password_hash: str,
+        used_at: datetime,
+    ) -> bool:
+        with self.transaction:
+            verification = (
+                self.session.query(PasswordResetVerification)
+                .where(
+                    PasswordResetVerification.id == verification_id,
+                    PasswordResetVerification.email == email,
+                )
+                .with_for_update()
+                .first()
+            )
+            if verification is None or verification.used_at is not None:
+                return False
+
+            user = (
+                self.session.query(User)
+                .where(User.email == email)
+                .with_for_update()
+                .first()
+            )
+            if user is None:
+                return False
+
+            user.password = password_hash
+            verification.used_at = used_at
+        return True
 
     def expire_unused_password_reset_verifications(
         self, email: EmailStr, expires_at: datetime

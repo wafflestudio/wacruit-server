@@ -112,13 +112,14 @@ class AuthService:
         expires_at = now + timedelta(minutes=PASSWORD_RESET_CODE_TTL_MINUTES)
 
         self.email_service.send_password_reset_code(str(email), code)
-        self.auth_repository.expire_unused_password_reset_verifications(email, now)
-        self.auth_repository.create_password_reset_verification(
+        self.auth_repository.replace_active_password_reset_for_email(
+            email,
             PasswordResetVerification(
                 email=email,
                 code_hash=PasswordService.hash_password(code),
                 expires_at=expires_at,
-            )
+            ),
+            now,
         )
 
     def verify_password_reset_code(self, email: EmailStr, code: str) -> None:
@@ -135,10 +136,14 @@ class AuthService:
         if user is None:
             raise UserNotFoundException()
 
-        user.password = PasswordService.hash_password(new_password)
-        verification.used_at = datetime.now()
-        self.auth_repository.update_user(user)
-        self.auth_repository.update_password_reset_verification(verification)
+        consumed = self.auth_repository.consume_password_reset_verification(
+            verification.id,
+            email,
+            PasswordService.hash_password(new_password),
+            datetime.now(),
+        )
+        if not consumed:
+            raise InvalidPasswordResetCodeException()
 
     def _generate_password_reset_code(self) -> str:
         max_value = 10**PASSWORD_RESET_CODE_LENGTH
