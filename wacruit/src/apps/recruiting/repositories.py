@@ -200,10 +200,8 @@ class RecruitingRepository:
             .scalars()
             .all()
         )
-
-        q1_id = question_ids[0]
-        q2_id = question_ids[1]
-        q3_id = question_ids[2]
+        q_ids = list(question_ids) + [-1, -1, -1]
+        q1_id, q2_id, q3_id = q_ids[:3]
 
         problem_ids = (
             self.session.execute(
@@ -214,10 +212,8 @@ class RecruitingRepository:
             .scalars()
             .all()
         )
-
-        p1_id = problem_ids[0]
-        p2_id = problem_ids[1]
-        p3_id = problem_ids[2]
+        p_ids = list(problem_ids) + [-1, -1, -1]
+        p1_id, p2_id, p3_id = p_ids[:3]
 
         resume_max_time = (
             select(
@@ -274,7 +270,12 @@ class RecruitingRepository:
         )
 
         latest_code = (
-            select(CodeSubmission.id, CodeSubmission.user_id, CodeSubmission.problem_id)
+            select(
+                CodeSubmission.id,
+                CodeSubmission.user_id,
+                CodeSubmission.problem_id,
+                CodeSubmission.source_code,
+            )
             .join(
                 code_max_time,
                 (CodeSubmission.user_id == code_max_time.c.user_id)
@@ -284,18 +285,26 @@ class RecruitingRepository:
             .subquery("latest_code")
         )
 
+        correct_counts = (
+            select(
+                CodeSubmissionResult.submission_id,
+                func.count(CodeSubmissionResult.testcase_id).label("correct_count"),
+            )
+            .where(CodeSubmissionResult.status == CodeSubmissionResultStatus.CORRECT)
+            .group_by(CodeSubmissionResult.submission_id)
+            .subquery("correct_counts")
+        )
+
         code_result_join = (
             select(
                 latest_code.c.user_id,
                 latest_code.c.problem_id,
-                func.count(CodeSubmissionResult.testcase_id).label("correct_count"),
+                latest_code.c.source_code,
+                func.coalesce(correct_counts.c.correct_count, 0).label("correct_count"),
             )
-            .join(
-                CodeSubmissionResult,
-                CodeSubmissionResult.submission_id == latest_code.c.id,
+            .outerjoin(
+                correct_counts, correct_counts.c.submission_id == latest_code.c.id
             )
-            .where(CodeSubmissionResult.status == CodeSubmissionResultStatus.CORRECT)
-            .group_by(latest_code.c.user_id, latest_code.c.problem_id)
             .subquery("code_result_join")
         )
 
@@ -335,6 +344,30 @@ class RecruitingRepository:
                     ),
                     0,
                 ).label("problem_3_correct"),
+                func.max(
+                    case(
+                        (
+                            code_result_join.c.problem_id == p1_id,
+                            code_result_join.c.source_code,
+                        )
+                    )
+                ).label("problem_1_code"),
+                func.max(
+                    case(
+                        (
+                            code_result_join.c.problem_id == p2_id,
+                            code_result_join.c.source_code,
+                        )
+                    )
+                ).label("problem_2_code"),
+                func.max(
+                    case(
+                        (
+                            code_result_join.c.problem_id == p3_id,
+                            code_result_join.c.source_code,
+                        )
+                    )
+                ).label("problem_3_code"),
             )
             .group_by(code_result_join.c.user_id)
             .subquery("code_pivot")
@@ -354,6 +387,9 @@ class RecruitingRepository:
                 resume_pivot.c.q1_answer,
                 resume_pivot.c.q2_answer,
                 resume_pivot.c.q3_answer,
+                code_pivot.c.problem_1_code,
+                code_pivot.c.problem_2_code,
+                code_pivot.c.problem_3_code,
                 func.coalesce(code_pivot.c.problem_1_correct, 0).label(
                     "problem_1_correct"
                 ),
