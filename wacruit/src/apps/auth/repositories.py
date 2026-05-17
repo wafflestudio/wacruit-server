@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Annotated
 
 from fastapi import Depends
@@ -5,9 +6,10 @@ from pydantic import EmailStr
 from sqlalchemy.orm import Session
 
 from wacruit.src.apps.auth.models import BlockedToken
+from wacruit.src.apps.auth.models import PasswordResetVerification
 from wacruit.src.apps.user.models import User
-from wacruit.src.database.connection import get_db_session
 from wacruit.src.database.connection import Transaction
+from wacruit.src.database.connection import get_db_session
 
 
 class AuthRepository:
@@ -24,6 +26,53 @@ class AuthRepository:
 
     def get_user_by_id(self, user_id: int) -> User | None:
         return self.session.query(User).where(User.id == user_id).first()
+
+    def update_user(self, user: User) -> User:
+        with self.transaction:
+            self.session.merge(user)
+        return user
+
+    def create_password_reset_verification(
+        self, verification: PasswordResetVerification
+    ) -> PasswordResetVerification:
+        with self.transaction:
+            self.session.add(verification)
+        return verification
+
+    def get_latest_password_reset_verification(
+        self, email: EmailStr
+    ) -> PasswordResetVerification | None:
+        return (
+            self.session.query(PasswordResetVerification)
+            .where(PasswordResetVerification.email == email)
+            .order_by(
+                PasswordResetVerification.created_at.desc(),
+                PasswordResetVerification.id.desc(),
+            )
+            .first()
+        )
+
+    def update_password_reset_verification(
+        self, verification: PasswordResetVerification
+    ) -> PasswordResetVerification:
+        with self.transaction:
+            self.session.merge(verification)
+        return verification
+
+    def expire_unused_password_reset_verifications(
+        self, email: EmailStr, expires_at: datetime
+    ) -> None:
+        verifications = (
+            self.session.query(PasswordResetVerification)
+            .where(
+                PasswordResetVerification.email == email,
+                PasswordResetVerification.used_at.is_(None),
+            )
+            .all()
+        )
+        with self.transaction:
+            for verification in verifications:
+                verification.expires_at = expires_at
 
     def is_blocked_token(self, token: str) -> bool:
         result = (
