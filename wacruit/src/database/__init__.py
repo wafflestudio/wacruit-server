@@ -1,4 +1,5 @@
 import wacruit.src.apps.user.models  # isort: skip
+import wacruit.src.apps.auth.models  # isort: skip
 import wacruit.src.apps.recruiting.models  # isort: skip
 import wacruit.src.apps.announcement.models  # isort: skip
 import wacruit.src.apps.portfolio.url.models  # isort: skip
@@ -13,4 +14,4 @@ import wacruit.src.apps.project.models  # isort: skip
 import wacruit.src.apps.faq.models  # isort: skip
 import wacruit.src.apps.history.models  # isort: skip
 import wacruit.src.apps.timeline.models  # isort: skip
-import wacruit.src.apps.pre_registration.models  # isort: skip
+import wacruit.src.apps.pre_registration.models  # noqa: F401  # isort: skip
