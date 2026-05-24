@@ -75,13 +75,14 @@ class EmailService:
 
         try:
             signer = oci.auth.signers.InstancePrincipalsSecurityTokenSigner()
+        except Exception:  # noqa: PLW0718
+            config = oci.config.from_file()
+            self._client = EmailDPClient(config, **client_kwargs)
+        else:
             self._client = EmailDPClient(
                 {"region": settings.oci_region},
                 signer=signer,
                 **client_kwargs,
             )
-        except Exception:  # noqa: PLW0718
-            config = oci.config.from_file()
-            self._client = EmailDPClient(config, **client_kwargs)
 
         return self._client

@@ -111,7 +111,6 @@ class AuthService:
         now = datetime.now()
         expires_at = now + timedelta(minutes=PASSWORD_RESET_CODE_TTL_MINUTES)
 
-        self.email_service.send_password_reset_code(str(email), code)
         self.auth_repository.replace_active_password_reset_for_email(
             email,
             PasswordResetVerification(
@@ -121,6 +120,7 @@ class AuthService:
             ),
             now,
         )
+        self.email_service.send_password_reset_code(str(email), code)
 
     def verify_password_reset_code(self, email: EmailStr, code: str) -> None:
         verification = self._get_valid_password_reset_verification(email, code)
