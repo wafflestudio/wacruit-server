@@ -1,12 +1,26 @@
-from email.message import EmailMessage
-import smtplib
+from typing import Optional
+import uuid
+
+import oci
+from oci.email_data_plane import EmailDPClient
+from oci.email_data_plane.models import EmailAddress
+from oci.email_data_plane.models import Recipients
+from oci.email_data_plane.models import Sender
+from oci.email_data_plane.models import SubmitEmailDetails
+from oci.exceptions import BaseRequestException
+from oci.exceptions import InvalidConfig
+from oci.exceptions import ServiceError
 
 from wacruit.src.apps.mail.config import mail_config
 from wacruit.src.apps.mail.exceptions import MailConfigException
 from wacruit.src.apps.mail.exceptions import MailSendFailedException
+from wacruit.src.settings import settings
 
 
 class EmailService:
+    def __init__(self) -> None:
+        self._client: Optional[EmailDPClient] = None
+
     def send_password_reset_code(self, to_email: str, code: str) -> None:
         subject = "[Waffle Studio] 비밀번호 재설정 인증 번호"
         content = (
@@ -17,30 +31,57 @@ class EmailService:
         self.send_email(to_email=to_email, subject=subject, content=content)
 
     def send_email(self, to_email: str, subject: str, content: str) -> None:
-        if not (
-            mail_config.host
-            and mail_config.port
-            and mail_config.username
-            and mail_config.password
-            and mail_config.from_email
-        ):
+        if not mail_config.compartment_id or not mail_config.from_email:
             raise MailConfigException()
 
-        message = EmailMessage()
-        message["Subject"] = subject
-        message["From"] = mail_config.from_email
-        message["To"] = to_email
-        message.set_content(content)
+        sender_address = EmailAddress(email=mail_config.from_email)
+        if mail_config.from_name:
+            sender_address.name = mail_config.from_name
 
         try:
-            with smtplib.SMTP(
-                mail_config.host,
-                mail_config.port,
-                timeout=mail_config.timeout,
-            ) as smtp:
-                if mail_config.use_tls:
-                    smtp.starttls()
-                smtp.login(mail_config.username, mail_config.password)
-                smtp.send_message(message)
-        except (OSError, smtplib.SMTPException) as exc:
+            self._get_client().submit_email(
+                SubmitEmailDetails(
+                    message_id=str(uuid.uuid4()),
+                    sender=Sender(
+                        sender_address=sender_address,
+                        compartment_id=mail_config.compartment_id,
+                    ),
+                    recipients=Recipients(to=[EmailAddress(email=to_email)]),
+                    subject=subject,
+                    body_text=content,
+                    reply_to=(
+                        [EmailAddress(email=mail_config.reply_to)]
+                        if mail_config.reply_to
+                        else None
+                    ),
+                )
+            )
+        except (
+            BaseRequestException,
+            InvalidConfig,
+            OSError,
+            ServiceError,
+            ValueError,
+        ) as exc:
             raise MailSendFailedException() from exc
+
+    def _get_client(self) -> EmailDPClient:
+        if self._client is not None:
+            return self._client
+
+        client_kwargs: dict[str, object] = {"timeout": mail_config.timeout}
+        if mail_config.service_endpoint:
+            client_kwargs["service_endpoint"] = mail_config.service_endpoint
+
+        try:
+            signer = oci.auth.signers.InstancePrincipalsSecurityTokenSigner()
+            self._client = EmailDPClient(
+                {"region": settings.oci_region},
+                signer=signer,
+                **client_kwargs,
+            )
+        except Exception:  # noqa: PLW0718
+            config = oci.config.from_file()
+            self._client = EmailDPClient(config, **client_kwargs)
+
+        return self._client

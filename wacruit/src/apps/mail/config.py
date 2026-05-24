@@ -3,27 +3,26 @@ from pydantic import BaseSettings
 from wacruit.src.secrets import OCISecretManager
 from wacruit.src.settings import settings
 
-_MAIL_SECRET_KEYS = {
-    "smtp_host": "host",
-    "smtp_port": "port",
-    "smtp_username": "username",
-    "smtp_password": "password",
-    "smtp_from_email": "from_email",
+_EMAIL_SECRET_KEYS = {
+    "email_compartment_id": "compartment_id",
+    "email_from_email": "from_email",
+    "email_from_name": "from_name",
+    "email_reply_to": "reply_to",
+    "email_service_endpoint": "service_endpoint",
 }
 
 
 class MailConfig(BaseSettings):
-    host: str = ""
-    port: int = 587
-    username: str = ""
-    password: str = ""
+    compartment_id: str = ""
     from_email: str = ""
-    use_tls: bool = True
-    timeout: float = 10
+    from_name: str = ""
+    reply_to: str = ""
+    service_endpoint: str = ""
+    timeout: float = 60
 
     class Config(BaseSettings.Config):
         case_sensitive = False
-        env_prefix = "SMTP_"
+        env_prefix = "EMAIL_"
         env_file = settings.env_files
 
     def __init__(self):
@@ -33,10 +32,11 @@ class MailConfig(BaseSettings):
             self._load_from_vault(secret_manager)
 
     def _load_from_vault(self, secret_manager: OCISecretManager) -> None:
-        for secret_key, attr_name in _MAIL_SECRET_KEYS.items():
-            value: str | int = secret_manager.get_secret(secret_key)
-            if attr_name == "port":
-                value = int(value)
+        for secret_key, attr_name in _EMAIL_SECRET_KEYS.items():
+            try:
+                value = secret_manager.get_secret(secret_key)
+            except KeyError:
+                continue
             setattr(self, attr_name, value)
 
 

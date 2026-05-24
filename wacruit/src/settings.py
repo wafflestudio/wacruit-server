@@ -8,6 +8,7 @@ ROOT_PATH = Path(__file__).parent.parent.parent
 
 class Settings(BaseSettings):
     env: Literal["dev", "prod", "local", "test"] = "local"
+    oci_region: str = "ap-chuncheon-1"
     sql_echo: bool = False
     TOKEN_SECRET: str = "secret"
 
