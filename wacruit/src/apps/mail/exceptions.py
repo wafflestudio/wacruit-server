@@ -2,8 +2,8 @@ from wacruit.src.apps.common.exceptions import WacruitException
 
 
 class MailConfigException(WacruitException):
-    def __init__(self):
-        super().__init__(status_code=500, detail="메일 설정이 올바르지 않습니다.")
+    def __init__(self, detail: str = "메일 설정이 올바르지 않습니다."):
+        super().__init__(status_code=500, detail=detail)
 
 
 class MailSendFailedException(WacruitException):

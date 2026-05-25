@@ -33,6 +33,8 @@ class EmailService:
     def send_email(self, to_email: str, subject: str, content: str) -> None:
         if not mail_config.compartment_id or not mail_config.from_email:
             raise MailConfigException()
+        if not self._is_valid_from_email(mail_config.from_email):
+            raise MailConfigException("메일 발신자 주소 형식이 올바르지 않습니다.")
 
         sender_address = EmailAddress(email=mail_config.from_email)
         if mail_config.from_name:
@@ -90,3 +92,7 @@ class EmailService:
     def _generate_message_id(self) -> str:
         domain = mail_config.from_email.rsplit("@", 1)[-1]
         return f"<{uuid.uuid4()}@{domain}>"
+
+    def _is_valid_from_email(self, email: str) -> bool:
+        local_part, separator, domain = email.partition("@")
+        return bool(local_part and separator and domain and "@" not in domain)

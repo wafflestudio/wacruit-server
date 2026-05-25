@@ -31,6 +31,34 @@ def test_send_email_raises_when_required_config_is_missing():
         )
 
 
+@pytest.mark.parametrize(
+    "from_email",
+    [
+        "no-reply",
+        "no-reply@",
+        "@example.com",
+        "no-reply@example@com",
+    ],
+)
+def test_send_email_raises_when_from_email_is_invalid(monkeypatch, from_email):
+    fake_client = FakeEmailClient()
+    monkeypatch.setattr(mail_config, "compartment_id", "ocid1.compartment.oc1..test")
+    monkeypatch.setattr(mail_config, "from_email", from_email)
+
+    service = EmailService()
+    service._client = fake_client  # type: ignore[assignment]
+
+    with pytest.raises(MailConfigException) as exc_info:
+        service.send_email(
+            to_email="to@example.com",
+            subject="subject",
+            content="content",
+        )
+
+    assert exc_info.value.detail == "메일 발신자 주소 형식이 올바르지 않습니다."
+    assert fake_client.submitted == []
+
+
 def test_send_email_submits_oci_email_payload(monkeypatch):
     fake_client = FakeEmailClient()
     monkeypatch.setattr(mail_config, "compartment_id", "ocid1.compartment.oc1..test")
