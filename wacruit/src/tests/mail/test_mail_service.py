@@ -55,3 +55,5 @@ def test_send_email_submits_oci_email_payload(monkeypatch):
     assert details.reply_to[0].email == "help@example.com"
     assert details.subject == "subject"
     assert details.body_text == "content"
+    assert details.message_id.startswith("<")
+    assert details.message_id.endswith("@example.com>")

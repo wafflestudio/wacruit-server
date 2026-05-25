@@ -41,7 +41,7 @@ class EmailService:
         try:
             self._get_client().submit_email(
                 SubmitEmailDetails(
-                    message_id=str(uuid.uuid4()),
+                    message_id=self._generate_message_id(),
                     sender=Sender(
                         sender_address=sender_address,
                         compartment_id=mail_config.compartment_id,
@@ -86,3 +86,7 @@ class EmailService:
             )
 
         return self._client
+
+    def _generate_message_id(self) -> str:
+        domain = mail_config.from_email.rsplit("@", 1)[-1]
+        return f"<{uuid.uuid4()}@{domain}>"
