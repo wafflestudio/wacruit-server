@@ -1,14 +1,14 @@
 from fastapi import Depends
+from sqlalchemy import Float
 from sqlalchemy import case
 from sqlalchemy import cast
-from sqlalchemy import Float
 from sqlalchemy import null
 from sqlalchemy.orm import Session
 
 from wacruit.src.apps.common.enums import Position
 from wacruit.src.apps.member.models import Member
-from wacruit.src.database.connection import get_db_session
 from wacruit.src.database.connection import Transaction
+from wacruit.src.database.connection import get_db_session
 
 
 class MemberRepository:
@@ -51,7 +51,7 @@ class MemberRepository:
         )
 
         query = self.session.query(Member).order_by(
-            safe_num.desc(), position_order.asc()
+            safe_num.desc(), position_order.asc(), Member.id.asc()
         )
 
         if position is not None:
