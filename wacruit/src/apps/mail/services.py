@@ -1,3 +1,4 @@
+from html import escape
 from typing import Optional
 import uuid
 
@@ -22,15 +23,31 @@ class EmailService:
         self._client: Optional[EmailDPClient] = None
 
     def send_password_reset_code(self, to_email: str, code: str) -> None:
-        subject = "[Waffle Studio] 비밀번호 재설정 인증 번호"
+        subject = "[Waffle Studio] 비밀번호 재설정 인증번호"
         content = (
-            "비밀번호 재설정을 위한 인증 번호입니다.\n\n"
-            f"인증 번호: {code}\n\n"
-            "인증 번호는 10분 동안 유효합니다."
+            "비밀번호 재설정을 위한 인증번호입니다.\n\n"
+            f"인증번호: {code}\n\n"
+            "인증번호는 5분 동안 유효합니다."
         )
-        self.send_email(to_email=to_email, subject=subject, content=content)
+        html_content = (
+            "<p>비밀번호 재설정을 위한 인증번호입니다.</p>"
+            f"<p><strong>인증번호: {escape(code)}</strong></p>"
+            "<p>인증번호는 5분 동안 유효합니다.</p>"
+        )
+        self.send_email(
+            to_email=to_email,
+            subject=subject,
+            content=content,
+            html_content=html_content,
+        )
 
-    def send_email(self, to_email: str, subject: str, content: str) -> None:
+    def send_email(
+        self,
+        to_email: str,
+        subject: str,
+        content: str,
+        html_content: str | None = None,
+    ) -> None:
         if not mail_config.compartment_id or not mail_config.from_email:
             raise MailConfigException()
         if not self._is_valid_from_email(mail_config.from_email):
@@ -51,6 +68,7 @@ class EmailService:
                     recipients=Recipients(to=[EmailAddress(email=to_email)]),
                     subject=subject,
                     body_text=content,
+                    body_html=html_content,
                     reply_to=(
                         [EmailAddress(email=mail_config.reply_to)]
                         if mail_config.reply_to
@@ -91,7 +109,7 @@ class EmailService:
 
     def _generate_message_id(self) -> str:
         domain = mail_config.from_email.rsplit("@", 1)[-1]
-        return f"<{uuid.uuid4()}@{domain}>"
+        return f"{uuid.uuid4()}@{domain}"
 
     def _is_valid_from_email(self, email: str) -> bool:
         local_part, separator, domain = email.partition("@")

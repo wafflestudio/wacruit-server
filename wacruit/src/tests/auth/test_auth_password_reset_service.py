@@ -7,6 +7,7 @@ import pytest
 from wacruit.src.apps.auth.exceptions import ExpiredPasswordResetCodeException
 from wacruit.src.apps.auth.exceptions import InvalidPasswordResetCodeException
 from wacruit.src.apps.auth.exceptions import PasswordResetCodeNotVerifiedException
+from wacruit.src.apps.auth.exceptions import UserNotFoundException
 from wacruit.src.apps.auth.models import PasswordResetVerification
 from wacruit.src.apps.auth.services import AuthService
 from wacruit.src.apps.common.security import PasswordService
@@ -30,6 +31,8 @@ def test_send_password_reset_email_creates_verification(
     )
     assert verification is not None
     assert PasswordService.verify_password("123456", verification.code_hash)
+    assert datetime.now() + timedelta(minutes=4, seconds=50) < verification.expires_at
+    assert verification.expires_at < datetime.now() + timedelta(minutes=5, seconds=10)
     assert fake_email_service.sent_password_reset_codes == [(user.email, "123456")]
 
 
@@ -63,14 +66,15 @@ def test_send_password_reset_email_replaces_active_verification(
     ]
 
 
-def test_send_password_reset_email_ignores_unknown_email(
+def test_send_password_reset_email_rejects_unknown_email(
     auth_service: AuthService,
     auth_repository: FakeAuthRepository,
     fake_email_service: FakeEmailService,
 ):
     email = EmailStr("unknown@email.com")
 
-    auth_service.send_password_reset_email(email)
+    with pytest.raises(UserNotFoundException):
+        auth_service.send_password_reset_email(email)
 
     assert auth_repository.get_latest_password_reset_verification(email) is None
     assert fake_email_service.sent_password_reset_codes == []

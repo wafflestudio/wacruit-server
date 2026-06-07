@@ -60,7 +60,11 @@ def check_available_email(
 @v3_router.post(
     "/password-reset/email",
     status_code=200,
-    responses=responses_from(MailConfigException, MailSendFailedException),
+    responses=responses_from(
+        MailConfigException,
+        MailSendFailedException,
+        UserNotFoundException,
+    ),
 )
 def send_password_reset_email(
     req: PasswordResetEmailRequest,
