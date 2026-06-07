@@ -1,4 +1,5 @@
 from datetime import datetime
+from datetime import timezone
 
 from pydantic import EmailStr
 import pytest
@@ -13,6 +14,7 @@ class FakeAuthRepository:
     def __init__(self) -> None:
         self.users: dict[str, User] = {}
         self.verifications: list[PasswordResetVerification] = []
+        self.commit_count = 0
 
     def get_user_by_email(self, email: EmailStr) -> User | None:
         return self.users.get(str(email))
@@ -28,10 +30,13 @@ class FakeAuthRepository:
         self, verification: PasswordResetVerification
     ) -> PasswordResetVerification:
         verification.id = len(self.verifications) + 1
-        verification.created_at = datetime.now()
+        verification.created_at = datetime.now(timezone.utc)
         verification.attempt_count = verification.attempt_count or 0
         self.verifications.append(verification)
         return verification
+
+    def commit(self) -> None:
+        self.commit_count += 1
 
     def replace_active_password_reset_for_email(
         self,

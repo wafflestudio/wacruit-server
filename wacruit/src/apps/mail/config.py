@@ -25,8 +25,8 @@ class MailConfig(BaseSettings):
         env_prefix = "EMAIL_"
         env_file = settings.env_files
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **values):
+        super().__init__(**values)
         secret_manager = OCISecretManager()
         if secret_manager.is_available():
             self._load_from_vault(secret_manager)

@@ -38,6 +38,11 @@ def test_send_email_raises_when_required_config_is_missing():
         "no-reply@",
         "@example.com",
         "no-reply@example@com",
+        " no-reply@example.com",
+        "no-reply@example.com ",
+        "no reply@example.com",
+        "no-reply@exa mple.com",
+        "no-reply@example.com\nbcc@example.com",
     ],
 )
 def test_send_email_raises_when_from_email_is_invalid(monkeypatch, from_email):
