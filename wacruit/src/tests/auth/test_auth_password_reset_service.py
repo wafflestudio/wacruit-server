@@ -1,5 +1,6 @@
 from datetime import datetime
 from datetime import timedelta
+from datetime import timezone
 
 from pydantic import EmailStr
 import pytest
@@ -31,8 +32,15 @@ def test_send_password_reset_email_creates_verification(
     )
     assert verification is not None
     assert PasswordService.verify_password("123456", verification.code_hash)
-    assert datetime.now() + timedelta(minutes=4, seconds=50) < verification.expires_at
-    assert verification.expires_at < datetime.now() + timedelta(minutes=5, seconds=10)
+    assert (
+        datetime.now(timezone.utc) + timedelta(minutes=4, seconds=50)
+        < verification.expires_at
+    )
+    assert verification.expires_at < datetime.now(timezone.utc) + timedelta(
+        minutes=5,
+        seconds=10,
+    )
+    assert auth_repository.commit_count == 1
     assert fake_email_service.sent_password_reset_codes == [(user.email, "123456")]
 
 
@@ -56,7 +64,7 @@ def test_send_password_reset_email_replaces_active_verification(
         EmailStr(user.email)
     )
     assert first_verification is not None
-    assert first_verification.expires_at <= datetime.now()
+    assert first_verification.expires_at <= datetime.now(timezone.utc)
     assert latest_verification is not None
     assert latest_verification != first_verification
     assert PasswordService.verify_password("654321", latest_verification.code_hash)
@@ -123,7 +131,7 @@ def test_verify_password_reset_code_rejects_expired_code(
     verification = PasswordResetVerification(
         email=user.email,
         code_hash=PasswordService.hash_password("123456"),
-        expires_at=datetime.now() - timedelta(minutes=1),
+        expires_at=datetime.now(timezone.utc) - timedelta(minutes=1),
     )
     auth_repository.create_password_reset_verification(verification)
 
@@ -184,7 +192,7 @@ def test_reset_password_rejects_verification_used_during_consume(
     ) -> bool:
         verification = auth_repository.get_latest_password_reset_verification(email)
         assert verification is not None
-        verification.used_at = datetime.now()
+        verification.used_at = datetime.now(timezone.utc)
         return consume_password_reset_verification(
             verification_id,
             email,

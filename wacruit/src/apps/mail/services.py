@@ -96,6 +96,8 @@ class EmailService:
         try:
             signer = oci.auth.signers.InstancePrincipalsSecurityTokenSigner()
         except Exception:  # noqa: PLW0718
+            if not (settings.is_local or settings.is_test):
+                raise
             config = oci.config.from_file()
             self._client = EmailDPClient(config, **client_kwargs)
         else:
@@ -112,5 +114,9 @@ class EmailService:
         return f"{uuid.uuid4()}@{domain}"
 
     def _is_valid_from_email(self, email: str) -> bool:
+        if email != email.strip() or any(char.isspace() for char in email):
+            return False
+        if email.count("@") != 1:
+            return False
         local_part, separator, domain = email.partition("@")
         return bool(local_part and separator and domain and "@" not in domain)

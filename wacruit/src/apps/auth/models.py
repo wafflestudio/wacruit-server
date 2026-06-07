@@ -26,7 +26,7 @@ class PasswordResetVerification(DeclarativeBase):
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    attempt_count: Mapped[int] = mapped_column(default=0)
+    attempt_count: Mapped[int] = mapped_column(default=0, server_default="0")
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=CURRENT_TIMESTAMP,

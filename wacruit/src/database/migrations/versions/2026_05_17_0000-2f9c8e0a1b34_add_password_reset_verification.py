@@ -24,7 +24,12 @@ def upgrade() -> None:
         sa.Column("expires_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("verified_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("used_at", sa.DateTime(timezone=True), nullable=True),
-        sa.Column("attempt_count", sa.Integer(), nullable=False),
+        sa.Column(
+            "attempt_count",
+            sa.Integer(),
+            server_default=sa.text("0"),
+            nullable=False,
+        ),
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),

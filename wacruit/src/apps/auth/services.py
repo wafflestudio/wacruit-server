@@ -1,5 +1,6 @@
 from datetime import datetime
 from datetime import timedelta
+from datetime import timezone
 import secrets
 from typing import Annotated
 
@@ -24,6 +25,16 @@ from wacruit.src.apps.user.models import User
 PASSWORD_RESET_CODE_LENGTH = 6
 PASSWORD_RESET_CODE_TTL_MINUTES = 5
 PASSWORD_RESET_MAX_ATTEMPTS = 5
+
+
+def _utc_now() -> datetime:
+    return datetime.now(timezone.utc)
+
+
+def _as_utc(value: datetime) -> datetime:
+    if value.tzinfo is None:
+        return value.replace(tzinfo=timezone.utc)
+    return value.astimezone(timezone.utc)
 
 
 class AuthService:
@@ -90,7 +101,7 @@ class AuthService:
         header = {"alg": "HS256"}
         payload = {
             "sub": user_id,
-            "exp": int((datetime.now() + timedelta(hours=expiration_hour)).timestamp()),
+            "exp": int((_utc_now() + timedelta(hours=expiration_hour)).timestamp()),
             "token_type": token_type,
         }
 
@@ -108,7 +119,7 @@ class AuthService:
             raise UserNotFoundException()
 
         code = self._generate_password_reset_code()
-        now = datetime.now()
+        now = _utc_now()
         expires_at = now + timedelta(minutes=PASSWORD_RESET_CODE_TTL_MINUTES)
 
         self.auth_repository.replace_active_password_reset_for_email(
@@ -120,11 +131,12 @@ class AuthService:
             ),
             now,
         )
+        self.auth_repository.commit()
         self.email_service.send_password_reset_code(str(email), code)
 
     def verify_password_reset_code(self, email: EmailStr, code: str) -> None:
         verification = self._get_valid_password_reset_verification(email, code)
-        verification.verified_at = datetime.now()
+        verification.verified_at = _utc_now()
         self.auth_repository.update_password_reset_verification(verification)
 
     def reset_password(self, email: EmailStr, code: str, new_password: str) -> None:
@@ -140,7 +152,7 @@ class AuthService:
             verification.id,
             email,
             PasswordService.hash_password(new_password),
-            datetime.now(),
+            _utc_now(),
         )
         if not consumed:
             raise InvalidPasswordResetCodeException()
@@ -161,8 +173,8 @@ class AuthService:
         if verification is None or verification.used_at is not None:
             raise InvalidPasswordResetCodeException()
 
-        now = datetime.now()
-        if verification.expires_at < now:
+        now = _utc_now()
+        if _as_utc(verification.expires_at) < now:
             raise ExpiredPasswordResetCodeException()
 
         if verification.attempt_count >= PASSWORD_RESET_MAX_ATTEMPTS:
