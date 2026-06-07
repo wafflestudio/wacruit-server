@@ -22,7 +22,7 @@ from wacruit.src.apps.mail.services import EmailService
 from wacruit.src.apps.user.models import User
 
 PASSWORD_RESET_CODE_LENGTH = 6
-PASSWORD_RESET_CODE_TTL_MINUTES = 10
+PASSWORD_RESET_CODE_TTL_MINUTES = 5
 PASSWORD_RESET_MAX_ATTEMPTS = 5
 
 
@@ -105,7 +105,7 @@ class AuthService:
     def send_password_reset_email(self, email: EmailStr) -> None:
         user = self.auth_repository.get_user_by_email(email)
         if user is None:
-            return
+            raise UserNotFoundException()
 
         code = self._generate_password_reset_code()
         now = datetime.now()
