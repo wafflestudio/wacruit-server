@@ -32,14 +32,9 @@ def test_send_password_reset_email_creates_verification(
     )
     assert verification is not None
     assert PasswordService.verify_password("123456", verification.code_hash)
-    assert (
-        datetime.now(timezone.utc) + timedelta(minutes=4, seconds=50)
-        < verification.expires_at
-    )
-    assert verification.expires_at < datetime.now(timezone.utc) + timedelta(
-        minutes=5,
-        seconds=10,
-    )
+    now = datetime.now(timezone.utc)
+    assert now + timedelta(minutes=4, seconds=50) < verification.expires_at
+    assert verification.expires_at < now + timedelta(minutes=5, seconds=10)
     assert auth_repository.commit_count == 1
     assert fake_email_service.sent_password_reset_codes == [(user.email, "123456")]
 
