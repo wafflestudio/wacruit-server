@@ -38,6 +38,11 @@ def test_send_email_raises_when_required_config_is_missing():
         "no-reply@",
         "@example.com",
         "no-reply@example@com",
+        " no-reply@example.com",
+        "no-reply@example.com ",
+        "no reply@example.com",
+        "no-reply@exa mple.com",
+        "no-reply@example.com\nbcc@example.com",
     ],
 )
 def test_send_email_raises_when_from_email_is_invalid(monkeypatch, from_email):
@@ -83,5 +88,26 @@ def test_send_email_submits_oci_email_payload(monkeypatch):
     assert details.reply_to[0].email == "help@example.com"
     assert details.subject == "subject"
     assert details.body_text == "content"
-    assert details.message_id.startswith("<")
-    assert details.message_id.endswith("@example.com>")
+    assert details.body_html is None
+    assert details.message_id.endswith("@example.com")
+    assert not details.message_id.startswith("<")
+    assert not details.message_id.endswith(">")
+
+
+def test_send_password_reset_code_submits_text_and_html_body(monkeypatch):
+    fake_client = FakeEmailClient()
+    monkeypatch.setattr(mail_config, "compartment_id", "ocid1.compartment.oc1..test")
+    monkeypatch.setattr(mail_config, "from_email", "no-reply@example.com")
+
+    service = EmailService()
+    service._client = fake_client  # type: ignore[assignment]
+
+    service.send_password_reset_code("to@gmail.com", "123456")
+
+    [details] = fake_client.submitted
+    assert details.recipients.to[0].email == "to@gmail.com"
+    assert details.subject == "[Waffle Studio] 비밀번호 재설정 인증번호"
+    assert "인증번호: 123456" in details.body_text
+    assert "인증번호는 5분 동안 유효합니다." in details.body_text
+    assert "<strong>인증번호: 123456</strong>" in details.body_html
+    assert "<p>인증번호는 5분 동안 유효합니다.</p>" in details.body_html

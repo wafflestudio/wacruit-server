@@ -5,6 +5,7 @@ from fastapi import Depends
 from pydantic import EmailStr
 from sqlalchemy.orm import Session
 
+from wacruit.src.apps.auth.exceptions import UserNotFoundException
 from wacruit.src.apps.auth.models import BlockedToken
 from wacruit.src.apps.auth.models import PasswordResetVerification
 from wacruit.src.apps.user.models import User
@@ -46,6 +47,15 @@ class AuthRepository:
         expires_at: datetime,
     ) -> PasswordResetVerification:
         with self.transaction:
+            # Lock the user row to serialize password reset requests per email.
+            locked_user = (
+                self.session.query(User)
+                .where(User.email == email)
+                .with_for_update()
+                .one_or_none()
+            )
+            if locked_user is None:
+                raise UserNotFoundException()
             (
                 self.session.query(PasswordResetVerification)
                 .where(
@@ -59,6 +69,9 @@ class AuthRepository:
             )
             self.session.add(verification)
         return verification
+
+    def commit(self) -> None:
+        self.session.commit()
 
     def get_latest_password_reset_verification(
         self, email: EmailStr
