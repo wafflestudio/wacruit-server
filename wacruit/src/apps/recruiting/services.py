@@ -20,6 +20,8 @@ from wacruit.src.apps.recruiting.schemas import RecruitingInfoResponse
 from wacruit.src.apps.recruiting.schemas import RecruitingInfoUpdateRequest
 from wacruit.src.apps.recruiting.schemas import RecruitingResponse
 from wacruit.src.apps.recruiting.schemas import RecruitingResultResponse
+from wacruit.src.apps.recruiting.schemas import RecruitingSubmissionListResponse
+from wacruit.src.apps.recruiting.schemas import RecruitingSubmissionResponse
 from wacruit.src.apps.recruiting.schemas import RecruitingSummaryResponse
 from wacruit.src.apps.recruiting.schemas import RecruitingUpdateRequest
 from wacruit.src.apps.recruiting.schemas import UserRecruitingResponse
@@ -277,3 +279,14 @@ class RecruitingService:
             )
         except IntegrityError as exc:
             raise InfoAlreadyExistsException() from exc
+
+    def get_recruiting_submissions(
+        self, recruiting_id: int, limit: int, offset: int
+    ) -> RecruitingSubmissionListResponse:
+        raw_submissions = self.recruiting_repository.get_submissions_by_recruiting_id(
+            recruiting_id, limit, offset
+        )
+
+        parsed_items = [RecruitingSubmissionResponse(**row) for row in raw_submissions]
+
+        return RecruitingSubmissionListResponse(items=parsed_items)

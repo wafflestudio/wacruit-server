@@ -3,14 +3,15 @@ from typing import Annotated
 
 from fastapi import APIRouter
 from fastapi import Depends
+from fastapi import Query
 
-from wacruit.src.apps.common.enums import RecruitingType
 from wacruit.src.apps.common.schemas import ListResponse
 from wacruit.src.apps.recruiting.schemas import RecruitingCreateRequest
 from wacruit.src.apps.recruiting.schemas import RecruitingInfoCreateRequest
 from wacruit.src.apps.recruiting.schemas import RecruitingInfoResponse
 from wacruit.src.apps.recruiting.schemas import RecruitingInfoUpdateRequest
 from wacruit.src.apps.recruiting.schemas import RecruitingResponse
+from wacruit.src.apps.recruiting.schemas import RecruitingSubmissionListResponse
 from wacruit.src.apps.recruiting.schemas import RecruitingSummaryResponse
 from wacruit.src.apps.recruiting.schemas import RecruitingUpdateRequest
 from wacruit.src.apps.recruiting.services import RecruitingService
@@ -30,7 +31,7 @@ def create_recruiting(
 
 @v3_router.get("/active")
 def get_active_recruitings(
-    recruiting_service: Annotated[RecruitingService, Depends()]
+    recruiting_service: Annotated[RecruitingService, Depends()],
 ) -> ListResponse[RecruitingSummaryResponse]:
     return recruiting_service.get_active_recruitings()
 
@@ -82,3 +83,14 @@ def update_recruiting_info(
     request: RecruitingInfoUpdateRequest,
 ) -> RecruitingInfoResponse:
     return recruiting_service.update_recruiting_info(recruiting_info_id, request)
+
+
+@v3_router.get("/{recruiting_id}/submission")
+def get_recruiting_submission(
+    admin_user: AdminUser,
+    recruiting_id: int,
+    recruiting_service: Annotated[RecruitingService, Depends()],
+    limit: int = Query(100),
+    offset: int = Query(0),
+) -> RecruitingSubmissionListResponse:
+    return recruiting_service.get_recruiting_submissions(recruiting_id, limit, offset)
