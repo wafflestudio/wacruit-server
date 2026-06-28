@@ -31,7 +31,7 @@ class PreRegistrationService:
             self.pre_registration_repository.get_active_pre_registration()
         )
         if pre_registration is None:
-            raise PreRegistNotActiveException
+            raise PreRegistNotActiveException()
         return pre_registration
 
     def get_pre_registration(self) -> list[PreRegistration]:
@@ -42,7 +42,7 @@ class PreRegistrationService:
         self, req: CreatePreRegistrationRequest
     ) -> PreRegistration:
         if req.is_active and (self.check_active_pre_registration()):
-            raise PreRegistAlreadyExistException
+            raise PreRegistAlreadyExistException()
         to_create = PreRegistration(
             url=req.url, generation=req.generation, is_active=req.is_active
         )
@@ -58,9 +58,17 @@ class PreRegistrationService:
             pre_registration_id
         )
         if pre_registration is None:
-            raise PreRegistNotExistException
-        if req.is_active and (self.check_active_pre_registration()):
-            raise PreRegistAlreadyExistException
+            raise PreRegistNotExistException()
+
+        active_pre_registration = (
+            self.pre_registration_repository.get_active_pre_registration()
+        )
+        if (
+            req.is_active
+            and active_pre_registration is not None
+            and active_pre_registration.id != pre_registration_id
+        ):
+            raise PreRegistAlreadyExistException()
 
         for key, value in req.dict(exclude_none=True).items():
             setattr(pre_registration, key, value)
@@ -73,5 +81,5 @@ class PreRegistrationService:
             pre_registration_id
         )
         if pre_registration is None:
-            raise PreRegistNotExistException
+            raise PreRegistNotExistException()
         self.pre_registration_repository.delete_pre_registration(pre_registration_id)

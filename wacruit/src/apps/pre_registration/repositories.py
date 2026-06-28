@@ -5,8 +5,8 @@ from sqlalchemy import true
 from sqlalchemy.orm import Session
 
 from wacruit.src.apps.pre_registration.models import PreRegistration
-from wacruit.src.database.connection import get_db_session
 from wacruit.src.database.connection import Transaction
+from wacruit.src.database.connection import get_db_session
 
 
 class PreRegistrationRepository:
@@ -46,6 +46,7 @@ class PreRegistrationRepository:
         return pre_registration
 
     def delete_pre_registration(self, pre_registration_id: int) -> None:
-        self.session.execute(
-            delete(PreRegistration).where(PreRegistration.id == pre_registration_id)
-        )
+        with self.transaction:
+            self.session.execute(
+                delete(PreRegistration).where(PreRegistration.id == pre_registration_id)
+            )

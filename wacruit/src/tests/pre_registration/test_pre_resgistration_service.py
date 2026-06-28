@@ -7,6 +7,7 @@ from wacruit.src.apps.pre_registration.exceptions import PreRegistNotActiveExcep
 from wacruit.src.apps.pre_registration.exceptions import PreRegistNotExistException
 from wacruit.src.apps.pre_registration.models import PreRegistration
 from wacruit.src.apps.pre_registration.schemas import PreRegistrationResponse
+from wacruit.src.apps.pre_registration.schemas import UpdatePreRegistrationRequest
 from wacruit.src.apps.pre_registration.services import PreRegistrationService
 
 
@@ -49,7 +50,7 @@ def test_no_active_pre_registration(
     created_no_active_pre_registration: PreRegistration,
 ):
     with pytest.raises(PreRegistNotActiveException):
-        response = pre_registration_service.get_active_pre_registration()
+        pre_registration_service.get_active_pre_registration()
 
 
 def test_get_all_pre_registrations(
@@ -95,3 +96,37 @@ def test_delete_pre_registration_not_exist(
 ):
     with pytest.raises(PreRegistNotExistException):
         pre_registration_service.delete_pre_registration(999)
+
+
+def test_update_active_pre_registration_itself(
+    pre_registration_service: PreRegistrationService,
+    created_active_pre_registration: PreRegistration,
+):
+    request = UpdatePreRegistrationRequest(
+        url="https://wafflestudio.com/24_5_pre_registration_updated",
+        generation="24.5",
+        is_active=True,
+    )
+
+    pre_registration = pre_registration_service.update_pre_registration(
+        created_active_pre_registration.id, request
+    )
+
+    assert (
+        pre_registration.url == "https://wafflestudio.com/24_5_pre_registration_updated"
+    )
+    assert pre_registration.generation == "24.5"
+    assert pre_registration.is_active is True
+
+
+def test_update_pre_registration_to_active_when_other_active_exists(
+    pre_registration_service: PreRegistrationService,
+    created_active_pre_registration: PreRegistration,
+    created_no_active_pre_registration: PreRegistration,
+):
+    request = UpdatePreRegistrationRequest(is_active=True)
+
+    with pytest.raises(PreRegistAlreadyExistException):
+        pre_registration_service.update_pre_registration(
+            created_no_active_pre_registration.id, request
+        )
