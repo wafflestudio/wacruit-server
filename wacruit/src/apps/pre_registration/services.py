@@ -1,5 +1,6 @@
 from typing import Annotated
 
+from fastapi import BackgroundTasks
 from fastapi import Depends
 from sqlalchemy.exc import IntegrityError
 
@@ -21,6 +22,8 @@ from wacruit.src.apps.pre_registration.schemas import PreRegistrationUserRespons
 from wacruit.src.apps.pre_registration.schemas import SendPreRegistrationEmailRequest
 from wacruit.src.apps.pre_registration.schemas import SendPreRegistrationEmailResponse
 from wacruit.src.apps.pre_registration.schemas import UpdatePreRegistrationRequest
+
+PRE_REGISTRATION_EMAIL_BATCH_LIMIT = 200
 
 
 class PreRegistrationService:
@@ -148,34 +151,50 @@ class PreRegistrationService:
         ]
 
     def send_email_to_pre_registration_users(
-        self, request: SendPreRegistrationEmailRequest
+        self,
+        request: SendPreRegistrationEmailRequest,
+        background_tasks: BackgroundTasks,
     ) -> SendPreRegistrationEmailResponse:
         pre_registration_users = (
             self.pre_registration_repository.get_pre_registration_users(
                 pre_registration_id=request.pre_registration_id,
                 active_only=request.active_only,
-                limit=None,
+                limit=PRE_REGISTRATION_EMAIL_BATCH_LIMIT,
                 offset=0,
             )
         )
+        recipient_emails = [user.email for user in pre_registration_users]
 
-        failed_emails: list[str] = []
-        for pre_registration_user in pre_registration_users:
+        if recipient_emails:
+            background_tasks.add_task(
+                self._send_email_to_recipients,
+                recipient_emails,
+                request.subject,
+                request.content,
+                request.html_content,
+            )
+
+        return SendPreRegistrationEmailResponse(
+            status="queued",
+            total_count=len(recipient_emails),
+            queued_count=len(recipient_emails),
+            recipient_limit=PRE_REGISTRATION_EMAIL_BATCH_LIMIT,
+        )
+
+    def _send_email_to_recipients(
+        self,
+        recipient_emails: list[str],
+        subject: str,
+        content: str,
+        html_content: str | None,
+    ) -> None:
+        for recipient_email in recipient_emails:
             try:
                 self.email_service.send_email(
-                    to_email=pre_registration_user.email,
-                    subject=request.subject,
-                    content=request.content,
-                    html_content=request.html_content,
+                    to_email=recipient_email,
+                    subject=subject,
+                    content=content,
+                    html_content=html_content,
                 )
             except (MailConfigException, MailSendFailedException):
-                failed_emails.append(pre_registration_user.email)
-
-        total_count = len(pre_registration_users)
-        failed_count = len(failed_emails)
-        return SendPreRegistrationEmailResponse(
-            total_count=total_count,
-            success_count=total_count - failed_count,
-            failed_count=failed_count,
-            failed_emails=failed_emails,
-        )
+                continue

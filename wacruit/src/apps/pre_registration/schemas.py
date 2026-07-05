@@ -57,7 +57,7 @@ class SendPreRegistrationEmailRequest(BaseModel):
 
 
 class SendPreRegistrationEmailResponse(BaseModel):
+    status: str
     total_count: int
-    success_count: int
-    failed_count: int
-    failed_emails: list[str]
+    queued_count: int
+    recipient_limit: int

@@ -1,6 +1,7 @@
 from typing import List
 from typing import cast
 
+from fastapi import BackgroundTasks
 from pydantic import EmailStr
 import pytest
 from sqlalchemy.exc import IntegrityError
@@ -18,6 +19,9 @@ from wacruit.src.apps.pre_registration.schemas import CreatePreRegistrationUserR
 from wacruit.src.apps.pre_registration.schemas import PreRegistrationResponse
 from wacruit.src.apps.pre_registration.schemas import SendPreRegistrationEmailRequest
 from wacruit.src.apps.pre_registration.schemas import UpdatePreRegistrationRequest
+from wacruit.src.apps.pre_registration.services import (
+    PRE_REGISTRATION_EMAIL_BATCH_LIMIT,
+)
 from wacruit.src.apps.pre_registration.services import PreRegistrationService
 from wacruit.src.tests.pre_registration.conftest import FakeEmailService
 
@@ -278,7 +282,7 @@ def test_get_pre_registration_users_by_pre_registration_id(
     assert response[0].email == "inactive@example.com"
 
 
-def test_send_email_to_active_pre_registration_users(
+def test_send_email_to_active_pre_registration_users_queues_background_task(
     db_session: Session,
     pre_registration_service: PreRegistrationService,
     fake_email_service: FakeEmailService,
@@ -299,6 +303,7 @@ def test_send_email_to_active_pre_registration_users(
     )
     db_session.add_all([active_user, inactive_user])
     db_session.commit()
+    background_tasks = BackgroundTasks()
 
     response = pre_registration_service.send_email_to_pre_registration_users(
         SendPreRegistrationEmailRequest(
@@ -306,54 +311,62 @@ def test_send_email_to_active_pre_registration_users(
             subject="subject",
             content="content",
             html_content="<p>content</p>",
-        )
+        ),
+        background_tasks,
     )
 
+    assert response.status == "queued"
     assert response.total_count == 1
-    assert response.success_count == 1
-    assert response.failed_count == 0
-    assert response.failed_emails == []
+    assert response.queued_count == 1
+    assert response.recipient_limit == PRE_REGISTRATION_EMAIL_BATCH_LIMIT
+    assert fake_email_service.sent_emails == []
+    assert len(background_tasks.tasks) == 1
+
+    [background_task] = background_tasks.tasks
+    background_task.func(*background_task.args, **background_task.kwargs)
+
     assert fake_email_service.sent_emails == [
         ("active@example.com", "subject", "content", "<p>content</p>")
     ]
 
 
-def test_send_email_to_pre_registration_users_returns_failed_emails(
+def test_send_email_to_pre_registration_users_applies_recipient_cap(
     db_session: Session,
     pre_registration_service: PreRegistrationService,
     fake_email_service: FakeEmailService,
     created_active_pre_registration: PreRegistration,
 ):
-    first_user = PreRegistrationUser(
-        pre_registration_id=created_active_pre_registration.id,
-        name="First User",
-        email="first@example.com",
-        phone_number="010-1111-1111",
+    user_count = PRE_REGISTRATION_EMAIL_BATCH_LIMIT + 1
+    db_session.add_all(
+        [
+            PreRegistrationUser(
+                pre_registration_id=created_active_pre_registration.id,
+                name=f"User {index}",
+                email=f"user-{index}@example.com",
+                phone_number="010-1111-1111",
+            )
+            for index in range(user_count)
+        ]
     )
-    second_user = PreRegistrationUser(
-        pre_registration_id=created_active_pre_registration.id,
-        name="Second User",
-        email="second@example.com",
-        phone_number="010-2222-2222",
-    )
-    db_session.add_all([first_user, second_user])
     db_session.commit()
-    fake_email_service.failed_emails.add("second@example.com")
+    background_tasks = BackgroundTasks()
 
     response = pre_registration_service.send_email_to_pre_registration_users(
         SendPreRegistrationEmailRequest(
             active_only=True,
             subject="subject",
             content="content",
-        )
+        ),
+        background_tasks,
     )
 
-    expected_total_count = 2
+    assert response.status == "queued"
+    assert response.total_count == PRE_REGISTRATION_EMAIL_BATCH_LIMIT
+    assert response.queued_count == PRE_REGISTRATION_EMAIL_BATCH_LIMIT
+    assert response.recipient_limit == PRE_REGISTRATION_EMAIL_BATCH_LIMIT
+    assert fake_email_service.sent_emails == []
 
-    assert response.total_count == expected_total_count
-    assert response.success_count == 1
-    assert response.failed_count == 1
-    assert response.failed_emails == ["second@example.com"]
-    assert fake_email_service.sent_emails == [
-        ("first@example.com", "subject", "content", None)
-    ]
+    [background_task] = background_tasks.tasks
+    background_task.func(*background_task.args, **background_task.kwargs)
+
+    assert len(fake_email_service.sent_emails) == PRE_REGISTRATION_EMAIL_BATCH_LIMIT

@@ -2,6 +2,7 @@ from http import HTTPStatus
 from typing import Annotated
 
 from fastapi import APIRouter
+from fastapi import BackgroundTasks
 from fastapi import Depends
 from fastapi import Query
 
@@ -49,13 +50,17 @@ def create_pre_registration_user(
     return pre_registration_service.create_pre_registration_user(request)
 
 
-@v3_router.post("/users/email", status_code=HTTPStatus.OK)
+@v3_router.post("/users/email", status_code=HTTPStatus.ACCEPTED)
 def send_email_to_pre_registration_users(
     admin_user: AdminUser,
     request: SendPreRegistrationEmailRequest,
+    background_tasks: BackgroundTasks,
     pre_registration_service: Annotated[PreRegistrationService, Depends()],
 ) -> SendPreRegistrationEmailResponse:
-    return pre_registration_service.send_email_to_pre_registration_users(request)
+    return pre_registration_service.send_email_to_pre_registration_users(
+        request,
+        background_tasks,
+    )
 
 
 @v3_router.get("/users", status_code=HTTPStatus.OK)
