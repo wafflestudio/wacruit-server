@@ -1,5 +1,3 @@
-from fastapi import HTTPException
-
 from wacruit.src.apps.common.exceptions import WacruitException
 
 

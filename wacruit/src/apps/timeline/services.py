@@ -1,5 +1,3 @@
-from typing import Annotated
-
 from fastapi import Depends
 
 from wacruit.src.apps.common.enums import TimelineGroupType

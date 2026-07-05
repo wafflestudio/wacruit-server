@@ -8,9 +8,10 @@ from fastapi.security import HTTPBearer
 from wacruit.src.apps.auth.services import AuthService
 from wacruit.src.apps.user.exceptions import UserPermissionDeniedException
 from wacruit.src.apps.user.models import User
-from wacruit.src.apps.user.repositories import UserRepository
 
-security = HTTPBearer(scheme_name="waffle_token", description="인증을 위한 access token")
+security = HTTPBearer(
+    scheme_name="waffle_token", description="인증을 위한 access token"
+)
 
 
 def get_current_user(

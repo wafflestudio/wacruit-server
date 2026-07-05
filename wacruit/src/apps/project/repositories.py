@@ -1,13 +1,12 @@
 from fastapi import Depends
 from sqlalchemy import update
-from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import Session
+from sqlalchemy.orm import joinedload
 
 from wacruit.src.apps.project.models import Project
 from wacruit.src.apps.project.models import ProjectImage
-from wacruit.src.apps.project.models import ProjectURL
-from wacruit.src.database.connection import get_db_session
 from wacruit.src.database.connection import Transaction
+from wacruit.src.database.connection import get_db_session
 
 
 class ProjectRepository:

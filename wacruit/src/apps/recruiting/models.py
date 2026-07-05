@@ -4,9 +4,9 @@ from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
-from sqlalchemy import text
 from sqlalchemy import Text
 from sqlalchemy import UniqueConstraint
+from sqlalchemy import text
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship

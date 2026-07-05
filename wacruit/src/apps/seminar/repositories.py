@@ -4,8 +4,8 @@ from sqlalchemy import true
 from sqlalchemy.orm import Session
 
 from wacruit.src.apps.seminar.models import Seminar
-from wacruit.src.database.connection import get_db_session
 from wacruit.src.database.connection import Transaction
+from wacruit.src.database.connection import get_db_session
 
 
 class SeminarRepository:

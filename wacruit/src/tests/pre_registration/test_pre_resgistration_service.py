@@ -16,8 +16,10 @@ from wacruit.src.apps.pre_registration.models import PreRegistration
 from wacruit.src.apps.pre_registration.models import PreRegistrationUser
 from wacruit.src.apps.pre_registration.schemas import CreatePreRegistrationUserRequest
 from wacruit.src.apps.pre_registration.schemas import PreRegistrationResponse
+from wacruit.src.apps.pre_registration.schemas import SendPreRegistrationEmailRequest
 from wacruit.src.apps.pre_registration.schemas import UpdatePreRegistrationRequest
 from wacruit.src.apps.pre_registration.services import PreRegistrationService
+from wacruit.src.tests.pre_registration.conftest import FakeEmailService
 
 
 def test_create_pre_registration(
@@ -274,3 +276,84 @@ def test_get_pre_registration_users_by_pre_registration_id(
     assert len(response) == 1
     assert response[0].pre_registration_id == created_no_active_pre_registration.id
     assert response[0].email == "inactive@example.com"
+
+
+def test_send_email_to_active_pre_registration_users(
+    db_session: Session,
+    pre_registration_service: PreRegistrationService,
+    fake_email_service: FakeEmailService,
+    created_active_pre_registration: PreRegistration,
+    created_no_active_pre_registration: PreRegistration,
+):
+    active_user = PreRegistrationUser(
+        pre_registration_id=created_active_pre_registration.id,
+        name="Active User",
+        email="active@example.com",
+        phone_number="010-1111-1111",
+    )
+    inactive_user = PreRegistrationUser(
+        pre_registration_id=created_no_active_pre_registration.id,
+        name="Inactive User",
+        email="inactive@example.com",
+        phone_number="010-2222-2222",
+    )
+    db_session.add_all([active_user, inactive_user])
+    db_session.commit()
+
+    response = pre_registration_service.send_email_to_pre_registration_users(
+        SendPreRegistrationEmailRequest(
+            active_only=True,
+            subject="subject",
+            content="content",
+            html_content="<p>content</p>",
+        )
+    )
+
+    assert response.total_count == 1
+    assert response.success_count == 1
+    assert response.failed_count == 0
+    assert response.failed_emails == []
+    assert fake_email_service.sent_emails == [
+        ("active@example.com", "subject", "content", "<p>content</p>")
+    ]
+
+
+def test_send_email_to_pre_registration_users_returns_failed_emails(
+    db_session: Session,
+    pre_registration_service: PreRegistrationService,
+    fake_email_service: FakeEmailService,
+    created_active_pre_registration: PreRegistration,
+):
+    first_user = PreRegistrationUser(
+        pre_registration_id=created_active_pre_registration.id,
+        name="First User",
+        email="first@example.com",
+        phone_number="010-1111-1111",
+    )
+    second_user = PreRegistrationUser(
+        pre_registration_id=created_active_pre_registration.id,
+        name="Second User",
+        email="second@example.com",
+        phone_number="010-2222-2222",
+    )
+    db_session.add_all([first_user, second_user])
+    db_session.commit()
+    fake_email_service.failed_emails.add("second@example.com")
+
+    response = pre_registration_service.send_email_to_pre_registration_users(
+        SendPreRegistrationEmailRequest(
+            active_only=True,
+            subject="subject",
+            content="content",
+        )
+    )
+
+    expected_total_count = 2
+
+    assert response.total_count == expected_total_count
+    assert response.success_count == 1
+    assert response.failed_count == 1
+    assert response.failed_emails == ["second@example.com"]
+    assert fake_email_service.sent_emails == [
+        ("first@example.com", "subject", "content", None)
+    ]

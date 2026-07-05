@@ -1,8 +1,8 @@
 from typing import Annotated
 
 from sqlalchemy import String
-from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import DeclarativeBase as Base
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import mapped_column
 
 DeclarativeBase: type[Base] = declarative_base()

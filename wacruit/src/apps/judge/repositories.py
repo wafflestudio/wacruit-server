@@ -10,6 +10,7 @@ from .schemas import JudgeGetSubmissionResponse
 
 # DEFAULT_FIELDS = "stdout,stderr,compile_output,message,status,time,memory"
 DEFAULT_FIELDS = "stdout,message,status,time,memory"
+HTTP_CLIENT_ERROR_STATUS_CODE = 400
 
 
 class JudgeApiRepository:
@@ -25,7 +26,7 @@ class JudgeApiRepository:
             json=request.dict(),
             timeout=60,
         )
-        if res.status_code >= 400:
+        if res.status_code >= HTTP_CLIENT_ERROR_STATUS_CODE:
             print(f"ERROR for sending {res.url} / status code: {res.status_code}.")
             print(f"Details: {res.text}")
         res.raise_for_status()
@@ -41,7 +42,7 @@ class JudgeApiRepository:
             json=batch_request_data,
             timeout=60,
         )
-        if res.status_code >= 400:
+        if res.status_code >= HTTP_CLIENT_ERROR_STATUS_CODE:
             print(f"ERROR for sending {res.url} / status code: {res.status_code}.")
             print(f"Details: {res.text}")
         res.raise_for_status()
@@ -56,7 +57,7 @@ class JudgeApiRepository:
             },
             timeout=60,
         )
-        if res.status_code >= 400:
+        if res.status_code >= HTTP_CLIENT_ERROR_STATUS_CODE:
             print(f"ERROR for sending {res.url} / status code: {res.status_code}.")
             print(f"Details: {res.text}")
         res.raise_for_status()
@@ -76,7 +77,7 @@ class JudgeApiRepository:
             },
             timeout=60,
         )
-        if res.status_code >= 400:
+        if res.status_code >= HTTP_CLIENT_ERROR_STATUS_CODE:
             print(f"ERROR for sending {res.url} / status code: {res.status_code}.")
             print(f"Details: {res.text}")
         res.raise_for_status()

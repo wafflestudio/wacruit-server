@@ -63,7 +63,7 @@ class PreRegistrationRepository:
         self,
         pre_registration_id: int | None,
         active_only: bool,
-        limit: int,
+        limit: int | None,
         offset: int,
     ) -> list[PreRegistrationUser]:
         query = select(PreRegistrationUser).join(PreRegistration)
@@ -73,7 +73,7 @@ class PreRegistrationRepository:
             )
         if active_only:
             query = query.where(PreRegistration.is_active == true())
-        query = (
-            query.order_by(PreRegistrationUser.id.desc()).limit(limit).offset(offset)
-        )
+        query = query.order_by(PreRegistrationUser.id.desc()).offset(offset)
+        if limit is not None:
+            query = query.limit(limit)
         return list(self.session.execute(query).scalars())

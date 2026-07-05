@@ -1,11 +1,12 @@
 from datetime import timedelta
-from typing import Iterable, Sequence, Tuple
+from typing import Iterable
+from typing import Tuple
 
 from fastapi import Depends
 from sqlalchemy import select
+from sqlalchemy.orm import Session
 from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm import joinedload
-from sqlalchemy.orm import Session
 from tenacity import retry
 from tenacity.stop import stop_after_attempt
 from tenacity.wait import wait_fixed
@@ -17,8 +18,8 @@ from wacruit.src.apps.problem.models import CodeSubmission
 from wacruit.src.apps.problem.models import CodeSubmissionResult
 from wacruit.src.apps.problem.models import Problem
 from wacruit.src.apps.problem.models import Testcase
-from wacruit.src.database.connection import get_db_session
 from wacruit.src.database.connection import Transaction
+from wacruit.src.database.connection import get_db_session
 from wacruit.src.utils.mixins import LoggingMixin
 
 

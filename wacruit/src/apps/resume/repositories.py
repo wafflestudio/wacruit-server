@@ -6,14 +6,14 @@ from sqlalchemy import delete
 from sqlalchemy import select
 from sqlalchemy import update
 from sqlalchemy.exc import InvalidRequestError
-from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import Session
+from sqlalchemy.orm import joinedload
 
 from wacruit.src.apps.resume.exceptions import ResumeNotFound
 from wacruit.src.apps.resume.models import ResumeQuestion
 from wacruit.src.apps.resume.models import ResumeSubmission
-from wacruit.src.database.connection import get_db_session
 from wacruit.src.database.connection import Transaction
+from wacruit.src.database.connection import get_db_session
 
 
 class ResumeRepository:

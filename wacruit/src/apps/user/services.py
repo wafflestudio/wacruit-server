@@ -1,5 +1,3 @@
-from typing import Annotated
-
 from fastapi import Depends
 from sqlalchemy.exc import IntegrityError
 

@@ -46,3 +46,18 @@ class PreRegistrationUserResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class SendPreRegistrationEmailRequest(BaseModel):
+    subject: str = Field(..., min_length=1, max_length=255)
+    content: str = Field(..., min_length=1)
+    html_content: str | None = None
+    active_only: bool = True
+    pre_registration_id: int | None = None
+
+
+class SendPreRegistrationEmailResponse(BaseModel):
+    total_count: int
+    success_count: int
+    failed_count: int
+    failed_emails: list[str]

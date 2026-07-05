@@ -5,7 +5,6 @@ from fastapi import APIRouter
 from fastapi import Depends
 
 from wacruit.src.apps.common.schemas import ListResponse
-from wacruit.src.apps.faq.models import FAQ
 from wacruit.src.apps.faq.schemas import CreateQuestionRequest
 from wacruit.src.apps.faq.schemas import QuestionResponse
 from wacruit.src.apps.faq.schemas import UpdateQuestionRequest
@@ -17,7 +16,7 @@ v3_router = APIRouter(prefix="/v3/questions", tags=["questions"])
 
 @v3_router.get(path="", status_code=HTTPStatus.OK)
 def get_questions(
-    question_service: Annotated[QuestionService, Depends()]
+    question_service: Annotated[QuestionService, Depends()],
 ) -> ListResponse[QuestionResponse]:
     res = question_service.get_questions()
     items = []

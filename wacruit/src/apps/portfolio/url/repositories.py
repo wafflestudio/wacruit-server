@@ -9,8 +9,8 @@ from sqlalchemy.orm import Session
 from wacruit.src.apps.portfolio.url.exceptions import PortfolioUrlNotFound
 from wacruit.src.apps.portfolio.url.models import PortfolioUrl
 from wacruit.src.database.base import intpk
-from wacruit.src.database.connection import get_db_session
 from wacruit.src.database.connection import Transaction
+from wacruit.src.database.connection import get_db_session
 
 
 class PortfolioUrlRepository:

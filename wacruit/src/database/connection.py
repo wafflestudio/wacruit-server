@@ -4,7 +4,6 @@ from fastapi import Depends
 import sqlalchemy
 from sqlalchemy import orm
 from sqlalchemy.orm.session import Session
-from tenacity import Retrying
 
 from wacruit.src.database.config import db_config
 from wacruit.src.settings import settings

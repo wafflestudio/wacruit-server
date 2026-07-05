@@ -1,15 +1,11 @@
-from fastapi import FastAPI
-from fastapi.testclient import TestClient
 import pytest
 from sqlalchemy.orm import Session
 
 from wacruit.src.apps.announcement.repositories import AnnouncementRepository
 from wacruit.src.apps.announcement.schemas import AnnouncementCreateDto
 from wacruit.src.apps.announcement.services import AnnouncementService
-from wacruit.src.apps.announcement.views import v1_router
 from wacruit.src.apps.common.security import PasswordService
 from wacruit.src.apps.user.models import User
-from wacruit.src.apps.user.repositories import UserRepository
 from wacruit.src.database.connection import Transaction
 
 

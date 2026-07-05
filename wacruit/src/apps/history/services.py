@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from fastapi import Depends
 
 from wacruit.src.apps.history.exceptions import HistoryNotFoundException

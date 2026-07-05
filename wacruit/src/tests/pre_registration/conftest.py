@@ -3,12 +3,31 @@ from typing import List
 import pytest
 from sqlalchemy.orm import Session
 
+from wacruit.src.apps.mail.exceptions import MailSendFailedException
+from wacruit.src.apps.mail.services import EmailService
 from wacruit.src.apps.pre_registration.models import PreRegistration
 from wacruit.src.apps.pre_registration.repositories import PreRegistrationRepository
 from wacruit.src.apps.pre_registration.schemas import CreatePreRegistrationRequest
 from wacruit.src.apps.pre_registration.schemas import UpdatePreRegistrationRequest
 from wacruit.src.apps.pre_registration.services import PreRegistrationService
 from wacruit.src.database.connection import Transaction
+
+
+class FakeEmailService(EmailService):
+    def __init__(self) -> None:
+        self.sent_emails: list[tuple[str, str, str, str | None]] = []
+        self.failed_emails: set[str] = set()
+
+    def send_email(
+        self,
+        to_email: str,
+        subject: str,
+        content: str,
+        html_content: str | None = None,
+    ) -> None:
+        if to_email in self.failed_emails:
+            raise MailSendFailedException()
+        self.sent_emails.append((to_email, subject, content, html_content))
 
 
 @pytest.fixture
@@ -19,11 +38,18 @@ def pre_registration_repository(db_session: Session) -> PreRegistrationRepositor
 
 
 @pytest.fixture
+def fake_email_service() -> FakeEmailService:
+    return FakeEmailService()
+
+
+@pytest.fixture
 def pre_registration_service(
     pre_registration_repository: PreRegistrationRepository,
+    fake_email_service: FakeEmailService,
 ) -> PreRegistrationService:
     return PreRegistrationService(
-        pre_registration_repository=pre_registration_repository
+        pre_registration_repository=pre_registration_repository,
+        email_service=fake_email_service,
     )
 
 

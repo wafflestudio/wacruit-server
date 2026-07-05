@@ -2,7 +2,6 @@ from typing import Sequence
 
 from fastapi import APIRouter
 from fastapi import Depends
-from fastapi import Response
 
 from wacruit.src.apps.common.exceptions import ApiDeprecatedException
 from wacruit.src.apps.common.exceptions import responses_from

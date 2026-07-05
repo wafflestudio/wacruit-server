@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from pydantic import Field
 
 from wacruit.src.apps.common.enums import SeminarType
 

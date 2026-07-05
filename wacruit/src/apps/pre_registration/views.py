@@ -10,6 +10,8 @@ from wacruit.src.apps.pre_registration.schemas import CreatePreRegistrationReque
 from wacruit.src.apps.pre_registration.schemas import CreatePreRegistrationUserRequest
 from wacruit.src.apps.pre_registration.schemas import PreRegistrationResponse
 from wacruit.src.apps.pre_registration.schemas import PreRegistrationUserResponse
+from wacruit.src.apps.pre_registration.schemas import SendPreRegistrationEmailRequest
+from wacruit.src.apps.pre_registration.schemas import SendPreRegistrationEmailResponse
 from wacruit.src.apps.pre_registration.schemas import UpdatePreRegistrationRequest
 from wacruit.src.apps.pre_registration.services import PreRegistrationService
 from wacruit.src.apps.user.dependencies import AdminUser
@@ -45,6 +47,15 @@ def create_pre_registration_user(
     pre_registration_service: Annotated[PreRegistrationService, Depends()],
 ) -> PreRegistrationUserResponse:
     return pre_registration_service.create_pre_registration_user(request)
+
+
+@v3_router.post("/users/email", status_code=HTTPStatus.OK)
+def send_email_to_pre_registration_users(
+    admin_user: AdminUser,
+    request: SendPreRegistrationEmailRequest,
+    pre_registration_service: Annotated[PreRegistrationService, Depends()],
+) -> SendPreRegistrationEmailResponse:
+    return pre_registration_service.send_email_to_pre_registration_users(request)
 
 
 @v3_router.get("/users", status_code=HTTPStatus.OK)

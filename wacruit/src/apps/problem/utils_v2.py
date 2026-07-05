@@ -1,5 +1,3 @@
-from decimal import Decimal
-
 from pydantic import BaseModel
 
 from wacruit.src.apps.hodu.schemas import HoduLanguage

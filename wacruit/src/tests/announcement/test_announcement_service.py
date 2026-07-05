@@ -3,6 +3,8 @@ import pytest
 from wacruit.src.apps.announcement.exceptions import AnnouncementNotFound
 from wacruit.src.apps.announcement.services import AnnouncementService
 
+EXPECTED_ANNOUNCEMENT_COUNT = 2
+
 
 def test_create_announcement(
     announcement_service: AnnouncementService, announcement_create_dto
@@ -21,7 +23,7 @@ def test_list_announcements(
     announcement_service.create_announcement(announcement_create_dto)
     announcement_service.create_announcement(announcement_create_dto)
     announcements = announcement_service.list_announcements()
-    assert len(announcements) == 2
+    assert len(announcements) == EXPECTED_ANNOUNCEMENT_COUNT
 
 
 def test_list_pinned_announcements(

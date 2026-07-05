@@ -1,5 +1,5 @@
-from logging import getLogger
 from logging import Logger
+from logging import getLogger
 
 
 class LoggingMixin:

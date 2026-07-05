@@ -3,7 +3,9 @@ from wacruit.src.apps.common.exceptions import WacruitException
 
 class NumPortfolioUrlLimitException(WacruitException):
     def __init__(self):
-        super().__init__(status_code=403, detail="등록 가능한 Url 개수 한계를 초과하셨습니다.")
+        super().__init__(
+            status_code=403, detail="등록 가능한 Url 개수 한계를 초과하셨습니다."
+        )
 
 
 class PortfolioUrlNotAuthorized(WacruitException):

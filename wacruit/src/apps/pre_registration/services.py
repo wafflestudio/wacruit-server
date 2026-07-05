@@ -3,6 +3,9 @@ from typing import Annotated
 from fastapi import Depends
 from sqlalchemy.exc import IntegrityError
 
+from wacruit.src.apps.mail.exceptions import MailConfigException
+from wacruit.src.apps.mail.exceptions import MailSendFailedException
+from wacruit.src.apps.mail.services import EmailService
 from wacruit.src.apps.pre_registration.exceptions import PreRegistAlreadyExistException
 from wacruit.src.apps.pre_registration.exceptions import PreRegistNotActiveException
 from wacruit.src.apps.pre_registration.exceptions import PreRegistNotExistException
@@ -15,6 +18,8 @@ from wacruit.src.apps.pre_registration.repositories import PreRegistrationReposi
 from wacruit.src.apps.pre_registration.schemas import CreatePreRegistrationRequest
 from wacruit.src.apps.pre_registration.schemas import CreatePreRegistrationUserRequest
 from wacruit.src.apps.pre_registration.schemas import PreRegistrationUserResponse
+from wacruit.src.apps.pre_registration.schemas import SendPreRegistrationEmailRequest
+from wacruit.src.apps.pre_registration.schemas import SendPreRegistrationEmailResponse
 from wacruit.src.apps.pre_registration.schemas import UpdatePreRegistrationRequest
 
 
@@ -22,8 +27,10 @@ class PreRegistrationService:
     def __init__(
         self,
         pre_registration_repository: Annotated[PreRegistrationRepository, Depends()],
+        email_service: Annotated[EmailService, Depends()],
     ):
         self.pre_registration_repository = pre_registration_repository
+        self.email_service = email_service
 
     def check_active_pre_registration(self) -> bool:
         pre_registration = (
@@ -139,3 +146,36 @@ class PreRegistrationService:
             PreRegistrationUserResponse.from_orm(pre_registration_user)
             for pre_registration_user in pre_registration_users
         ]
+
+    def send_email_to_pre_registration_users(
+        self, request: SendPreRegistrationEmailRequest
+    ) -> SendPreRegistrationEmailResponse:
+        pre_registration_users = (
+            self.pre_registration_repository.get_pre_registration_users(
+                pre_registration_id=request.pre_registration_id,
+                active_only=request.active_only,
+                limit=None,
+                offset=0,
+            )
+        )
+
+        failed_emails: list[str] = []
+        for pre_registration_user in pre_registration_users:
+            try:
+                self.email_service.send_email(
+                    to_email=pre_registration_user.email,
+                    subject=request.subject,
+                    content=request.content,
+                    html_content=request.html_content,
+                )
+            except (MailConfigException, MailSendFailedException):
+                failed_emails.append(pre_registration_user.email)
+
+        total_count = len(pre_registration_users)
+        failed_count = len(failed_emails)
+        return SendPreRegistrationEmailResponse(
+            total_count=total_count,
+            success_count=total_count - failed_count,
+            failed_count=failed_count,
+            failed_emails=failed_emails,
+        )

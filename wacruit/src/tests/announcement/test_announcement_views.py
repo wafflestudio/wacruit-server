@@ -2,6 +2,9 @@ from fastapi.testclient import TestClient
 
 from wacruit.src.apps.user.models import User
 
+HTTP_OK = 200
+HTTP_FORBIDDEN = 403
+
 
 def test_cant_create_announcement_if_not_admin(user: User, test_client: TestClient):
     assert user.is_admin is False
@@ -17,7 +20,7 @@ def test_cant_create_announcement_if_not_admin(user: User, test_client: TestClie
         },
         headers={"Authorization": f"Bearer {token_response['access_token']}"},
     )
-    assert response.status_code == 403
+    assert response.status_code == HTTP_FORBIDDEN
 
 
 def test_can_create_announcement_if_admin(admin_user: User, test_client: TestClient):
@@ -34,6 +37,6 @@ def test_can_create_announcement_if_admin(admin_user: User, test_client: TestCli
         },
         headers={"Authorization": f"Bearer {token_res['access_token']}"},
     )
-    assert response.status_code == 200
+    assert response.status_code == HTTP_OK
     assert response.json()["title"] == "title"
     assert response.json()["content"] == "content"

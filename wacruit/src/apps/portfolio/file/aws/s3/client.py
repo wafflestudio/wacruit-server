@@ -4,7 +4,8 @@ import boto3
 from botocore.client import BaseClient
 from botocore.config import Config
 
-from wacruit.src.apps.portfolio.file.aws.config import StorageConfig, storage_config
+from wacruit.src.apps.portfolio.file.aws.config import StorageConfig
+from wacruit.src.apps.portfolio.file.aws.config import storage_config
 
 
 class S3Client:

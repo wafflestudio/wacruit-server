@@ -1,9 +1,5 @@
 from enum import StrEnum
-from subprocess import STDOUT
-from typing import Self
-from xmlrpc.client import INTERNAL_ERROR
 
-from MySQLdb import TIME
 from pydantic import BaseModel
 from pydantic import Field
 
@@ -68,43 +64,46 @@ class HoduSubmitStatus(StrEnum):
     INTERNAL_ERROR = "INTERNAL_ERROR"
 
     def to_submission_result_status(self) -> CodeSubmissionResultStatus:
-        match self:
-            case HoduSubmitStatus.CORRECT:
-                return CodeSubmissionResultStatus.CORRECT
-            case HoduSubmitStatus.WRONG:
-                return CodeSubmissionResultStatus.WRONG
-            case HoduSubmitStatus.COMPILE_ERROR:
-                return CodeSubmissionResultStatus.COMPILE_ERROR
-            case HoduSubmitStatus.RUNTIME_ERROR:
-                return CodeSubmissionResultStatus.RUNTIME_ERROR
-            case HoduSubmitStatus.TIME_LIMIT_EXCEEDED:
-                return CodeSubmissionResultStatus.TIME_LIMIT_EXCEEDED
-            case HoduSubmitStatus.MEMORY_LIMIT_EXCEEDED:
-                return CodeSubmissionResultStatus.MEMORY_LIMIT_EXCEEDED
-            case HoduSubmitStatus.INTERNAL_ERROR:
-                return CodeSubmissionResultStatus.INTERNAL_SERVER_ERROR
+        status_map = {
+            HoduSubmitStatus.CORRECT: CodeSubmissionResultStatus.CORRECT,
+            HoduSubmitStatus.WRONG: CodeSubmissionResultStatus.WRONG,
+            HoduSubmitStatus.COMPILE_ERROR: CodeSubmissionResultStatus.COMPILE_ERROR,
+            HoduSubmitStatus.RUNTIME_ERROR: CodeSubmissionResultStatus.RUNTIME_ERROR,
+            HoduSubmitStatus.TIME_LIMIT_EXCEEDED: (
+                CodeSubmissionResultStatus.TIME_LIMIT_EXCEEDED
+            ),
+            HoduSubmitStatus.MEMORY_LIMIT_EXCEEDED: (
+                CodeSubmissionResultStatus.MEMORY_LIMIT_EXCEEDED
+            ),
+            HoduSubmitStatus.INTERNAL_ERROR: (
+                CodeSubmissionResultStatus.INTERNAL_SERVER_ERROR
+            ),
+        }
+        return status_map[self]
 
     @staticmethod
     def from_submission_result_status(
         status: CodeSubmissionResultStatus,
     ) -> "HoduSubmitStatus":
-        match status:
-            case CodeSubmissionResultStatus.CORRECT:
-                return HoduSubmitStatus.CORRECT
-            case CodeSubmissionResultStatus.WRONG:
-                return HoduSubmitStatus.WRONG
-            case CodeSubmissionResultStatus.COMPILE_ERROR:
-                return HoduSubmitStatus.COMPILE_ERROR
-            case CodeSubmissionResultStatus.RUNTIME_ERROR:
-                return HoduSubmitStatus.RUNTIME_ERROR
-            case CodeSubmissionResultStatus.TIME_LIMIT_EXCEEDED:
-                return HoduSubmitStatus.TIME_LIMIT_EXCEEDED
-            case CodeSubmissionResultStatus.MEMORY_LIMIT_EXCEEDED:
-                return HoduSubmitStatus.MEMORY_LIMIT_EXCEEDED
-            case CodeSubmissionResultStatus.INTERNAL_SERVER_ERROR:
-                return HoduSubmitStatus.INTERNAL_ERROR
-            case _:
-                raise ValueError(f"Invalid CodeSubmissionResultStatus: {status}")
+        status_map = {
+            CodeSubmissionResultStatus.CORRECT: HoduSubmitStatus.CORRECT,
+            CodeSubmissionResultStatus.WRONG: HoduSubmitStatus.WRONG,
+            CodeSubmissionResultStatus.COMPILE_ERROR: HoduSubmitStatus.COMPILE_ERROR,
+            CodeSubmissionResultStatus.RUNTIME_ERROR: HoduSubmitStatus.RUNTIME_ERROR,
+            CodeSubmissionResultStatus.TIME_LIMIT_EXCEEDED: (
+                HoduSubmitStatus.TIME_LIMIT_EXCEEDED
+            ),
+            CodeSubmissionResultStatus.MEMORY_LIMIT_EXCEEDED: (
+                HoduSubmitStatus.MEMORY_LIMIT_EXCEEDED
+            ),
+            CodeSubmissionResultStatus.INTERNAL_SERVER_ERROR: (
+                HoduSubmitStatus.INTERNAL_ERROR
+            ),
+        }
+        try:
+            return status_map[status]
+        except KeyError as exc:
+            raise ValueError(f"Invalid CodeSubmissionResultStatus: {status}") from exc
 
 
 class HoduSubmitExtraFields(BaseModel):

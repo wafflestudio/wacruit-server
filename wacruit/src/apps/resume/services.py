@@ -1,9 +1,8 @@
-from typing import Annotated, Sequence
+from typing import Annotated
+from typing import Sequence
 
 from fastapi import Depends
 
-from wacruit.src.apps.portfolio.file.services_v2 import PortfolioFileService
-from wacruit.src.apps.portfolio.url.services import PortfolioUrlService
 from wacruit.src.apps.recruiting.exceptions import RecruitingClosedException
 from wacruit.src.apps.recruiting.repositories import RecruitingRepository
 from wacruit.src.apps.resume.exceptions import ResumeNotFound

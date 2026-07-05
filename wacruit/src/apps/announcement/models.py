@@ -2,8 +2,8 @@ from datetime import datetime
 
 from sqlalchemy import DateTime
 from sqlalchemy import String
-from sqlalchemy import text
 from sqlalchemy import Text
+from sqlalchemy import text
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 

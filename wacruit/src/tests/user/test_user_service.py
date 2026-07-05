@@ -3,9 +3,7 @@ from typing import cast
 from pydantic import EmailStr
 import pytest
 
-from wacruit.src.apps.common.security import PasswordService
 from wacruit.src.apps.user.exceptions import EmailAlreadyExistsException
-from wacruit.src.apps.user.exceptions import UserAlreadyExistsException
 from wacruit.src.apps.user.exceptions import UserNotFoundException
 from wacruit.src.apps.user.models import User
 from wacruit.src.apps.user.schemas import UserCreateRequest
@@ -159,10 +157,10 @@ def test_partial_update_invitation_emails(
     new_data = cast(dict[str, EmailStr], new_data)
     new_request = UserUpdateInvitationEmailsRequest(**new_data)
     user = user_service.update_invitaion_emails(created_user, new_request)
-    assert (
-        user.github_email == new_data["github_email"]
-    ), "github_email should be updated"
-    assert (
-        user.notion_email == data["notion_email"]
-    ), "notion_email should not be updated"
+    assert user.github_email == new_data["github_email"], (
+        "github_email should be updated"
+    )
+    assert user.notion_email == data["notion_email"], (
+        "notion_email should not be updated"
+    )
     assert user.slack_email == data["slack_email"], "slack_email should not be updated"

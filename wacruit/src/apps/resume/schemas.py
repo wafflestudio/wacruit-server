@@ -1,12 +1,9 @@
 from datetime import datetime
-from typing import Sequence
 
 from pydantic import BaseModel
 from pydantic import Field
 
-from wacruit.src.apps.user.models import User
 from wacruit.src.apps.user.schemas import UserDetailResponse
-from wacruit.src.database.base import intpk
 
 
 class ResumeQuestionDto(BaseModel):

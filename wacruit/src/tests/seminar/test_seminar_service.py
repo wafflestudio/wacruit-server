@@ -1,9 +1,6 @@
 from typing import List
 
-import pytest
-
 from wacruit.src.apps.seminar.models import Seminar
-from wacruit.src.apps.seminar.models import SeminarType
 from wacruit.src.apps.seminar.schemas import CreateSeminarRequest
 from wacruit.src.apps.seminar.schemas import UpdateSeminarRequest
 from wacruit.src.apps.seminar.services import SeminarService
