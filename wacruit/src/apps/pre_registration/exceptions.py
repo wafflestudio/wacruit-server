@@ -23,3 +23,11 @@ class PreRegistAlreadyExistException(WacruitException):
             status_code=409,
             detail="활성화된 사전 등록이 이미 존재합니다.",
         )
+
+
+class PreRegistUserAlreadyExistException(WacruitException):
+    def __init__(self):
+        super().__init__(
+            status_code=409,
+            detail="이미 사전 등록한 이메일입니다.",
+        )

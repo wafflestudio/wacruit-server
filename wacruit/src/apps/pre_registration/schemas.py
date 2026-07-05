@@ -1,4 +1,6 @@
 from pydantic import BaseModel
+from pydantic import EmailStr
+from pydantic import Field
 
 
 class CreatePreRegistrationRequest(BaseModel):
@@ -18,6 +20,29 @@ class PreRegistrationResponse(BaseModel):
     url: str
     generation: str
     is_active: bool
+
+    class Config:
+        orm_mode = True
+
+
+class CreatePreRegistrationUserRequest(BaseModel):
+    name: str = Field(..., max_length=50)
+    email: EmailStr
+    phone_number: str = Field(..., max_length=30)
+    university: str | None = Field(default=None, max_length=50)
+    college: str | None = Field(default=None, max_length=50)
+    department: str | None = Field(default=None, max_length=50)
+
+
+class PreRegistrationUserResponse(BaseModel):
+    id: int
+    pre_registration_id: int
+    name: str
+    email: str
+    phone_number: str
+    university: str | None
+    college: str | None
+    department: str | None
 
     class Config:
         orm_mode = True

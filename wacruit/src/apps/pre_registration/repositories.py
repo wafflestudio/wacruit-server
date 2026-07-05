@@ -5,6 +5,7 @@ from sqlalchemy import true
 from sqlalchemy.orm import Session
 
 from wacruit.src.apps.pre_registration.models import PreRegistration
+from wacruit.src.apps.pre_registration.models import PreRegistrationUser
 from wacruit.src.database.connection import Transaction
 from wacruit.src.database.connection import get_db_session
 
@@ -50,3 +51,29 @@ class PreRegistrationRepository:
             self.session.execute(
                 delete(PreRegistration).where(PreRegistration.id == pre_registration_id)
             )
+
+    def create_pre_registration_user(
+        self, pre_registration_user: PreRegistrationUser
+    ) -> PreRegistrationUser:
+        with self.transaction:
+            self.session.add(pre_registration_user)
+        return pre_registration_user
+
+    def get_pre_registration_users(
+        self,
+        pre_registration_id: int | None,
+        active_only: bool,
+        limit: int,
+        offset: int,
+    ) -> list[PreRegistrationUser]:
+        query = select(PreRegistrationUser).join(PreRegistration)
+        if pre_registration_id is not None:
+            query = query.where(
+                PreRegistrationUser.pre_registration_id == pre_registration_id
+            )
+        if active_only:
+            query = query.where(PreRegistration.is_active == true())
+        query = (
+            query.order_by(PreRegistrationUser.id.desc()).limit(limit).offset(offset)
+        )
+        return list(self.session.execute(query).scalars())
