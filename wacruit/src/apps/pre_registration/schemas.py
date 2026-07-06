@@ -61,3 +61,4 @@ class SendPreRegistrationEmailResponse(BaseModel):
     total_count: int
     queued_count: int
     recipient_limit: int
+    is_truncated: bool

@@ -1,3 +1,4 @@
+import logging
 from typing import Annotated
 
 from fastapi import BackgroundTasks
@@ -22,6 +23,8 @@ from wacruit.src.apps.pre_registration.schemas import PreRegistrationUserRespons
 from wacruit.src.apps.pre_registration.schemas import SendPreRegistrationEmailRequest
 from wacruit.src.apps.pre_registration.schemas import SendPreRegistrationEmailResponse
 from wacruit.src.apps.pre_registration.schemas import UpdatePreRegistrationRequest
+
+logger = logging.getLogger(__name__)
 
 PRE_REGISTRATION_EMAIL_BATCH_LIMIT = 200
 
@@ -155,6 +158,10 @@ class PreRegistrationService:
         request: SendPreRegistrationEmailRequest,
         background_tasks: BackgroundTasks,
     ) -> SendPreRegistrationEmailResponse:
+        total_count = self.pre_registration_repository.count_pre_registration_users(
+            pre_registration_id=request.pre_registration_id,
+            active_only=request.active_only,
+        )
         pre_registration_users = (
             self.pre_registration_repository.get_pre_registration_users(
                 pre_registration_id=request.pre_registration_id,
@@ -176,9 +183,10 @@ class PreRegistrationService:
 
         return SendPreRegistrationEmailResponse(
             status="queued",
-            total_count=len(recipient_emails),
+            total_count=total_count,
             queued_count=len(recipient_emails),
             recipient_limit=PRE_REGISTRATION_EMAIL_BATCH_LIMIT,
+            is_truncated=total_count > len(recipient_emails),
         )
 
     def _send_email_to_recipients(
@@ -196,5 +204,15 @@ class PreRegistrationService:
                     content=content,
                     html_content=html_content,
                 )
-            except (MailConfigException, MailSendFailedException):
+            except MailConfigException:
+                logger.exception(
+                    "Pre-registration email configuration failed for recipient %s",
+                    recipient_email,
+                )
+                break
+            except MailSendFailedException:
+                logger.exception(
+                    "Failed to send pre-registration email to recipient %s",
+                    recipient_email,
+                )
                 continue

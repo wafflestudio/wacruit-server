@@ -1,5 +1,6 @@
 from fastapi import Depends
 from sqlalchemy import delete
+from sqlalchemy import func
 from sqlalchemy import select
 from sqlalchemy import true
 from sqlalchemy.orm import Session
@@ -58,6 +59,22 @@ class PreRegistrationRepository:
         with self.transaction:
             self.session.add(pre_registration_user)
         return pre_registration_user
+
+    def count_pre_registration_users(
+        self,
+        pre_registration_id: int | None,
+        active_only: bool,
+    ) -> int:
+        query = (
+            select(func.count()).select_from(PreRegistrationUser).join(PreRegistration)
+        )
+        if pre_registration_id is not None:
+            query = query.where(
+                PreRegistrationUser.pre_registration_id == pre_registration_id
+            )
+        if active_only:
+            query = query.where(PreRegistration.is_active == true())
+        return int(self.session.execute(query).scalar_one())
 
     def get_pre_registration_users(
         self,

@@ -3,6 +3,7 @@ from typing import List
 import pytest
 from sqlalchemy.orm import Session
 
+from wacruit.src.apps.mail.exceptions import MailConfigException
 from wacruit.src.apps.mail.exceptions import MailSendFailedException
 from wacruit.src.apps.mail.services import EmailService
 from wacruit.src.apps.pre_registration.models import PreRegistration
@@ -17,6 +18,7 @@ class FakeEmailService(EmailService):
     def __init__(self) -> None:
         self.sent_emails: list[tuple[str, str, str, str | None]] = []
         self.failed_emails: set[str] = set()
+        self.config_failed_emails: set[str] = set()
 
     def send_email(
         self,
@@ -25,6 +27,8 @@ class FakeEmailService(EmailService):
         content: str,
         html_content: str | None = None,
     ) -> None:
+        if to_email in self.config_failed_emails:
+            raise MailConfigException()
         if to_email in self.failed_emails:
             raise MailSendFailedException()
         self.sent_emails.append((to_email, subject, content, html_content))

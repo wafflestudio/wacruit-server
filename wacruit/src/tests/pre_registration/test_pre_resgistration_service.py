@@ -1,3 +1,4 @@
+import logging
 from typing import List
 from typing import cast
 
@@ -215,6 +216,15 @@ def test_create_duplicate_pre_registration_user(
     with pytest.raises(PreRegistUserAlreadyExistException):
         pre_registration_service.create_pre_registration_user(request)
 
+    users = pre_registration_service.get_pre_registration_users(
+        pre_registration_id=created_active_pre_registration.id,
+        active_only=False,
+        limit=50,
+        offset=0,
+    )
+
+    assert users == []
+
 
 def test_get_active_pre_registration_users(
     db_session: Session,
@@ -319,6 +329,7 @@ def test_send_email_to_active_pre_registration_users_queues_background_task(
     assert response.total_count == 1
     assert response.queued_count == 1
     assert response.recipient_limit == PRE_REGISTRATION_EMAIL_BATCH_LIMIT
+    assert response.is_truncated is False
     assert fake_email_service.sent_emails == []
     assert len(background_tasks.tasks) == 1
 
@@ -361,12 +372,59 @@ def test_send_email_to_pre_registration_users_applies_recipient_cap(
     )
 
     assert response.status == "queued"
-    assert response.total_count == PRE_REGISTRATION_EMAIL_BATCH_LIMIT
+    assert response.total_count == user_count
     assert response.queued_count == PRE_REGISTRATION_EMAIL_BATCH_LIMIT
     assert response.recipient_limit == PRE_REGISTRATION_EMAIL_BATCH_LIMIT
+    assert response.is_truncated is True
     assert fake_email_service.sent_emails == []
 
     [background_task] = background_tasks.tasks
     background_task.func(*background_task.args, **background_task.kwargs)
 
     assert len(fake_email_service.sent_emails) == PRE_REGISTRATION_EMAIL_BATCH_LIMIT
+
+
+def test_send_email_to_recipients_logs_send_failure_and_continues(
+    pre_registration_service: PreRegistrationService,
+    fake_email_service: FakeEmailService,
+    caplog: pytest.LogCaptureFixture,
+):
+    fake_email_service.failed_emails.add("failed@example.com")
+
+    with caplog.at_level(
+        logging.ERROR, logger="wacruit.src.apps.pre_registration.services"
+    ):
+        pre_registration_service._send_email_to_recipients(
+            recipient_emails=["failed@example.com", "success@example.com"],
+            subject="subject",
+            content="content",
+            html_content=None,
+        )
+
+    assert fake_email_service.sent_emails == [
+        ("success@example.com", "subject", "content", None)
+    ]
+    assert "Failed to send pre-registration email" in caplog.text
+    assert "failed@example.com" in caplog.text
+
+
+def test_send_email_to_recipients_logs_config_failure_and_stops(
+    pre_registration_service: PreRegistrationService,
+    fake_email_service: FakeEmailService,
+    caplog: pytest.LogCaptureFixture,
+):
+    fake_email_service.config_failed_emails.add("config@example.com")
+
+    with caplog.at_level(
+        logging.ERROR, logger="wacruit.src.apps.pre_registration.services"
+    ):
+        pre_registration_service._send_email_to_recipients(
+            recipient_emails=["config@example.com", "skipped@example.com"],
+            subject="subject",
+            content="content",
+            html_content=None,
+        )
+
+    assert fake_email_service.sent_emails == []
+    assert "Pre-registration email configuration failed" in caplog.text
+    assert "config@example.com" in caplog.text
