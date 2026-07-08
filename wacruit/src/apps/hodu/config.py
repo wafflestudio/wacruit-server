@@ -1,3 +1,4 @@
+from fastapi.security import api_key
 from pydantic import BaseSettings
 
 from wacruit.src.secrets import OCISecretManager
@@ -8,7 +9,7 @@ class HoduAPIConfig(BaseSettings):
     url: str = ""
     api_key: str = ""
 
-    class Config(BaseSettings.Config):
+    class Config:
         case_sensitive = False
         env_prefix = "HODU_"
         env_file = settings.env_files

@@ -2,6 +2,7 @@ import pytest
 from sqlalchemy.orm import Session
 
 from wacruit.src.apps.common.security import PasswordService
+import wacruit.src.apps.problem.models  # nopycln: import
 from wacruit.src.apps.user.models import User
 from wacruit.src.apps.user.repositories import UserRepository
 from wacruit.src.apps.user.services import UserService

@@ -1,7 +1,10 @@
 import asyncio
+from decimal import Decimal
+from heapq import merge
 import json
-from typing import AsyncGenerator
-from typing import Literal
+from math import e
+import re
+from typing import AsyncGenerator, Literal, Tuple
 
 from fastapi import BackgroundTasks
 from fastapi import Depends
@@ -29,6 +32,7 @@ from wacruit.src.apps.problem.repositories_v2 import ProblemRepository
 from wacruit.src.apps.problem.schemas_v2 import CodeSubmissionResultResponse
 from wacruit.src.apps.problem.schemas_v2 import CodeSubmitRequest
 from wacruit.src.apps.problem.schemas_v2 import ProblemResponse
+from wacruit.src.apps.problem.schemas_v2 import TokenStr
 from wacruit.src.apps.problem.utils_v2 import memory_handi
 from wacruit.src.apps.problem.utils_v2 import time_handi
 from wacruit.src.apps.recruiting.exceptions import RecruitingClosedException
@@ -229,12 +233,7 @@ class ProblemService(LoggingMixin):
 
             except HTTPStatusError as e:
                 data = json.dumps(
-                    {
-                        "detail": (
-                            "채점 서버에 일시적인 문제가 생겼습니다. "
-                            "잠시 후 다시 시도해주세요."
-                        )
-                    },
+                    {"detail": "채점 서버에 일시적인 문제가 생겼습니다. 잠시 후 다시 시도해주세요."},
                     ensure_ascii=False,
                 )
                 event = "error"

@@ -5,8 +5,8 @@ from sqlalchemy.orm import Session
 from wacruit.src.apps.common.enums import TimelineGroupType
 from wacruit.src.apps.timeline.models import Timeline
 from wacruit.src.apps.timeline.models import TimelineCategory
-from wacruit.src.database.connection import Transaction
 from wacruit.src.database.connection import get_db_session
+from wacruit.src.database.connection import Transaction
 
 
 class TimelineRepository:

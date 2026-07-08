@@ -47,7 +47,7 @@ def update_seminar(
 
 @v3_router.get("/active")
 def get_active_seminar(
-    seminar_service: Annotated[SeminarService, Depends()],
+    seminar_service: Annotated[SeminarService, Depends()]
 ) -> ListResponse:
     seminar_list = seminar_service.get_active_seminar()
 

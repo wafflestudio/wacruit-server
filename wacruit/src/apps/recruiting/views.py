@@ -20,7 +20,7 @@ v1_router = APIRouter(prefix="/v1/recruitings", tags=["recruitings"])
 
 @v1_router.get("")
 def list_recruitings(
-    recruiting_service: Annotated[RecruitingService, Depends()],
+    recruiting_service: Annotated[RecruitingService, Depends()]
 ) -> ListResponse[RecruitingSummaryResponse]:
     return recruiting_service.get_all_recruiting()
 

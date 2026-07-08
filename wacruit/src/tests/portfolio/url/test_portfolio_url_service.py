@@ -62,7 +62,7 @@ def test_list_portfolio_urls(
         url="https://test1.com",
         recruiting_id=recruiting1.id,
     )
-    portfolio_url_service.create_portfolio_url(
+    portfolio2 = portfolio_url_service.create_portfolio_url(
         user_id=user1.id,
         url="https://test2.com",
         recruiting_id=recruiting2.id,

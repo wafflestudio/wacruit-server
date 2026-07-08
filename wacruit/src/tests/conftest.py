@@ -1,7 +1,4 @@
-import os
 from typing import Iterable
-
-os.environ.setdefault("ENV", "test")
 
 from fastapi import FastAPI
 from fastapi.testclient import TestClient

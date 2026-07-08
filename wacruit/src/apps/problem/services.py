@@ -1,8 +1,7 @@
 import asyncio
 from decimal import Decimal
 import json
-from typing import AsyncGenerator
-from typing import Tuple
+from typing import AsyncGenerator, Tuple
 
 from fastapi import Depends
 from fastapi import Request
@@ -200,12 +199,7 @@ class ProblemService(LoggingMixin):
 
             except HTTPStatusError as e:
                 data = json.dumps(
-                    {
-                        "detail": (
-                            "채점 서버에 일시적인 문제가 생겼습니다. "
-                            "잠시 후 다시 시도해주세요."
-                        )
-                    },
+                    {"detail": "채점 서버에 일시적인 문제가 생겼습니다. 잠시 후 다시 시도해주세요."},
                     ensure_ascii=False,
                 )
                 event = "error"

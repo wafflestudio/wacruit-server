@@ -1,7 +1,9 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
 
+from sqlalchemy import Column
 from sqlalchemy import ForeignKey
+from sqlalchemy import Table
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
@@ -11,12 +13,13 @@ from wacruit.src.apps.common.enums import ProjectURLType
 from wacruit.src.database.base import DeclarativeBase
 from wacruit.src.database.base import intpk
 from wacruit.src.database.base import str30
+from wacruit.src.database.base import str50
 from wacruit.src.database.base import str100
 from wacruit.src.database.base import str255
 from wacruit.src.database.base import str1500
 
 if TYPE_CHECKING:
-    pass
+    from wacruit.src.apps.member.models import Member
 
 
 class Project(DeclarativeBase):

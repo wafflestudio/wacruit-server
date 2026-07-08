@@ -1,5 +1,1 @@
-from .views import v3_router
-
-router = v3_router
-
-__all__ = ["router"]
+from .views import v3_router as router

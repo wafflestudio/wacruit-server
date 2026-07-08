@@ -61,7 +61,7 @@ def generate_presigned_url(
     return url
 
 
-def generate_presigned_post_url(  # noqa: PLR0913
+def generate_presigned_post_url(
     s3_client: BaseClient,
     s3_bucket: str,
     s3_object: str,

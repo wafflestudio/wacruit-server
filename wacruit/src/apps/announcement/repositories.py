@@ -6,8 +6,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from wacruit.src.apps.announcement.models import Announcement
-from wacruit.src.database.connection import Transaction
 from wacruit.src.database.connection import get_db_session
+from wacruit.src.database.connection import Transaction
 
 
 class AnnouncementRepository:

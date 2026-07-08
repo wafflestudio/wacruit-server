@@ -9,6 +9,7 @@ from wacruit.src.apps.portfolio.file.exceptions import NumPortfolioLimitExceptio
 from wacruit.src.apps.portfolio.file.exceptions import PortfolioNotFoundException
 from wacruit.src.apps.portfolio.file.schemas import PortfolioFileRequest
 from wacruit.src.apps.portfolio.file.schemas import PortfolioFileResponse
+from wacruit.src.apps.portfolio.file.schemas import PortfolioRequest
 from wacruit.src.apps.portfolio.file.schemas import PresignedUrlResponse
 from wacruit.src.apps.portfolio.file.schemas import PresignedUrlWithIdResponse
 from wacruit.src.apps.portfolio.file.services_v2 import PortfolioFileService

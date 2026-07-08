@@ -2,12 +2,13 @@ from datetime import datetime
 from typing import List
 
 from fastapi import Depends
+from sqlalchemy import delete
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from wacruit.src.apps.history.models import History
-from wacruit.src.database.connection import Transaction
 from wacruit.src.database.connection import get_db_session
+from wacruit.src.database.connection import Transaction
 
 
 class HistoryRepository:

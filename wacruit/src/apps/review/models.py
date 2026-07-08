@@ -8,6 +8,7 @@ from sqlalchemy.orm import relationship
 from wacruit.src.database.base import DeclarativeBase
 from wacruit.src.database.base import intpk
 from wacruit.src.database.base import str30
+from wacruit.src.database.base import str255
 from wacruit.src.database.base import str1500
 
 if TYPE_CHECKING:

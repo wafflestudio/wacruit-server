@@ -1,3 +1,5 @@
+from typing import List
+
 import pytest
 
 from wacruit.src.apps.faq.exceptions import QuestionNotFoundException

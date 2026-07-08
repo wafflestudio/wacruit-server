@@ -9,8 +9,9 @@ from sqlalchemy.orm import Session
 
 from wacruit.src.apps.portfolio.file.exceptions import PortfolioNotFoundException
 from wacruit.src.apps.portfolio.file.models import PortfolioFile
-from wacruit.src.database.connection import Transaction
+from wacruit.src.database.base import intpk
 from wacruit.src.database.connection import get_db_session
+from wacruit.src.database.connection import Transaction
 
 
 class PortfolioFileRepository:
@@ -29,7 +30,7 @@ class PortfolioFileRepository:
         query = select(PortfolioFile).where(
             (PortfolioFile.user_id == user_id)
             & (PortfolioFile.recruiting_id == recruiting_id)
-            & PortfolioFile.is_uploaded
+            & (PortfolioFile.is_uploaded == True)
         )
         return self.session.execute(query).scalars().all()
 

@@ -1,4 +1,5 @@
 from datetime import timedelta
+from typing import Iterable
 
 from fastapi import Depends
 from httpx import AsyncClient
@@ -8,14 +9,13 @@ from tenacity import retry
 from tenacity.stop import stop_after_attempt
 from tenacity.wait import wait_fixed
 
+from wacruit.src.apps.hodu.schemas import HoduSubmitError
 from wacruit.src.apps.hodu.schemas import HoduSubmitErrorResponse
 from wacruit.src.apps.hodu.schemas import HoduSubmitRequest
 from wacruit.src.apps.hodu.schemas import HoduSubmitResponse
 from wacruit.src.utils.mixins import LoggingMixin
 
 from .connections import get_hodu_api_client
-
-HTTP_CLIENT_ERROR_STATUS_CODE = 400
 
 
 class HoduApiRepository(LoggingMixin):
@@ -37,7 +37,7 @@ class HoduApiRepository(LoggingMixin):
         self, response: Response
     ) -> HoduSubmitResponse | HoduSubmitErrorResponse:
         try:
-            if response.status_code >= HTTP_CLIENT_ERROR_STATUS_CODE:
+            if response.status_code >= 400:
                 self.logger.error(
                     "HODU API ERROR for sending %s / status code: %d / response: %s",
                     response.url,

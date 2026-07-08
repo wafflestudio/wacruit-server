@@ -18,9 +18,6 @@ if TYPE_CHECKING:
     from wacruit.src.apps.user.models import User
 
 
-PREVIEW_LENGTH = 10
-
-
 class ResumeQuestion(DeclarativeBase):
     __tablename__ = "resume_question"
 
@@ -50,8 +47,8 @@ class ResumeQuestion(DeclarativeBase):
             f"recruiting_id={self.recruiting_id}, "
             f"num={self.question_num}, "
             f"limit={self.content_limit}, "
-            f"content={self.content[:PREVIEW_LENGTH]}"
-            f"{'...' if len(self.content) > PREVIEW_LENGTH else ''}>"
+            f"content={self.content[:10]}"
+            f"{'...' if len(self.content) > 10 else ''}>"
         )
 
 
@@ -89,6 +86,6 @@ class ResumeSubmission(DeclarativeBase):
             f"user_id={self.user_id}, "
             f"recruiting_id={self.recruiting_id}, "
             f"question_id={self.question_id}"
-            f"answer={self.answer[:PREVIEW_LENGTH]}"
-            f"{'...' if len(self.answer) > PREVIEW_LENGTH else ''}>"
+            f"answer={self.answer[:10]}"
+            f"{'...' if len(self.answer) > 10 else ''}>"
         )

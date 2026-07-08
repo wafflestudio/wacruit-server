@@ -14,6 +14,7 @@ from wacruit.src.database.base import str50
 from wacruit.src.database.base import str255
 
 if TYPE_CHECKING:
+    from wacruit.src.apps.project.models import Project
     from wacruit.src.apps.review.models import Review
 
 

@@ -1,10 +1,10 @@
-from typing import Iterable
+from typing import Iterable, Sequence
 
 from fastapi import Depends
 from sqlalchemy import select
-from sqlalchemy.orm import Session
 from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import Session
 
 from wacruit.src.apps.common.enums import CodeSubmissionStatus
 from wacruit.src.apps.common.enums import Language
@@ -12,8 +12,8 @@ from wacruit.src.apps.problem.models import CodeSubmission
 from wacruit.src.apps.problem.models import CodeSubmissionResult
 from wacruit.src.apps.problem.models import Problem
 from wacruit.src.apps.problem.models import Testcase
-from wacruit.src.database.connection import Transaction
 from wacruit.src.database.connection import get_db_session
+from wacruit.src.database.connection import Transaction
 
 
 class ProblemRepository:
@@ -39,7 +39,7 @@ class ProblemRepository:
         )
         return self.session.execute(query).scalar()
 
-    def create_submission(  # noqa: PLR0913
+    def create_submission(
         self,
         user_id: int,
         problem_id: int,

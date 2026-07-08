@@ -6,8 +6,8 @@ from sqlalchemy import Boolean
 from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
 from sqlalchemy import Numeric
-from sqlalchemy import Text
 from sqlalchemy import text
+from sqlalchemy import Text
 from sqlalchemy.dialects.mysql import MEDIUMTEXT
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column

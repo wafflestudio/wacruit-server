@@ -12,6 +12,7 @@ from wacruit.src.apps.timeline.schemas import TimelineCategoryCreateUpdateReques
 from wacruit.src.apps.timeline.schemas import TimelineCreateRequest
 from wacruit.src.apps.timeline.schemas import TimelineUpdateRequest
 from wacruit.src.apps.timeline.services import TimelineService
+from wacruit.src.apps.user.models import User
 from wacruit.src.database.connection import Transaction
 
 
