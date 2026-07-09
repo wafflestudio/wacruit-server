@@ -9,18 +9,9 @@ class Language(Enum):
     PYTHON = 92  # 3.11.2
     KOTLIN = 78  # 1.3.70
     SWIFT = 83  # 5.2.3
-    # C = 100
-    # CPP = 101
-    # JAVA = 102
-    # JAVASCRIPT = 103
-    # PYTHON = 104
-    # RUBY = 105
-    # GO = 106
-    # TYPESCRIPT = 107
-    # KOTLIN = 108
-    # SCALA = 109
-    # SQL = 110
-    # SWIFT = 111
+    GO = 106
+    TYPESCRIPT = 107
+    RUST = 112
 
 
 class JudgeSubmissionStatus(Enum):

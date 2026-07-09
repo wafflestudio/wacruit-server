@@ -1,4 +1,3 @@
-from fastapi.security import api_key
 from pydantic import BaseSettings
 
 from wacruit.src.secrets import OCISecretManager
