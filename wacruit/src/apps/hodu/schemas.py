@@ -1,9 +1,5 @@
 from enum import StrEnum
-from subprocess import STDOUT
-from typing import Self
-from xmlrpc.client import INTERNAL_ERROR
 
-from MySQLdb import TIME
 from pydantic import BaseModel
 from pydantic import Field
 
@@ -13,31 +9,30 @@ from wacruit.src.apps.common.enums import Language
 
 class HoduLanguage(StrEnum):
     C = "c"
-    CPP = "c++"
+    CPP = "cpp"
+    GO = "go"
     JAVA = "java"
-    JAVASCRIPT = "javascript"
+    KOTLIN = "kotlin"
+    NODE = "node"
     PYTHON = "python"
-    # KOTLIN = "kotlin"
-    # SWIFT = "swift"
+    RUST = "rust"
+    TYPESCRIPT = "typescript"
 
     def to_language(self) -> Language:
-        match self:
-            case HoduLanguage.C:
-                return Language.C
-            case HoduLanguage.CPP:
-                return Language.CPP
-            case HoduLanguage.JAVA:
-                return Language.JAVA
-            case HoduLanguage.JAVASCRIPT:
-                return Language.JAVASCRIPT
-            case HoduLanguage.PYTHON:
-                return Language.PYTHON
-            # case HoduLanguage.KOTLIN:
-            #     return Language.KOTLIN
-            # case HoduLanguage.SWIFT:
-            #     return Language.SWIFT
-            case _:
-                raise ValueError(f"Invalid HoduLanguage: {self}")
+        mapping = {
+            HoduLanguage.C: Language.C,
+            HoduLanguage.CPP: Language.CPP,
+            HoduLanguage.GO: Language.GO,
+            HoduLanguage.JAVA: Language.JAVA,
+            HoduLanguage.KOTLIN: Language.KOTLIN,
+            HoduLanguage.NODE: Language.JAVASCRIPT,
+            HoduLanguage.PYTHON: Language.PYTHON,
+            HoduLanguage.RUST: Language.RUST,
+            HoduLanguage.TYPESCRIPT: Language.TYPESCRIPT,
+        }
+        if self in mapping:
+            return mapping[self]
+        raise ValueError(f"Invalid HoduLanguage: {self}")
 
 
 class HoduField(StrEnum):
@@ -59,52 +54,54 @@ class HoduSubmitRequest(BaseModel):
 
 
 class HoduSubmitStatus(StrEnum):
-    CORRECT = "CORRECT"
-    WRONG = "WRONG"
-    COMPILE_ERROR = "COMPILE_ERROR"
-    RUNTIME_ERROR = "RUNTIME_ERROR"
-    TIME_LIMIT_EXCEEDED = "TIME_LIMIT_EXCEEDED"
-    MEMORY_LIMIT_EXCEEDED = "MEMORY_LIMIT_EXCEEDED"
-    INTERNAL_ERROR = "INTERNAL_ERROR"
+    CORRECT = "Accepted"
+    WRONG = "WrongAnswer"
+    COMPILE_ERROR = "CompileError"
+    RUNTIME_ERROR = "RuntimeError"
+    TIME_LIMIT_EXCEEDED = "TimeLimitExceeded"
+    MEMORY_LIMIT_EXCEEDED = "MemoryLimitExceeded"
+    INTERNAL_ERROR = "InternalError"
 
     def to_submission_result_status(self) -> CodeSubmissionResultStatus:
-        match self:
-            case HoduSubmitStatus.CORRECT:
-                return CodeSubmissionResultStatus.CORRECT
-            case HoduSubmitStatus.WRONG:
-                return CodeSubmissionResultStatus.WRONG
-            case HoduSubmitStatus.COMPILE_ERROR:
-                return CodeSubmissionResultStatus.COMPILE_ERROR
-            case HoduSubmitStatus.RUNTIME_ERROR:
-                return CodeSubmissionResultStatus.RUNTIME_ERROR
-            case HoduSubmitStatus.TIME_LIMIT_EXCEEDED:
-                return CodeSubmissionResultStatus.TIME_LIMIT_EXCEEDED
-            case HoduSubmitStatus.MEMORY_LIMIT_EXCEEDED:
-                return CodeSubmissionResultStatus.MEMORY_LIMIT_EXCEEDED
-            case HoduSubmitStatus.INTERNAL_ERROR:
-                return CodeSubmissionResultStatus.INTERNAL_SERVER_ERROR
+        mapping = {
+            HoduSubmitStatus.CORRECT: CodeSubmissionResultStatus.CORRECT,
+            HoduSubmitStatus.WRONG: CodeSubmissionResultStatus.WRONG,
+            HoduSubmitStatus.COMPILE_ERROR: CodeSubmissionResultStatus.COMPILE_ERROR,
+            HoduSubmitStatus.RUNTIME_ERROR: CodeSubmissionResultStatus.RUNTIME_ERROR,
+            HoduSubmitStatus.TIME_LIMIT_EXCEEDED: (
+                CodeSubmissionResultStatus.TIME_LIMIT_EXCEEDED
+            ),
+            HoduSubmitStatus.MEMORY_LIMIT_EXCEEDED: (
+                CodeSubmissionResultStatus.MEMORY_LIMIT_EXCEEDED
+            ),
+            HoduSubmitStatus.INTERNAL_ERROR: (
+                CodeSubmissionResultStatus.INTERNAL_SERVER_ERROR
+            ),
+        }
+        return mapping[self]
 
     @staticmethod
     def from_submission_result_status(
         status: CodeSubmissionResultStatus,
     ) -> "HoduSubmitStatus":
-        match status:
-            case CodeSubmissionResultStatus.CORRECT:
-                return HoduSubmitStatus.CORRECT
-            case CodeSubmissionResultStatus.WRONG:
-                return HoduSubmitStatus.WRONG
-            case CodeSubmissionResultStatus.COMPILE_ERROR:
-                return HoduSubmitStatus.COMPILE_ERROR
-            case CodeSubmissionResultStatus.RUNTIME_ERROR:
-                return HoduSubmitStatus.RUNTIME_ERROR
-            case CodeSubmissionResultStatus.TIME_LIMIT_EXCEEDED:
-                return HoduSubmitStatus.TIME_LIMIT_EXCEEDED
-            case CodeSubmissionResultStatus.MEMORY_LIMIT_EXCEEDED:
-                return HoduSubmitStatus.MEMORY_LIMIT_EXCEEDED
-            case CodeSubmissionResultStatus.INTERNAL_SERVER_ERROR:
-                return HoduSubmitStatus.INTERNAL_ERROR
-            case _:
-                raise ValueError(f"Invalid CodeSubmissionResultStatus: {status}")
+        mapping = {
+            CodeSubmissionResultStatus.CORRECT: HoduSubmitStatus.CORRECT,
+            CodeSubmissionResultStatus.WRONG: HoduSubmitStatus.WRONG,
+            CodeSubmissionResultStatus.COMPILE_ERROR: HoduSubmitStatus.COMPILE_ERROR,
+            CodeSubmissionResultStatus.RUNTIME_ERROR: HoduSubmitStatus.RUNTIME_ERROR,
+            CodeSubmissionResultStatus.TIME_LIMIT_EXCEEDED: (
+                HoduSubmitStatus.TIME_LIMIT_EXCEEDED
+            ),
+            CodeSubmissionResultStatus.MEMORY_LIMIT_EXCEEDED: (
+                HoduSubmitStatus.MEMORY_LIMIT_EXCEEDED
+            ),
+            CodeSubmissionResultStatus.INTERNAL_SERVER_ERROR: (
+                HoduSubmitStatus.INTERNAL_ERROR
+            ),
+        }
+        if status in mapping:
+            return mapping[status]
+        raise ValueError(f"Invalid CodeSubmissionResultStatus: {status}")
 
 
 class HoduSubmitExtraFields(BaseModel):
@@ -119,10 +116,5 @@ class HoduSubmitResponse(BaseModel):
     fields: HoduSubmitExtraFields
 
 
-class HoduSubmitError(StrEnum):
-    PAYLOAD_PARSE_ERROR = "PAYLOAD_PARSE_ERROR"
-    HODU_CORE_ERROR = "HODU_CORE_ERROR"
-
-
 class HoduSubmitErrorResponse(BaseModel):
-    detail: HoduSubmitError
+    detail: str

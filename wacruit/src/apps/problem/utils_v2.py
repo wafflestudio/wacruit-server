@@ -1,5 +1,3 @@
-from decimal import Decimal
-
 from pydantic import BaseModel
 
 from wacruit.src.apps.hodu.schemas import HoduLanguage
@@ -32,15 +30,23 @@ handi_map = {
         time=Factor(multiply=2, increment=1),
         memory=Factor(multiply=2, increment=10500 + 16000),
     ),
-    # HoduLanguage.KOTLIN: Handi(
-    #     time=Factor(multiply=2, increment=1),
-    #     memory=Factor(multiply=2, increment=10500 + 16000),
-    # ),
-    # HoduLanguage.SWIFT: Handi(
-    #     time=Factor(multiply=2, increment=1),
-    #     memory=Factor(multiply=2, increment=10500 + 16000),
-    # ),
-    HoduLanguage.JAVASCRIPT: Handi(
+    HoduLanguage.KOTLIN: Handi(
+        time=Factor(multiply=2, increment=1),
+        memory=Factor(multiply=2, increment=10500 + 16000),
+    ),
+    HoduLanguage.NODE: Handi(
+        time=Factor(multiply=3, increment=2),
+        memory=Factor(multiply=2, increment=8000 + 2000),
+    ),
+    HoduLanguage.GO: Handi(
+        time=Factor(multiply=1, increment=0),
+        memory=Factor(multiply=1, increment=2500 + 0),
+    ),
+    HoduLanguage.RUST: Handi(
+        time=Factor(multiply=1, increment=0),
+        memory=Factor(multiply=1, increment=1500 + 0),
+    ),
+    HoduLanguage.TYPESCRIPT: Handi(
         time=Factor(multiply=3, increment=2),
         memory=Factor(multiply=2, increment=8000 + 2000),
     ),
