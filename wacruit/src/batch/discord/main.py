@@ -1,28 +1,16 @@
 import httpx
 from loguru import logger
 
+from wacruit.src.apps.member.config import discord_config
 from wacruit.src.apps.member.models import DiscordMember
 from wacruit.src.database.connection import DBSessionFactory
-from wacruit.src.secrets import OCISecretManager
-from wacruit.src.settings import settings
 
 MAX_THRESHOLD = 1000
 
 
 def fetch_discord_members() -> list[dict]:
-    secret_manager = OCISecretManager()
-    if secret_manager.is_available():
-        try:
-            discord_bot_token = secret_manager.get_secret("discord_bot_token")
-        except Exception:
-            discord_bot_token = settings.discord_bot_token
-        try:
-            discord_guild_id = secret_manager.get_secret("discord_guild_id")
-        except Exception:
-            discord_guild_id = settings.discord_guild_id
-    else:
-        discord_bot_token = settings.discord_bot_token
-        discord_guild_id = settings.discord_guild_id
+    discord_bot_token = discord_config.discord_bot_token
+    discord_guild_id = discord_config.discord_guild_id
 
     if not discord_bot_token or not discord_guild_id:
         logger.error(

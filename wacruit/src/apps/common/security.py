@@ -27,16 +27,10 @@ def get_token_secret() -> str:
 def verify_internal_bot(
     credentials: HTTPAuthorizationCredentials = Depends(security),
 ) -> str:
-    secret_manager = OCISecretManager()
-    if secret_manager.is_available():
-        try:
-            bot_token = secret_manager.get_secret("bot_token")
-        except Exception:
-            bot_token = settings.bot_token
-    else:
-        bot_token = settings.bot_token
+    # circular import
+    from wacruit.src.apps.member.config import discord_config  # noqa
 
-    if credentials.credentials != bot_token:
+    if credentials.credentials != discord_config.bot_token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid bot token",
