@@ -2,9 +2,16 @@ from functools import cache
 
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
+from fastapi import Depends
+from fastapi import HTTPException
+from fastapi import status
+from fastapi.security import HTTPAuthorizationCredentials
+from fastapi.security import HTTPBearer
 
 from wacruit.src.secrets import OCISecretManager
 from wacruit.src.settings import settings
+
+security = HTTPBearer(scheme_name="bot_token", description="Bot Token")
 
 
 @cache
@@ -15,6 +22,26 @@ def get_token_secret() -> str:
     else:
         secret_token = settings.TOKEN_SECRET
     return secret_token
+
+
+def verify_internal_bot(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+) -> str:
+    secret_manager = OCISecretManager()
+    if secret_manager.is_available():
+        try:
+            bot_token = secret_manager.get_secret("bot_token")
+        except Exception:
+            bot_token = settings.bot_token
+    else:
+        bot_token = settings.bot_token
+
+    if credentials.credentials != bot_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid bot token",
+        )
+    return credentials.credentials
 
 
 class PasswordService:
