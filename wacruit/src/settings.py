@@ -11,6 +11,9 @@ class Settings(BaseSettings):
     oci_region: str = "ap-chuncheon-1"
     sql_echo: bool = False
     TOKEN_SECRET: str = "secret"
+    bot_token: str = "token"
+    discord_bot_token: str = ""
+    discord_guild_id: str = ""
 
     @property
     def oci_secret_ocid(self) -> str | None:
