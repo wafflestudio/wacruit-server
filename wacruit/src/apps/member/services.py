@@ -7,6 +7,7 @@ from wacruit.src.apps.member.exceptions import MemberAlreadyExistsException
 from wacruit.src.apps.member.exceptions import MemberNotFoundException
 from wacruit.src.apps.member.models import Member
 from wacruit.src.apps.member.repositories import MemberRepository
+from wacruit.src.apps.member.schemas import DiscordMemberInfoResponse
 from wacruit.src.apps.member.schemas import MemberBriefResponse
 from wacruit.src.apps.member.schemas import MemberCreateRequest
 from wacruit.src.apps.member.schemas import MemberInfoResponse
@@ -82,3 +83,10 @@ class MemberService:
             raise MemberAlreadyExistsException() from exc
 
         return MemberInfoResponse.from_orm(member)
+
+    def get_discord_member_info(self) -> ListResponse[DiscordMemberInfoResponse]:
+        members = self.member_repository.get_discord_member_info()
+
+        return ListResponse(
+            items=[DiscordMemberInfoResponse.from_orm(member) for member in members]
+        )
