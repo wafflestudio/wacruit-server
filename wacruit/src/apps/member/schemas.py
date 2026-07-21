@@ -50,3 +50,10 @@ class MemberUpdateRequest(BaseModel):
     is_active: bool | None = None
     generation: str | None = None
     position: Position | None = None
+
+
+class DiscordMemberInfoResponse(OrmModel):
+    name: str
+    discord_id: str
+    slack_user_id: str | None = None
+    github_username: str | None = None

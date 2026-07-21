@@ -2,20 +2,23 @@ from http import HTTPStatus
 from typing import Annotated
 
 from fastapi import APIRouter
+from fastapi import BackgroundTasks
 from fastapi import Depends
 from fastapi import Query
-from fastapi import Response
 from fastapi import Security
 from fastapi.security import APIKeyHeader
 
 from wacruit.src.apps.common.enums import Position
 from wacruit.src.apps.common.schemas import ListResponse
+from wacruit.src.apps.common.security import verify_internal_bot
+from wacruit.src.apps.member.schemas import DiscordMemberInfoResponse
 from wacruit.src.apps.member.schemas import MemberBriefResponse
 from wacruit.src.apps.member.schemas import MemberCreateRequest
 from wacruit.src.apps.member.schemas import MemberInfoResponse
 from wacruit.src.apps.member.schemas import MemberUpdateRequest
 from wacruit.src.apps.member.services import MemberService
 from wacruit.src.apps.user.dependencies import AdminUser
+from wacruit.src.batch.discord.main import sync_discord_members
 
 v3_router = APIRouter(prefix="/v3/members", tags=["members"])
 
@@ -27,6 +30,23 @@ def create_member(
     member_service: Annotated[MemberService, Depends()],
 ):
     member_service.create_member(request)
+
+
+@v3_router.get("/discord")
+def get_discord_members(
+    member_service: Annotated[MemberService, Depends()],
+    bot_token: Annotated[str, Depends(verify_internal_bot)],
+) -> ListResponse[DiscordMemberInfoResponse]:
+    return member_service.get_discord_member_info()
+
+
+@v3_router.post("/discord/sync")
+def trigger_discord_sync(
+    background_tasks: BackgroundTasks,
+    bot_token: Annotated[str, Depends(verify_internal_bot)],
+):
+    background_tasks.add_task(sync_discord_members)
+    return {"message": "Discord member sync triggered in the background"}
 
 
 @v3_router.get("/{member_id}")

@@ -14,7 +14,6 @@ from wacruit.src.database.base import str50
 from wacruit.src.database.base import str255
 
 if TYPE_CHECKING:
-    from wacruit.src.apps.project.models import Project
     from wacruit.src.apps.review.models import Review
 
 
@@ -35,3 +34,13 @@ class Member(DeclarativeBase):
     position: Mapped[Position | None] = mapped_column(default=None)
 
     review: Mapped["Review"] = relationship(back_populates="member")
+
+
+class DiscordMember(DeclarativeBase):
+    __tablename__ = "discord_member"
+
+    id: Mapped[intpk]
+    name: Mapped[str30]
+    discord_id: Mapped[str255]
+    slack_user_id: Mapped[str255 | None]
+    github_username: Mapped[str255 | None]

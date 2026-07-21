@@ -6,6 +6,7 @@ from sqlalchemy import null
 from sqlalchemy.orm import Session
 
 from wacruit.src.apps.common.enums import Position
+from wacruit.src.apps.member.models import DiscordMember
 from wacruit.src.apps.member.models import Member
 from wacruit.src.database.connection import Transaction
 from wacruit.src.database.connection import get_db_session
@@ -65,3 +66,6 @@ class MemberRepository:
         with self.transaction:
             self.session.merge(member)
         return member
+
+    def get_discord_member_info(self) -> list[DiscordMember]:
+        return self.session.query(DiscordMember).all()
