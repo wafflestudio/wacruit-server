@@ -43,11 +43,9 @@ class RecruitingRepository:
 
     def get_rookie_applicant_count(self, recruiting_id: int) -> int:
         query = (
-            select(func.count(CodeSubmission.user_id.distinct()))
-            .select_from(Recruiting)
-            .outerjoin(Problem, Problem.recruiting_id == Recruiting.id)
-            .outerjoin(CodeSubmission, CodeSubmission.problem_id == Problem.id)
-            .where(Recruiting.id == recruiting_id)
+            select(func.count(RecruitingApplication.id))
+            .select_from(RecruitingApplication)
+            .where(RecruitingApplication.recruiting_id == recruiting_id)
         )
         return self.session.execute(query).scalar_one()
 
@@ -410,4 +408,5 @@ class RecruitingRepository:
         )
 
         result = self.session.execute(stmt).mappings().all()
-        return result
+        applicant_count = self.get_rookie_applicant_count(recruiting_id)
+        return result, applicant_count

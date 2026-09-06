@@ -163,3 +163,4 @@ class RecruitingSubmissionResponse(OrmModel):
 
 class RecruitingSubmissionListResponse(OrmModel):
     items: List[RecruitingSubmissionResponse]
+    applicant_count: int
