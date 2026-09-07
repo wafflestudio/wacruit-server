@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from wacruit.src.apps.mail.exceptions import MailConfigException
 from wacruit.src.apps.mail.exceptions import MailSendFailedException
+from wacruit.src.apps.mail.schemas import EmailAttachment
 from wacruit.src.apps.mail.services import EmailService
 from wacruit.src.apps.pre_registration.models import PreRegistration
 from wacruit.src.apps.pre_registration.repositories import PreRegistrationRepository
@@ -17,6 +18,7 @@ from wacruit.src.database.connection import Transaction
 class FakeEmailService(EmailService):
     def __init__(self) -> None:
         self.sent_emails: list[tuple[str, str, str, str | None]] = []
+        self.sent_attachments: list[list[EmailAttachment] | None] = []
         self.failed_emails: set[str] = set()
         self.config_failed_emails: set[str] = set()
 
@@ -26,12 +28,14 @@ class FakeEmailService(EmailService):
         subject: str,
         content: str,
         html_content: str | None = None,
+        attachments: list[EmailAttachment] | None = None,
     ) -> None:
         if to_email in self.config_failed_emails:
             raise MailConfigException()
         if to_email in self.failed_emails:
             raise MailSendFailedException()
         self.sent_emails.append((to_email, subject, content, html_content))
+        self.sent_attachments.append(attachments)
 
 
 @pytest.fixture
