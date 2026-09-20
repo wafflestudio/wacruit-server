@@ -283,10 +283,14 @@ class RecruitingService:
     def get_recruiting_submissions(
         self, recruiting_id: int, limit: int, offset: int
     ) -> RecruitingSubmissionListResponse:
-        raw_submissions = self.recruiting_repository.get_submissions_by_recruiting_id(
-            recruiting_id, limit, offset
+        raw_submissions, applicant_count = (
+            self.recruiting_repository.get_submissions_by_recruiting_id(
+                recruiting_id, limit, offset
+            )
         )
 
         parsed_items = [RecruitingSubmissionResponse(**row) for row in raw_submissions]
 
-        return RecruitingSubmissionListResponse(items=parsed_items)
+        return RecruitingSubmissionListResponse(
+            items=parsed_items, applicant_count=applicant_count
+        )
