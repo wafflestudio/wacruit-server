@@ -83,8 +83,8 @@ def test_email_api_preserves_images_and_bodies_for_each_recipient(email_api):
         assert message["Subject"] == "이미지 첨부 테스트"
         plain_body = message.get_body(preferencelist=("plain",))
         html_body = message.get_body(preferencelist=("html",))
-        assert plain_body is not None
-        assert html_body is not None
+        assert isinstance(plain_body, EmailMessage)
+        assert isinstance(html_body, EmailMessage)
         assert plain_body.get_content().strip() == "텍스트 본문"
         assert html_body.get_content().strip() == "<p>HTML 본문</p>"
         attachments = list(message.iter_attachments())
