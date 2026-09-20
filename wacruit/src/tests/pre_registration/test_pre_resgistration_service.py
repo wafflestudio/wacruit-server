@@ -1,3 +1,4 @@
+import base64
 import logging
 from typing import List
 from typing import cast
@@ -17,6 +18,7 @@ from wacruit.src.apps.pre_registration.exceptions import (
 from wacruit.src.apps.pre_registration.models import PreRegistration
 from wacruit.src.apps.pre_registration.models import PreRegistrationUser
 from wacruit.src.apps.pre_registration.schemas import CreatePreRegistrationUserRequest
+from wacruit.src.apps.pre_registration.schemas import EmailImageAttachmentRequest
 from wacruit.src.apps.pre_registration.schemas import PreRegistrationResponse
 from wacruit.src.apps.pre_registration.schemas import SendPreRegistrationEmailRequest
 from wacruit.src.apps.pre_registration.schemas import UpdatePreRegistrationRequest
@@ -321,6 +323,15 @@ def test_send_email_to_active_pre_registration_users_queues_background_task(
             subject="subject",
             content="content",
             html_content="<p>content</p>",
+            attachments=[
+                EmailImageAttachmentRequest(
+                    file_name="poster.png",
+                    content_type="image/png",
+                    content_base64=base64.b64encode(
+                        b"\x89PNG\r\n\x1a\nimage-data"
+                    ).decode(),
+                )
+            ],
         ),
         background_tasks,
     )
@@ -339,6 +350,10 @@ def test_send_email_to_active_pre_registration_users_queues_background_task(
     assert fake_email_service.sent_emails == [
         ("active@example.com", "subject", "content", "<p>content</p>")
     ]
+    [sent_attachments] = fake_email_service.sent_attachments
+    assert sent_attachments is not None
+    assert sent_attachments[0].file_name == "poster.png"
+    assert sent_attachments[0].content == b"\x89PNG\r\n\x1a\nimage-data"
 
 
 def test_send_email_to_pre_registration_users_applies_recipient_cap(
