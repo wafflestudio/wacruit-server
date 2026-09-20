@@ -30,6 +30,7 @@ db.sqlite3
 .env
 .env.local
 .venv
+.tools/
 .codex
 
 # VScode
