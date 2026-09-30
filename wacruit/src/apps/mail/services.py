@@ -1,4 +1,8 @@
+from email.message import EmailMessage
+from email.policy import SMTP
+from email.utils import formataddr
 from html import escape
+from io import BytesIO
 from typing import Optional
 import uuid
 
@@ -15,7 +19,10 @@ from oci.exceptions import ServiceError
 from wacruit.src.apps.mail.config import mail_config
 from wacruit.src.apps.mail.exceptions import MailConfigException
 from wacruit.src.apps.mail.exceptions import MailSendFailedException
+from wacruit.src.apps.mail.schemas import EmailAttachment
 from wacruit.src.settings import settings
+
+MAX_RAW_EMAIL_SIZE_BYTES = 2 * 1024 * 1024
 
 
 class EmailService:
@@ -47,6 +54,7 @@ class EmailService:
         subject: str,
         content: str,
         html_content: str | None = None,
+        attachments: list[EmailAttachment] | None = None,
     ) -> None:
         if not mail_config.compartment_id or not mail_config.from_email:
             raise MailConfigException()
@@ -58,6 +66,16 @@ class EmailService:
             sender_address.name = mail_config.from_name
 
         try:
+            if attachments:
+                self._submit_email_with_attachments(
+                    to_email=to_email,
+                    subject=subject,
+                    content=content,
+                    html_content=html_content,
+                    attachments=attachments,
+                )
+                return
+
             self._get_client().submit_email(
                 SubmitEmailDetails(
                     message_id=self._generate_message_id(),
@@ -84,6 +102,52 @@ class EmailService:
             ValueError,
         ) as exc:
             raise MailSendFailedException() from exc
+
+    def _submit_email_with_attachments(
+        self,
+        to_email: str,
+        subject: str,
+        content: str,
+        html_content: str | None,
+        attachments: list[EmailAttachment],
+    ) -> None:
+        message = EmailMessage()
+        message["Message-ID"] = f"<{self._generate_message_id()}>"
+        message["From"] = (
+            formataddr((mail_config.from_name, mail_config.from_email))
+            if mail_config.from_name
+            else mail_config.from_email
+        )
+        message["To"] = to_email
+        message["Subject"] = subject
+        if mail_config.reply_to:
+            message["Reply-To"] = mail_config.reply_to
+
+        message.set_content(content)
+        if html_content is not None:
+            message.add_alternative(html_content, subtype="html")
+
+        for attachment in attachments:
+            _, subtype = attachment.content_type.split("/", maxsplit=1)
+            message.add_attachment(
+                attachment.content,
+                maintype="image",
+                subtype=subtype,
+                filename=attachment.file_name,
+            )
+
+        raw_message = message.as_bytes(policy=SMTP)
+        if len(raw_message) > MAX_RAW_EMAIL_SIZE_BYTES:
+            raise ValueError("메일 본문과 첨부파일의 전체 크기는 2MB 이하여야 합니다.")
+
+        self._get_client().submit_raw_email(
+            content_type="message/rfc822",
+            compartment_id=mail_config.compartment_id,
+            sender=mail_config.from_email,
+            recipients=[to_email],
+            raw_message=BytesIO(raw_message),
+            content_length=len(raw_message),
+        )
 
     def _get_client(self) -> EmailDPClient:
         if self._client is not None:

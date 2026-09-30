@@ -7,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 
 from wacruit.src.apps.mail.exceptions import MailConfigException
 from wacruit.src.apps.mail.exceptions import MailSendFailedException
+from wacruit.src.apps.mail.schemas import EmailAttachment
 from wacruit.src.apps.mail.services import EmailService
 from wacruit.src.apps.pre_registration.exceptions import PreRegistAlreadyExistException
 from wacruit.src.apps.pre_registration.exceptions import PreRegistNotActiveException
@@ -179,6 +180,10 @@ class PreRegistrationService:
                 request.subject,
                 request.content,
                 request.html_content,
+                [
+                    attachment.to_email_attachment()
+                    for attachment in request.attachments
+                ],
             )
 
         return SendPreRegistrationEmailResponse(
@@ -195,6 +200,7 @@ class PreRegistrationService:
         subject: str,
         content: str,
         html_content: str | None,
+        attachments: list[EmailAttachment] | None = None,
     ) -> None:
         for recipient_email in recipient_emails:
             try:
@@ -203,6 +209,7 @@ class PreRegistrationService:
                     subject=subject,
                     content=content,
                     html_content=html_content,
+                    attachments=attachments,
                 )
             except MailConfigException:
                 logger.exception(

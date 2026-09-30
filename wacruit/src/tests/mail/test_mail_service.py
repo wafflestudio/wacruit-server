@@ -1,7 +1,15 @@
+from email import policy
+from email.message import EmailMessage
+from email.parser import BytesParser
+from typing import cast
+
 import pytest
 
+from wacruit.src.apps.mail import services as mail_services
 from wacruit.src.apps.mail.config import mail_config
 from wacruit.src.apps.mail.exceptions import MailConfigException
+from wacruit.src.apps.mail.exceptions import MailSendFailedException
+from wacruit.src.apps.mail.schemas import EmailAttachment
 from wacruit.src.apps.mail.services import EmailService
 
 
@@ -11,6 +19,9 @@ class FakeEmailClient:
 
     def submit_email(self, submit_email_details):
         self.submitted.append(submit_email_details)
+
+    def submit_raw_email(self, **kwargs):
+        self.submitted.append(kwargs)
 
 
 @pytest.fixture(autouse=True)
@@ -111,3 +122,76 @@ def test_send_password_reset_code_submits_text_and_html_body(monkeypatch):
     assert "인증번호는 5분 동안 유효합니다." in details.body_text
     assert "<strong>인증번호: 123456</strong>" in details.body_html
     assert "<p>인증번호는 5분 동안 유효합니다.</p>" in details.body_html
+
+
+def test_send_email_submits_mime_payload_with_image_attachment(monkeypatch):
+    fake_client = FakeEmailClient()
+    monkeypatch.setattr(mail_config, "compartment_id", "ocid1.compartment.oc1..test")
+    monkeypatch.setattr(mail_config, "from_email", "no-reply@example.com")
+    monkeypatch.setattr(mail_config, "from_name", "Waffle Studio")
+    monkeypatch.setattr(mail_config, "reply_to", "help@example.com")
+
+    service = EmailService()
+    service._client = fake_client  # type: ignore[assignment]
+
+    service.send_email(
+        to_email="to@example.com",
+        subject="이미지 첨부 테스트",
+        content="텍스트 본문",
+        html_content="<p>HTML 본문</p>",
+        attachments=[
+            EmailAttachment(
+                file_name="poster.png",
+                content_type="image/png",
+                content=b"\x89PNG\r\n\x1a\nimage-data",
+            )
+        ],
+    )
+
+    [submitted] = fake_client.submitted
+    assert submitted["content_type"] == "message/rfc822"
+    assert submitted["compartment_id"] == "ocid1.compartment.oc1..test"
+    assert submitted["sender"] == "no-reply@example.com"
+    assert submitted["recipients"] == ["to@example.com"]
+
+    raw_message = submitted["raw_message"].read()
+    assert submitted["content_length"] == len(raw_message)
+    message = cast(
+        EmailMessage,
+        BytesParser(policy=policy.default).parsebytes(raw_message),
+    )
+    assert message["From"] == "Waffle Studio <no-reply@example.com>"
+    assert message["To"] == "to@example.com"
+    assert message["Reply-To"] == "help@example.com"
+    assert message["Subject"] == "이미지 첨부 테스트"
+
+    attachment = next(message.iter_attachments())
+    assert attachment.get_filename() == "poster.png"
+    assert attachment.get_content_type() == "image/png"
+    assert attachment.get_payload(decode=True) == b"\x89PNG\r\n\x1a\nimage-data"
+
+
+def test_send_email_rejects_raw_message_over_oci_size_limit(monkeypatch):
+    fake_client = FakeEmailClient()
+    monkeypatch.setattr(mail_config, "compartment_id", "ocid1.compartment.oc1..test")
+    monkeypatch.setattr(mail_config, "from_email", "no-reply@example.com")
+    monkeypatch.setattr(mail_services, "MAX_RAW_EMAIL_SIZE_BYTES", 10)
+
+    service = EmailService()
+    service._client = fake_client  # type: ignore[assignment]
+
+    with pytest.raises(MailSendFailedException):
+        service.send_email(
+            to_email="to@example.com",
+            subject="subject",
+            content="content",
+            attachments=[
+                EmailAttachment(
+                    file_name="poster.png",
+                    content_type="image/png",
+                    content=b"\x89PNG\r\n\x1a\nimage-data",
+                )
+            ],
+        )
+
+    assert fake_client.submitted == []
