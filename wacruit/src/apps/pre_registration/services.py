@@ -8,6 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from wacruit.src.apps.mail.exceptions import MailConfigException
 from wacruit.src.apps.mail.exceptions import MailSendFailedException
 from wacruit.src.apps.mail.schemas import EmailAttachment
+from wacruit.src.apps.mail.schemas import EmailInlineImage
 from wacruit.src.apps.mail.services import EmailService
 from wacruit.src.apps.pre_registration.exceptions import PreRegistAlreadyExistException
 from wacruit.src.apps.pre_registration.exceptions import PreRegistNotActiveException
@@ -184,6 +185,7 @@ class PreRegistrationService:
                     attachment.to_email_attachment()
                     for attachment in request.attachments
                 ],
+                [image.to_inline_image() for image in request.inline_images],
             )
 
         return SendPreRegistrationEmailResponse(
@@ -194,13 +196,14 @@ class PreRegistrationService:
             is_truncated=total_count > len(recipient_emails),
         )
 
-    def _send_email_to_recipients(
+    def _send_email_to_recipients(  # noqa: PLR0913
         self,
         recipient_emails: list[str],
         subject: str,
         content: str,
         html_content: str | None,
         attachments: list[EmailAttachment] | None = None,
+        inline_images: list[EmailInlineImage] | None = None,
     ) -> None:
         for recipient_email in recipient_emails:
             try:
@@ -210,6 +213,7 @@ class PreRegistrationService:
                     content=content,
                     html_content=html_content,
                     attachments=attachments,
+                    inline_images=inline_images,
                 )
             except MailConfigException:
                 logger.exception(
