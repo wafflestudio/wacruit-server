@@ -169,9 +169,12 @@ def test_email_api_supports_inline_and_remote_images(email_api, with_attachment)
         assert len(related) == 1
         assert isinstance(related[0], EmailMessage)
         assert inline[0] in list(related[0].iter_parts())
-        assert len(
-            [part for part in parts if part.get_content_disposition() == "attachment"]
-        ) == int(with_attachment)
+        attachments = [
+            part for part in parts if part.get_content_disposition() == "attachment"
+        ]
+        assert len(attachments) == int(with_attachment)
+        related_parts = list(related[0].walk())
+        assert all(attachment not in related_parts for attachment in attachments)
 
 
 def test_email_api_remote_image_only(email_api):
