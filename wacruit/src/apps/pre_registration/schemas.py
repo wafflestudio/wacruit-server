@@ -1,14 +1,18 @@
 import base64
 import binascii
+from html.parser import HTMLParser
 from pathlib import PurePath
+import re
 from typing import Literal
 
 from pydantic import BaseModel
 from pydantic import EmailStr
 from pydantic import Field
+from pydantic import root_validator
 from pydantic import validator
 
 from wacruit.src.apps.mail.schemas import EmailAttachment
+from wacruit.src.apps.mail.schemas import EmailInlineImage
 
 MAX_EMAIL_IMAGE_COUNT = 5
 MAX_EMAIL_IMAGE_SIZE_BYTES = 1024 * 1024
@@ -74,6 +78,36 @@ class EmailImageAttachmentRequest(BaseModel):
         )
 
 
+class EmailInlineImageRequest(EmailImageAttachmentRequest):
+    content_id: str = Field(..., min_length=1, max_length=128)
+
+    @validator("content_id")
+    def validate_content_id(cls, value: str) -> str:
+        if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.@-]*", value):
+            raise ValueError("content_id는 영문, 숫자 및 _.@-만 사용할 수 있습니다.")
+        return value
+
+    def to_inline_image(self) -> EmailInlineImage:
+        return EmailInlineImage(
+            file_name=self.file_name,
+            content_type=self.content_type,
+            content=base64.b64decode(self.content_base64, validate=True),
+            content_id=self.content_id,
+        )
+
+
+class _ImageReferenceParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self.content_ids: set[str] = set()
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag == "img":
+            for name, value in attrs:
+                if name == "src" and value and value.lower().startswith("cid:"):
+                    self.content_ids.add(value[4:])
+
+
 class CreatePreRegistrationRequest(BaseModel):
     url: str
     generation: str
@@ -121,14 +155,44 @@ class PreRegistrationUserResponse(BaseModel):
 
 class SendPreRegistrationEmailRequest(BaseModel):
     subject: str = Field(..., min_length=1, max_length=255)
-    content: str = Field(..., min_length=1)
+    content: str = ""
     html_content: str | None = None
     attachments: list[EmailImageAttachmentRequest] = Field(
         default_factory=list,
         max_items=MAX_EMAIL_IMAGE_COUNT,
     )
+    inline_images: list[EmailInlineImageRequest] = Field(
+        default_factory=list, max_items=MAX_EMAIL_IMAGE_COUNT
+    )
     active_only: bool = True
     pre_registration_id: int | None = None
+
+    @root_validator(skip_on_failure=True)
+    def validate_body_and_images(cls, values):
+        images = values.get("inline_images", [])
+        if len(images) + len(values.get("attachments", [])) > MAX_EMAIL_IMAGE_COUNT:
+            raise ValueError("첨부 및 인라인 이미지는 합계 5개 이하여야 합니다.")
+        ids = [image.content_id for image in images]
+        if len(ids) != len(set(ids)):
+            raise ValueError("인라인 이미지의 content_id는 중복될 수 없습니다.")
+        html = values.get("html_content")
+        if images and not (html and html.strip()):
+            html = "".join(
+                f'<img src="cid:{cid}" style="max-width:100%;height:auto;" alt="">'
+                for cid in ids
+            )
+            values["html_content"] = html
+        parser = _ImageReferenceParser()
+        parser.feed(html or "")
+        if parser.content_ids != set(ids):
+            raise ValueError(
+                "HTML의 cid 참조와 inline_images의 content_id가 일치해야 합니다."
+            )
+        if not values.get("content", "").strip() and not (html and html.strip()):
+            raise ValueError(
+                "텍스트 또는 HTML 본문, 인라인 이미지 중 하나는 필요합니다."
+            )
+        return values
 
 
 class SendPreRegistrationEmailResponse(BaseModel):

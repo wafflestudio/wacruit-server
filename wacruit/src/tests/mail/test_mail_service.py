@@ -10,6 +10,7 @@ from wacruit.src.apps.mail.config import mail_config
 from wacruit.src.apps.mail.exceptions import MailConfigException
 from wacruit.src.apps.mail.exceptions import MailSendFailedException
 from wacruit.src.apps.mail.schemas import EmailAttachment
+from wacruit.src.apps.mail.schemas import EmailInlineImage
 from wacruit.src.apps.mail.services import EmailService
 
 
@@ -171,7 +172,8 @@ def test_send_email_submits_mime_payload_with_image_attachment(monkeypatch):
     assert attachment.get_payload(decode=True) == b"\x89PNG\r\n\x1a\nimage-data"
 
 
-def test_send_email_rejects_raw_message_over_oci_size_limit(monkeypatch):
+@pytest.mark.parametrize("inline", [False, True])
+def test_send_email_rejects_raw_message_over_oci_size_limit(monkeypatch, inline):
     fake_client = FakeEmailClient()
     monkeypatch.setattr(mail_config, "compartment_id", "ocid1.compartment.oc1..test")
     monkeypatch.setattr(mail_config, "from_email", "no-reply@example.com")
@@ -180,18 +182,20 @@ def test_send_email_rejects_raw_message_over_oci_size_limit(monkeypatch):
     service = EmailService()
     service._client = fake_client  # type: ignore[assignment]
 
+    image = EmailInlineImage(
+        file_name="poster.png",
+        content_type="image/png",
+        content=b"\x89PNG\r\n\x1a\nimage-data",
+        content_id="poster",
+    )
     with pytest.raises(MailSendFailedException):
         service.send_email(
             to_email="to@example.com",
             subject="subject",
             content="content",
-            attachments=[
-                EmailAttachment(
-                    file_name="poster.png",
-                    content_type="image/png",
-                    content=b"\x89PNG\r\n\x1a\nimage-data",
-                )
-            ],
+            html_content='<img src="cid:poster">' if inline else None,
+            attachments=[] if inline else [image],
+            inline_images=[image] if inline else [],
         )
 
     assert fake_client.submitted == []

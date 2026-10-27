@@ -20,6 +20,7 @@ from wacruit.src.apps.mail.config import mail_config
 from wacruit.src.apps.mail.exceptions import MailConfigException
 from wacruit.src.apps.mail.exceptions import MailSendFailedException
 from wacruit.src.apps.mail.schemas import EmailAttachment
+from wacruit.src.apps.mail.schemas import EmailInlineImage
 from wacruit.src.settings import settings
 
 MAX_RAW_EMAIL_SIZE_BYTES = 2 * 1024 * 1024
@@ -48,13 +49,14 @@ class EmailService:
             html_content=html_content,
         )
 
-    def send_email(
+    def send_email(  # noqa: PLR0913
         self,
         to_email: str,
         subject: str,
         content: str,
         html_content: str | None = None,
         attachments: list[EmailAttachment] | None = None,
+        inline_images: list[EmailInlineImage] | None = None,
     ) -> None:
         if not mail_config.compartment_id or not mail_config.from_email:
             raise MailConfigException()
@@ -66,13 +68,14 @@ class EmailService:
             sender_address.name = mail_config.from_name
 
         try:
-            if attachments:
+            if attachments or inline_images:
                 self._submit_email_with_attachments(
                     to_email=to_email,
                     subject=subject,
                     content=content,
                     html_content=html_content,
-                    attachments=attachments,
+                    attachments=attachments or [],
+                    inline_images=inline_images,
                 )
                 return
 
@@ -103,13 +106,14 @@ class EmailService:
         ) as exc:
             raise MailSendFailedException() from exc
 
-    def _submit_email_with_attachments(
+    def _submit_email_with_attachments(  # noqa: PLR0913
         self,
         to_email: str,
         subject: str,
         content: str,
         html_content: str | None,
         attachments: list[EmailAttachment],
+        inline_images: list[EmailInlineImage] | None = None,
     ) -> None:
         message = EmailMessage()
         message["Message-ID"] = f"<{self._generate_message_id()}>"
@@ -126,6 +130,21 @@ class EmailService:
         message.set_content(content)
         if html_content is not None:
             message.add_alternative(html_content, subtype="html")
+
+        if inline_images:
+            html_part = message.get_body(preferencelist=("html",))
+            if not isinstance(html_part, EmailMessage):
+                raise ValueError("Inline images require HTML.")
+            for image in inline_images:
+                _, subtype = image.content_type.split("/", maxsplit=1)
+                html_part.add_related(
+                    image.content,
+                    maintype="image",
+                    subtype=subtype,
+                    cid=f"<{image.content_id}>",
+                    disposition="inline",
+                    filename=image.file_name,
+                )
 
         for attachment in attachments:
             _, subtype = attachment.content_type.split("/", maxsplit=1)

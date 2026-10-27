@@ -122,3 +122,132 @@ def test_email_api_without_attachments_uses_existing_submission(email_api):
     assert response.status_code == HTTPStatus.ACCEPTED
     assert oci_client.submit_email.call_count == len(RECIPIENTS)
     oci_client.submit_raw_email.assert_not_called()
+
+
+@pytest.mark.parametrize("with_attachment", [False, True])
+def test_email_api_supports_inline_and_remote_images(email_api, with_attachment):
+    client, oci_client = email_api
+    image = {
+        "file_name": "poster.png",
+        "content_type": "image/png",
+        "content_base64": base64.b64encode(PNG).decode(),
+    }
+    html = '<img src="cid:poster"><img src="https://example.com/banner.png">'
+    response = client.post(
+        "/v3/pre-registration/users/email",
+        json={
+            "subject": "images",
+            "html_content": html,
+            "inline_images": [dict(image, content_id="poster")],
+            "attachments": [image] if with_attachment else [],
+        },
+    )
+    assert response.status_code == HTTPStatus.ACCEPTED
+    assert oci_client.submit_raw_email.call_count == len(RECIPIENTS)
+    for call in oci_client.submit_raw_email.call_args_list:
+        message = cast(
+            EmailMessage,
+            BytesParser(policy=policy.default).parsebytes(
+                call.kwargs["raw_message"].getvalue()
+            ),
+        )
+        html_body = message.get_body(preferencelist=("html",))
+        assert isinstance(html_body, EmailMessage)
+        assert html_body.get_content().strip() == html
+        parts = [
+            part for part in message.walk() if part.get_content_maintype() == "image"
+        ]
+        inline = [part for part in parts if part.get_content_disposition() == "inline"]
+        assert len(inline) == 1
+        assert inline[0]["Content-ID"] == "<poster>"
+        assert inline[0].get_payload(decode=True) == PNG
+        related = [
+            part
+            for part in message.walk()
+            if part.get_content_type() == "multipart/related"
+        ]
+        assert len(related) == 1
+        assert isinstance(related[0], EmailMessage)
+        assert inline[0] in list(related[0].iter_parts())
+        attachments = [
+            part for part in parts if part.get_content_disposition() == "attachment"
+        ]
+        assert len(attachments) == int(with_attachment)
+        related_parts = list(related[0].walk())
+        assert all(attachment not in related_parts for attachment in attachments)
+
+
+def test_email_api_remote_image_only(email_api):
+    client, oci_client = email_api
+    html = '<img src="https://example.com/banner.png">'
+    response = client.post(
+        "/v3/pre-registration/users/email",
+        json={"subject": "remote", "html_content": html},
+    )
+    assert response.status_code == HTTPStatus.ACCEPTED
+    oci_client.submit_raw_email.assert_not_called()
+    assert oci_client.submit_email.call_args.args[0].body_html == html
+
+
+def test_email_api_inline_image_without_body_generates_html(email_api):
+    client, oci_client = email_api
+    response = client.post(
+        "/v3/pre-registration/users/email",
+        json={
+            "subject": "inline",
+            "inline_images": [
+                {
+                    "file_name": "poster.png",
+                    "content_type": "image/png",
+                    "content_base64": base64.b64encode(PNG).decode(),
+                    "content_id": "poster",
+                }
+            ],
+        },
+    )
+    assert response.status_code == HTTPStatus.ACCEPTED
+    message = cast(
+        EmailMessage,
+        BytesParser(policy=policy.default).parsebytes(
+            oci_client.submit_raw_email.call_args.kwargs["raw_message"].getvalue()
+        ),
+    )
+    html_body = message.get_body(preferencelist=("html",))
+    assert isinstance(html_body, EmailMessage)
+    assert 'src="cid:poster"' in html_body.get_content()
+
+
+@pytest.mark.parametrize(
+    "case", ["missing", "duplicate", "unused", "invalid_id", "count", "empty"]
+)
+def test_email_api_rejects_invalid_inline_requests(email_api, case):
+    client, oci_client = email_api
+    image = {
+        "file_name": "poster.png",
+        "content_type": "image/png",
+        "content_base64": base64.b64encode(PNG).decode(),
+        "content_id": "poster",
+    }
+    body = {
+        "subject": "test",
+        "html_content": '<img src="cid:poster">',
+        "inline_images": [image],
+    }
+    if case == "missing":
+        body["inline_images"] = []
+    elif case == "duplicate":
+        body["inline_images"] = [image, image]
+    elif case == "unused":
+        body["html_content"] = "<p>hello</p>"
+    elif case == "invalid_id":
+        image["content_id"] = "bad\r\nID"
+    elif case == "count":
+        body["attachments"] = [
+            {k: v for k, v in image.items() if k != "content_id"}
+        ] * 5
+    else:
+        body = {"subject": "empty"}
+    response = client.post("/v3/pre-registration/users/email", json=body)
+    assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+    oci_client.submit_email.assert_not_called()
+    oci_client.submit_raw_email.assert_not_called()

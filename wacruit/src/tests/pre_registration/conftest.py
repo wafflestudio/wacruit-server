@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from wacruit.src.apps.mail.exceptions import MailConfigException
 from wacruit.src.apps.mail.exceptions import MailSendFailedException
 from wacruit.src.apps.mail.schemas import EmailAttachment
+from wacruit.src.apps.mail.schemas import EmailInlineImage
 from wacruit.src.apps.mail.services import EmailService
 from wacruit.src.apps.pre_registration.models import PreRegistration
 from wacruit.src.apps.pre_registration.repositories import PreRegistrationRepository
@@ -22,13 +23,14 @@ class FakeEmailService(EmailService):
         self.failed_emails: set[str] = set()
         self.config_failed_emails: set[str] = set()
 
-    def send_email(
+    def send_email(  # noqa: PLR0913
         self,
         to_email: str,
         subject: str,
         content: str,
         html_content: str | None = None,
         attachments: list[EmailAttachment] | None = None,
+        inline_images: list[EmailInlineImage] | None = None,
     ) -> None:
         if to_email in self.config_failed_emails:
             raise MailConfigException()
