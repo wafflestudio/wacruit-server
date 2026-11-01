@@ -1,15 +1,10 @@
 import asyncio
-from decimal import Decimal
-from heapq import merge
-import json
-from math import e
-import re
-from typing import AsyncGenerator, Literal, Tuple
+from typing import AsyncGenerator
+from typing import Literal
 
 from fastapi import BackgroundTasks
 from fastapi import Depends
 from fastapi import Request
-from httpx import HTTPStatusError
 from sse_starlette import ServerSentEvent
 
 from wacruit.src.apps.common.enums import CodeSubmissionResultStatus
@@ -21,7 +16,6 @@ from wacruit.src.apps.hodu.schemas import HoduSubmitErrorResponse
 from wacruit.src.apps.hodu.schemas import HoduSubmitRequest
 from wacruit.src.apps.hodu.schemas import HoduSubmitResponse
 from wacruit.src.apps.hodu.schemas import HoduSubmitStatus
-from wacruit.src.apps.problem.exceptions import CodeSubmissionErrorException
 from wacruit.src.apps.problem.exceptions import CodeSubmissionFailedException
 from wacruit.src.apps.problem.exceptions import NoRecentSubmissionException
 from wacruit.src.apps.problem.exceptions import ProblemNotFoundException
@@ -29,10 +23,10 @@ from wacruit.src.apps.problem.exceptions import TestcaseNotFoundException
 from wacruit.src.apps.problem.models import CodeSubmission
 from wacruit.src.apps.problem.models import CodeSubmissionResult
 from wacruit.src.apps.problem.repositories_v2 import ProblemRepository
+from wacruit.src.apps.problem.schemas_v2 import CodeSubmissionErrorResponse
 from wacruit.src.apps.problem.schemas_v2 import CodeSubmissionResultResponse
 from wacruit.src.apps.problem.schemas_v2 import CodeSubmitRequest
 from wacruit.src.apps.problem.schemas_v2 import ProblemResponse
-from wacruit.src.apps.problem.schemas_v2 import TokenStr
 from wacruit.src.apps.problem.utils_v2 import memory_handi
 from wacruit.src.apps.problem.utils_v2 import time_handi
 from wacruit.src.apps.recruiting.exceptions import RecruitingClosedException
@@ -144,7 +138,9 @@ class ProblemService(LoggingMixin):
                 if total_status == CodeSubmissionStatus.SOLVED:
                     total_status = CodeSubmissionStatus.WRONG
 
-        for submission_result, hodu_request in zip(results, hodu_requests):
+        for index, (submission_result, hodu_request) in enumerate(
+            zip(results, hodu_requests)
+        ):
             response = await self.hodu_api_repository.submit(hodu_request)
             if isinstance(response, HoduSubmitResponse):
                 submission_result_status = response.status.to_submission_result_status()
@@ -172,12 +168,14 @@ class ProblemService(LoggingMixin):
                 )
             elif isinstance(response, HoduSubmitErrorResponse):
                 merge_status(CodeSubmissionStatus.ERROR)
-                self.problem_repository.update_submission_result(
-                    submission_result,
-                    CodeSubmissionResultStatus.INTERNAL_SERVER_ERROR,
-                    None,
-                    None,
-                )
+                self.logger.error("HODU submission failed: %s", response.detail)
+                for pending_result in results[index:]:
+                    self.problem_repository.update_submission_result(
+                        pending_result,
+                        CodeSubmissionResultStatus.INTERNAL_SERVER_ERROR,
+                        None,
+                        None,
+                    )
                 break
 
         self.problem_repository.update_submission_status(submission, total_status)
@@ -201,58 +199,57 @@ class ProblemService(LoggingMixin):
             raise NoRecentSubmissionException()
 
         results = recent_submission.results
-        total_count = len(results)
         return_count = 0
-        disconnected = False
 
-        while return_count < total_count:
-            data = ""
-            event = "skip"
+        while return_count < len(results):
+            if await request.is_disconnected():
+                return
 
-            try:
-                partial_responses = []
-                for result in results[return_count:]:
-                    if result.status == CodeSubmissionResultStatus.RUNNING:
-                        break
+            partial_responses = []
+            judge_failed = False
+            for result in results[return_count:]:
+                if result.status == CodeSubmissionResultStatus.RUNNING:
+                    break
+                if result.status == CodeSubmissionResultStatus.INTERNAL_SERVER_ERROR:
+                    judge_failed = True
+                    break
 
-                    return_count += 1
-                    partial_responses.append(
-                        CodeSubmissionResultResponse(
-                            num=result.testcase.id,
-                            status=HoduSubmitStatus.from_submission_result_status(
-                                result.status
-                            ),
-                            time=result.time,
-                            memory=result.memory,
-                        )
+                return_count += 1
+                partial_responses.append(
+                    CodeSubmissionResultResponse(
+                        num=result.testcase.id,
+                        status=HoduSubmitStatus.from_submission_result_status(
+                            result.status
+                        ),
+                        time=result.time,
+                        memory=result.memory,
                     )
-
-                data = ListResponse(items=partial_responses).json()
-                if len(partial_responses) > 0:
-                    event = "message"
-
-            except HTTPStatusError as e:
-                data = json.dumps(
-                    {"detail": "채점 서버에 일시적인 문제가 생겼습니다. 잠시 후 다시 시도해주세요."},
-                    ensure_ascii=False,
                 )
-                event = "error"
-                self.logger.error(e)
-            except CodeSubmissionErrorException as e:
-                data = json.dumps({"detail": e.detail}, ensure_ascii=False)
-                event = "error"
-                self.logger.error(e)
-            finally:
-                if not disconnected:
-                    yield ServerSentEvent(data=data, event=event)
-                    if return_count == total_count:
-                        break  # pylint: disable=lost-exception
-                    disconnected = await request.is_disconnected()
-                await asyncio.sleep(1)
-                self.problem_repository.session.expire_all()
-                self.problem_repository.session.commit()
-                recent_submission = (
-                    self.problem_repository.get_recent_submission(user.id, problem_id)
-                    or recent_submission
+
+            if partial_responses:
+                yield ServerSentEvent(
+                    data=ListResponse(items=partial_responses).json(), event="message"
                 )
-                results = recent_submission.results
+
+            if judge_failed:
+                yield ServerSentEvent(
+                    data=CodeSubmissionErrorResponse().json(ensure_ascii=False),
+                    event="error",
+                )
+                return
+
+            if return_count == len(results):
+                return
+            if not partial_responses:
+                yield ServerSentEvent(data=ListResponse(items=[]).json(), event="skip")
+            if await request.is_disconnected():
+                return
+
+            await asyncio.sleep(1)
+            self.problem_repository.session.expire_all()
+            self.problem_repository.session.commit()
+            recent_submission = (
+                self.problem_repository.get_recent_submission(user.id, problem_id)
+                or recent_submission
+            )
+            results = recent_submission.results
