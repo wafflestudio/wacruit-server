@@ -57,6 +57,10 @@ async def get_submission(
     problem_id: int,
     problem_service: Annotated[ProblemService, Depends()],
 ):
+    """
+    A judge failure emits a terminal `error` event with JSON fields
+    `code: JUDGE_UNAVAILABLE` and `detail`.
+    """
     return EventSourceResponse(
         problem_service.get_recent_submission_result(request, user, problem_id),
         ping=3600,

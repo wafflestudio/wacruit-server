@@ -1,4 +1,4 @@
-from decimal import Decimal
+from typing import Literal
 
 from pydantic import BaseModel
 from pydantic import Field
@@ -44,6 +44,11 @@ class CodeSubmissionResultResponse(BaseModel):
     stdout: str | None = None
     time: float | None = None
     memory: float | None = None
+
+
+class CodeSubmissionErrorResponse(BaseModel):
+    code: Literal["JUDGE_UNAVAILABLE"] = "JUDGE_UNAVAILABLE"
+    detail: str = "채점 서버에 일시적인 문제가 생겼습니다. 잠시 후 다시 시도해주세요."
 
 
 class ProblemCreateDto(BaseModel):

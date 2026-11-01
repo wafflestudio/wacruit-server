@@ -3,9 +3,10 @@ from http import HTTPStatus
 
 from fastapi import Depends
 from httpx import AsyncClient
+from httpx import RequestError
 from httpx._models import Response
-from pydantic.error_wrappers import ValidationError
 from tenacity import retry
+from tenacity import retry_if_exception_type
 from tenacity.stop import stop_after_attempt
 from tenacity.wait import wait_fixed
 
@@ -21,8 +22,26 @@ class HoduApiRepository(LoggingMixin):
     def __init__(self, client: AsyncClient = Depends(get_hodu_api_client)):
         self.client = client
 
-    @retry(stop=stop_after_attempt(5), wait=wait_fixed(timedelta(seconds=1)))
     async def submit(
+        self, request: HoduSubmitRequest
+    ) -> HoduSubmitResponse | HoduSubmitErrorResponse:
+        try:
+            return await self._submit(request)
+        except (RequestError, ValueError) as exc:
+            self.logger.error("Pecan API submission failed after retries: %s", exc)
+            return HoduSubmitErrorResponse(
+                detail=(
+                    "채점 서버에 일시적인 문제가 생겼습니다. 잠시 후 다시 시도해주세요."
+                )
+            )
+
+    @retry(
+        stop=stop_after_attempt(5),
+        wait=wait_fixed(timedelta(seconds=1)),
+        retry=retry_if_exception_type((RequestError, ValueError)),
+        reraise=True,
+    )
+    async def _submit(
         self, request: HoduSubmitRequest
     ) -> HoduSubmitResponse | HoduSubmitErrorResponse:
         payload = {
@@ -43,23 +62,29 @@ class HoduApiRepository(LoggingMixin):
     def _parse_response(
         self, response: Response
     ) -> HoduSubmitResponse | HoduSubmitErrorResponse:
-        try:
-            if response.status_code >= HTTPStatus.BAD_REQUEST:
-                self.logger.error(
-                    "HODU API ERROR for sending %s / status code: %d / response: %s",
-                    response.url,
-                    response.status_code,
-                    response.json(),
-                )
+        if response.status_code >= HTTPStatus.BAD_REQUEST:
+            self.logger.error(
+                "Pecan API ERROR for sending %s / status code: %d",
+                response.url,
+                response.status_code,
+            )
+            detail = "Unknown error"
+            try:
                 data = response.json()
-                detail = (
-                    data.get("InternalError")
-                    or data.get("ServiceBusy")
-                    or "Unknown error"
-                )
-                return HoduSubmitErrorResponse(detail=detail)
+                if isinstance(data, dict):
+                    detail = (
+                        data.get("InternalError") or data.get("ServiceBusy") or detail
+                    )
+            except ValueError:
+                pass
+            return HoduSubmitErrorResponse(
+                detail=detail if isinstance(detail, str) else "Unknown error"
+            )
 
+        try:
             raw_data = response.json()
+            if not isinstance(raw_data, dict):
+                raise ValueError("Expected a JSON object from Pecan API")
             mapped_data = {
                 "status": raw_data.get("status"),
                 "fields": {
@@ -72,13 +97,12 @@ class HoduApiRepository(LoggingMixin):
                 },
             }
             return HoduSubmitResponse(**mapped_data)
-        except ValidationError as e:
+        except (ValueError, TypeError) as exc:
             self.logger.error(
-                "HODU API RESPONSE PARSING ERROR for sending %s / status code: %d / "
-                "response: %s / error: %s",
+                "Pecan API RESPONSE PARSING ERROR for sending %s / status code: %d / "
+                "error: %s",
                 response.url,
                 response.status_code,
-                response.json(),
-                e,
+                exc,
             )
-            raise e
+            raise ValueError("Invalid HODU API response") from exc
